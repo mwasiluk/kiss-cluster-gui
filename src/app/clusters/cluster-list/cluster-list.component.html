@@ -1,0 +1,62 @@
+<div class="cluster-list">
+  <mat-card>
+    <mat-card-title>
+      Clusters
+      <button mat-button color="primary" (click)="createClusterBtnClick();"><i class="material-icons">add</i> new cluster</button>
+    </mat-card-title>
+
+
+    <div class="cluster-table-container mat-elevation-z8">
+      <mat-table #table [dataSource]="dataSource" matSort>
+
+
+        <ng-container matColumnDef="id">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> Id</mat-header-cell>
+          <mat-cell *matCellDef="let cluster"> {{ cluster.id }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> Name</mat-header-cell>
+          <mat-cell *matCellDef="let cluster">
+            <a routerLink="/cluster/{{cluster.id}}"> {{ cluster.name }}</a>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="nodes">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> Nodes</mat-header-cell>
+          <mat-cell *matCellDef="let cluster"> {{ cluster.nodes }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="cpu">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> CPU</mat-header-cell>
+          <mat-cell *matCellDef="let cluster"> {{ cluster.cpu }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="activeNodes">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> Active nodes</mat-header-cell>
+          <mat-cell *matCellDef="let cluster"> {{ cluster.activeNodes }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="activeCPU">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> Active CPU</mat-header-cell>
+          <mat-cell *matCellDef="let cluster"> {{ cluster.activeCPU }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="currentQueue">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> Current queue</mat-header-cell>
+          <mat-cell *matCellDef="let cluster"> {{ cluster.currentQueue }}</mat-cell>
+        </ng-container>
+
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"
+                 [ngClass]="{'active': row.activeNodes > 0, 'empty': row.activeNodes == 0}"></mat-row>
+      </mat-table>
+
+      <mat-paginator #paginator
+                     [pageSize]="5"
+                     [pageSizeOptions]="[5, 10, 20]">
+      </mat-paginator>
+    </div>
+  </mat-card>
+</div>

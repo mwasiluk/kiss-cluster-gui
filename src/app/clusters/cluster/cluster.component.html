@@ -1,0 +1,25 @@
+
+<mat-card class="cluster-details-card">
+  <mat-card-header>
+    <mat-card-title>{{ cluster.name }}  {{mode}}</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="cluster-details-form">
+      <div class="cluster-id"><span>id: </span>{{cluster.id}}</div>
+
+      <mat-form-field>
+        <input matInput placeholder="Name" [(ngModel)]="cluster.name" [readonly]="mode=='view'">
+      </mat-form-field>
+
+      <app-queue-list *ngIf="mode=='view'" [cluster]="cluster"></app-queue-list>
+
+    </div>
+
+
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button (click)="goBack()">GO BACK</button>
+    <button mat-button *ngIf="mode!='view'">SAVE</button>
+    <button mat-button *ngIf="mode=='view'" (click)="edit()">EDIT</button>
+  </mat-card-actions>
+</mat-card>
