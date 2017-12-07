@@ -41,7 +41,8 @@
 
         <ng-container matColumnDef="cluster">
           <mat-header-cell *matHeaderCellDef mat-sort-header> Cluster</mat-header-cell>
-          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.cluster ? spotFleet.cluster.name : '-' }}</mat-cell>
+          <mat-cell *matCellDef="let spotFleet">
+            <a *ngIf="spotFleet.cluster" routerLink="/cluster/{{spotFleet.cluster.id}}"> {{ spotFleet.cluster.name }}</a></mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="bidPerCPU">
