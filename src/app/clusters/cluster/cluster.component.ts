@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import {Cluster} from '../cluster';
 import {ClusterService} from '../cluster.service';
 import {BreadcrumbsService} from 'ng2-breadcrumbs';
+import {MatDialog} from '@angular/material';
 
 @Component({
   selector: 'app-cluster',
@@ -21,8 +22,9 @@ export class ClusterComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
+    private dialog: MatDialog,
     private clusterService: ClusterService,
-    private breadcrumbs: BreadcrumbsService
+    private breadcrumbs: BreadcrumbsService,
   ) { }
 
   ngOnInit() {
@@ -44,4 +46,5 @@ export class ClusterComponent implements OnInit {
   edit() {
     this.router.navigate(['cluster', this.cluster.id, 'edit']);
   }
+
 }

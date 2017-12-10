@@ -1,9 +1,10 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
+import {MatDialog, MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {Queue} from '../queue';
 import {Router} from '@angular/router';
 import {QueueService} from '../queue.service';
 import {Cluster} from '../cluster';
+import {QueueDetailsDialogComponent} from "../queue-details-dialog/queue-details-dialog.component";
 
 @Component({
   selector: 'app-queue-list',
@@ -21,7 +22,7 @@ export class QueueListComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private router: Router, private queueService: QueueService) {}
+  constructor(private router: Router, private dialog: MatDialog, private queueService: QueueService) {}
 
   ngOnInit() {
     this.getClusters();
@@ -40,6 +41,31 @@ export class QueueListComponent implements OnInit {
   }
 
   createQueueBtnClick() {
-    this.router.navigate(['/queue/create']);
+    const dialogRef = this.dialog.open(QueueDetailsDialogComponent, {
+      width: '500px',
+      data: {
+        queue: new Queue(),
+        mode: 'create'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed' , result);
+    });
   }
+
+  viewQueue(queue) {
+    const dialogRef = this.dialog.open(QueueDetailsDialogComponent, {
+      width: '500px',
+      data: {
+        queue: queue,
+        mode: 'view'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
+  }
+
 }

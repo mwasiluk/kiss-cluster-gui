@@ -5,7 +5,7 @@ import {Form, FormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {
   MatButtonModule, MatCheckboxModule, MatCardModule, MatPaginatorModule, MatToolbarModule, MatSortModule,
-  MatSelectModule, MatMenuModule
+  MatSelectModule, MatMenuModule, MatDialogModule
 } from '@angular/material';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
@@ -24,6 +24,8 @@ import {AuthGuard} from './auth-guard.service';
 import {AuthService} from './auth.service';
 import {LoginRoutingModule} from './login/login-routing.module';
 import {BreadcrumbsModule} from 'ng2-breadcrumbs';
+import { HelpDialogComponent } from './help-dialog/help-dialog.component';
+import { AboutDialogComponent } from './about-dialog/about-dialog.component';
 
 
 @NgModule({
@@ -31,14 +33,17 @@ import {BreadcrumbsModule} from 'ng2-breadcrumbs';
     AppComponent,
     SpotFleetListComponent,
     DashboardComponent,
-    LoginComponent
+    LoginComponent,
+    HelpDialogComponent,
+    AboutDialogComponent
   ],
+  entryComponents: [HelpDialogComponent, AboutDialogComponent],
   imports: [
     BrowserModule,
     FormsModule,
     BrowserAnimationsModule,
     MatButtonModule, MatCheckboxModule, MatCardModule, MatFormFieldModule, MatInputModule, MatTableModule,
-    MatPaginatorModule, MatToolbarModule, MatSortModule, MatSelectModule, MatMenuModule,
+    MatPaginatorModule, MatToolbarModule, MatSortModule, MatSelectModule, MatMenuModule, MatDialogModule,
     BreadcrumbsModule,
     ClustersModule,
     LoginRoutingModule,

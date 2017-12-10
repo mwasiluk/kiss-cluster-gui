@@ -27,19 +27,19 @@
     <div class="separator"></div>
     <div class="toolbar-group output-s3-info">
       <label>Output S3:</label>
-      <span>{{outputS3}}</span>
+      <span>{{ outputS3 }}</span>
     </div>
 
     <span class="fill-remaining-space"></span>
 
     <div class="toolbar-group">
-      <span class="help-menu-button">
+      <span class="help-menu-button" (click)="openHelpDialog()">
          Help
       </span>
     </div>
     <div class="separator"></div>
     <div class="toolbar-group">
-      <span class="about-menu-button">
+      <span class="about-menu-button" (click)="openAboutDialog()">
          About
       </span>
     </div>

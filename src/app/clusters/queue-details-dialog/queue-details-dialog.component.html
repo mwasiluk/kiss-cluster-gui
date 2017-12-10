@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>Queue {{ queue.name }}</h1>
+<div mat-dialog-content>
+  <mat-form-field>
+    <input matInput placeholder="Name" [(ngModel)]="queue.name" [readonly]="mode==='view'">
+  </mat-form-field>
+
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="close()" tabindex="-1">Close</button>
+  <button mat-button (click)="close()" tabindex="-1" color="primary" *ngIf="mode!=='view'">Save</button>
+</div>
