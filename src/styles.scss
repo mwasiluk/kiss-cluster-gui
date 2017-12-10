@@ -1,2 +1,39 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+breadcrumb{
+  //text-align: center;
+
+  ol {
+    display: inline-block;
+    margin-right: 10px;
+    padding: .5rem 1rem;
+    //margin-bottom: 1rem;
+    list-style: none;
+    //background-color: #eceeef;
+    //border-radius: .25rem;
+    a{
+      cursor: pointer;
+      text-decoration: none;
+
+    }
+    li {
+      float: left;
+
+      text-decoration: none;
+      &:not(.active){
+        a{
+          color: #0275d8;
+        }
+      }
+    }
+
+    li + li::before {
+      display: inline-block;
+      padding-right: .5rem;
+      padding-left: .5rem;
+      color: #636c72;
+      content: "/";
+    }
+  }
+}

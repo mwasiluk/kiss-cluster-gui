@@ -1,15 +1,16 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import {Routes, RouterModule, PreloadAllModules} from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import {ClusterComponent} from './clusters/cluster/cluster.component';
+import {AuthGuard} from './auth-guard.service';
+
 
 const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardComponent },
+  { path: 'dashboard', redirectTo: '', pathMatch: 'full' },
+  { path: '', component: DashboardComponent, canActivate: [AuthGuard] },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {preloadingStrategy: PreloadAllModules, useHash: true})],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

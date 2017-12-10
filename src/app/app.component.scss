@@ -1,0 +1,35 @@
+.toolbar{
+  .toolbar-group {
+
+  }
+
+  .separator{
+    height: 1em;
+    border: 1px solid black;
+    margin: 0 10px;
+  }
+
+  .file-menu-button, .about-menu-button, .help-menu-button{
+    cursor: pointer;
+  }
+  .region-select{
+
+    display: flex;
+    align-items: center;
+
+    label{
+      padding-right: 5px;
+    }
+    .region-form-field{
+      padding-top: 7px;
+    }
+
+  }
+
+  .fill-remaining-space{
+    flex: 1 1 auto;
+  }
+
+  .output-s3-info{
+  }
+}

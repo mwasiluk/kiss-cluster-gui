@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 
 import {Cluster} from '../cluster';
 import {ClusterService} from '../cluster.service';
+import {BreadcrumbsService} from 'ng2-breadcrumbs';
 
 @Component({
   selector: 'app-cluster',
@@ -21,6 +22,7 @@ export class ClusterComponent implements OnInit {
     private router: Router,
     private location: Location,
     private clusterService: ClusterService,
+    private breadcrumbs: BreadcrumbsService
   ) { }
 
   ngOnInit() {

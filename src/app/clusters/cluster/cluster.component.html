@@ -1,11 +1,11 @@
 
 <mat-card class="cluster-details-card">
   <mat-card-header>
-    <mat-card-title>{{ cluster.name }}  {{mode}}</mat-card-title>
+    <mat-card-title> {{cluster.name}}   {{mode}} </mat-card-title>
   </mat-card-header>
   <mat-card-content>
     <div class="cluster-details-form">
-      <div class="cluster-id"><span>id: </span>{{cluster.id}}</div>
+      <div class="cluster-id"><span>id: </span>{{ cluster.id }}</div>
 
       <mat-form-field>
         <input matInput placeholder="Name" [(ngModel)]="cluster.name" [readonly]="mode=='view'">

@@ -39,6 +39,6 @@ export class ClusterListComponent implements OnInit {
   }
 
   createClusterBtnClick() {
-    this.router.navigate(['/cluster/create']);
+    this.router.navigate(['./cluster/create']);
   }
 }

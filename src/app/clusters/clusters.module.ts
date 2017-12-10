@@ -12,7 +12,8 @@ import {
 } from '@angular/material';
 
 import { QueueListComponent } from './queue-list/queue-list.component';
-import {QueueService} from "./queue.service";
+import {QueueService} from './queue.service';
+import {BreadcrumbsModule} from "ng2-breadcrumbs";
 
 
 @NgModule({
@@ -21,6 +22,7 @@ import {QueueService} from "./queue.service";
     FormsModule,
     MatButtonModule, MatCheckboxModule, MatCardModule, MatFormFieldModule, MatInputModule, MatTableModule,
     MatPaginatorModule, MatToolbarModule, MatSortModule,
+    BreadcrumbsModule,
     ClustersRoutingModule,
   ],
   declarations: [

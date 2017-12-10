@@ -25,6 +25,7 @@
     "@angular/router": "^5.0.0",
     "aws-sdk": "^2.163.0",
     "core-js": "^2.4.1",
+    "ng2-breadcrumbs": "^0.1.281",
     "rxjs": "5.5.2",
     "zone.js": "^0.8.14"
   },

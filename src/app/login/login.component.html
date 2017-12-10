@@ -1,0 +1,17 @@
+<div class="login-page">
+
+  <mat-card class="login-card">
+    <mat-card-title>KissCluster</mat-card-title>
+    <mat-card-subtitle> {{message}}</mat-card-subtitle>
+    <mat-card-content >
+
+      <input type="file" (change)="fileSelected($event.target.files[0])" *ngIf="!authService.isLoggedIn">
+
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button (click)="login()"  *ngIf="!authService.isLoggedIn" [disabled]="!credentialsFile">Login</button>
+      <button mat-button (click)="logout()" *ngIf="authService.isLoggedIn">Logout</button>
+    </mat-card-actions>
+  </mat-card>
+
+</div>

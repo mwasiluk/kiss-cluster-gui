@@ -1,6 +1,53 @@
 <!--The content below is only a placeholder and can be replaced.-->
 <div>
-  <mat-toolbar><a routerLink="/dashboard">{{ title }}</a> </mat-toolbar>
+  <mat-toolbar class="toolbar" *ngIf="authService.isLoggedIn">
+
+      <mat-menu #appMenu="matMenu">
+        <button mat-menu-item> Open </button>
+        <button mat-menu-item> Save </button>
+      </mat-menu>
+
+
+    <div class="toolbar-group">
+      <span class="file-menu-button" [matMenuTriggerFor]="appMenu">
+         File
+      </span>
+    </div>
+    <div class="separator"></div>
+
+
+    <div class="toolbar-group region-select">
+      <label>Region:</label>
+      <mat-form-field class="region-form-field">
+        <mat-select [(value)]="region">
+          <mat-option *ngFor="let r of availableRegions" [value]="r">{{r}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="separator"></div>
+    <div class="toolbar-group output-s3-info">
+      <label>Output S3:</label>
+      <span>{{outputS3}}</span>
+    </div>
+
+    <span class="fill-remaining-space"></span>
+
+    <div class="toolbar-group">
+      <span class="help-menu-button">
+         Help
+      </span>
+    </div>
+    <div class="separator"></div>
+    <div class="toolbar-group">
+      <span class="about-menu-button">
+         About
+      </span>
+    </div>
+
+  </mat-toolbar>
+
+  <breadcrumb [hidden]="!showBreadcrumb()"></breadcrumb>
+
 
   <router-outlet></router-outlet>
 </div>
