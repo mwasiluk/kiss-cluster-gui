@@ -1,0 +1,49 @@
+<div class="node-list">
+  <mat-card>
+    <mat-card-title>
+      Nodes
+      <!--<button mat-button color="primary" (click)="createNodeBtnClick();"><i class="material-icons">add</i> new node</button>-->
+    </mat-card-title>
+    <div class="spinner-container">
+      <mat-spinner *ngIf="!nodes"></mat-spinner>
+    </div>
+    <div class="node-table-container mat-elevation-z8" [hidden]="!nodes">
+      <mat-table #table [dataSource]="dataSource" matSort>
+
+
+
+        <ng-container matColumnDef="nodeid">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> nodeid</mat-header-cell>
+          <mat-cell *matCellDef="let node">
+            <a (click)="viewNode(node)" class="node-link"> {{ node.nodeid }}</a>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="ami_id">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> ami_id</mat-header-cell>
+          <mat-cell *matCellDef="let node"> {{ node.ami_id }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="currentqueueid">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> currentqueueid</mat-header-cell>
+          <mat-cell *matCellDef="let node"> {{ node.currentqueueid }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="instance_type">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> instance type</mat-header-cell>
+          <mat-cell *matCellDef="let node"> {{ node.instance_type }}</mat-cell>
+        </ng-container>
+
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+      </mat-table>
+
+      <mat-paginator #paginator
+                     [pageSize]="5"
+                     [pageSizeOptions]="[5, 10, 20]"
+                     [hidden]="!dataSource.data || dataSource.data.length<=5">
+      </mat-paginator>
+    </div>
+  </mat-card>
+</div>

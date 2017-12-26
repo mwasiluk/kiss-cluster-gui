@@ -5,7 +5,7 @@ import {Form, FormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {
   MatButtonModule, MatCheckboxModule, MatCardModule, MatPaginatorModule, MatToolbarModule, MatSortModule,
-  MatSelectModule, MatMenuModule, MatDialogModule
+  MatSelectModule, MatMenuModule, MatDialogModule, MatProgressSpinnerModule
 } from '@angular/material';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
@@ -26,6 +26,9 @@ import {LoginRoutingModule} from './login/login-routing.module';
 import {BreadcrumbsModule} from 'ng2-breadcrumbs';
 import { HelpDialogComponent } from './help-dialog/help-dialog.component';
 import { AboutDialogComponent } from './about-dialog/about-dialog.component';
+import {RegionService} from './region.service';
+import {CredentialsCsvService} from './csv.service';
+import {SimpleNotificationsModule} from "angular2-notifications";
 
 
 @NgModule({
@@ -43,13 +46,14 @@ import { AboutDialogComponent } from './about-dialog/about-dialog.component';
     FormsModule,
     BrowserAnimationsModule,
     MatButtonModule, MatCheckboxModule, MatCardModule, MatFormFieldModule, MatInputModule, MatTableModule,
-    MatPaginatorModule, MatToolbarModule, MatSortModule, MatSelectModule, MatMenuModule, MatDialogModule,
+    MatPaginatorModule, MatToolbarModule, MatSortModule, MatSelectModule, MatMenuModule, MatDialogModule, MatProgressSpinnerModule,
+    SimpleNotificationsModule.forRoot(),
     BreadcrumbsModule,
     ClustersModule,
     LoginRoutingModule,
     AppRoutingModule
   ],
-  providers: [SpotFleetService],
+  providers: [SpotFleetService, RegionService, CredentialsCsvService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

@@ -7,8 +7,10 @@
     <mat-card-subtitle>
       In KissCluster Queue is a distributed loop
     </mat-card-subtitle>
-
-    <div class="queue-table-container mat-elevation-z8">
+    <div class="spinner-container">
+      <mat-spinner *ngIf="!queues"></mat-spinner>
+    </div>
+    <div class="queue-table-container mat-elevation-z8" [hidden]="!queues">
       <mat-table #table [dataSource]="dataSource" matSort>
 
 
@@ -20,13 +22,13 @@
         <ng-container matColumnDef="name">
           <mat-header-cell *matHeaderCellDef mat-sort-header> Name</mat-header-cell>
           <mat-cell *matCellDef="let queue">
-            <a (click)="viewQueue(queue)" class="queue-link"> {{ queue.name }}</a>
+            <a (click)="viewQueue(queue)" class="queue-link"> {{ queue.queue_name }}</a>
           </mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="s3LocationProgram">
+        <ng-container matColumnDef="S3_location">
           <mat-header-cell *matHeaderCellDef mat-sort-header> s3LocationProgram</mat-header-cell>
-          <mat-cell *matCellDef="let queue"> {{ queue.s3LocationProgram }}</mat-cell>
+          <mat-cell *matCellDef="let queue"> {{ queue.S3_location }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="command">
@@ -44,24 +46,24 @@
           <mat-cell *matCellDef="let queue"> {{ queue.date }}</mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="jobId">
+        <ng-container matColumnDef="jobid">
           <mat-header-cell *matHeaderCellDef mat-sort-header> jobId</mat-header-cell>
-          <mat-cell *matCellDef="let queue"> {{ queue.jobId }}</mat-cell>
+          <mat-cell *matCellDef="let queue"> {{ queue.jobid }}</mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="maxJobId">
+        <ng-container matColumnDef="maxjobid">
           <mat-header-cell *matHeaderCellDef mat-sort-header> maxJobId</mat-header-cell>
-          <mat-cell *matCellDef="let queue"> {{ queue.maxJobId }}</mat-cell>
+          <mat-cell *matCellDef="let queue"> {{ queue.maxjobid }}</mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="minJobId">
+        <ng-container matColumnDef="minjobid">
           <mat-header-cell *matHeaderCellDef mat-sort-header> minJobId</mat-header-cell>
-          <mat-cell *matCellDef="let queue"> {{ queue.minJobId }}</mat-cell>
+          <mat-cell *matCellDef="let queue"> {{ queue.minjobid }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="status">
           <mat-header-cell *matHeaderCellDef mat-sort-header> status</mat-header-cell>
-          <mat-cell *matCellDef="let queue"> {{ queue.status }}</mat-cell>
+          <mat-cell *matCellDef="let queue"> {{ queue.qstatus }}</mat-cell>
         </ng-container>
 
 
@@ -73,7 +75,7 @@
       <mat-paginator #paginator
                      [pageSize]="5"
                      [pageSizeOptions]="[5, 10, 20]"
-                     *ngIf="dataSource.data && dataSource.data.length>5">
+                     [hidden]="!dataSource.data || dataSource.data.length<=5">
       </mat-paginator>
     </div>
   </mat-card>

@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {AuthService} from '../auth.service';
+import {RegionService} from '../region.service';
+import {CredentialsCsvService} from '../csv.service';
+import {Credentials} from 'aws-sdk';
 
 @Component({
   selector: 'app-login',
@@ -11,15 +14,20 @@ export class LoginComponent implements OnInit {
 
 
   message: string;
-  credentialsFile: any;
+  credentials: Credentials;
 
-  constructor(public authService: AuthService, public router: Router) {
+  availableRegions =  [];
+  inProgress = false;
+
+  constructor(public authService: AuthService, public router: Router, public regionService: RegionService,
+              private csvService: CredentialsCsvService) {
 
   }
 
   ngOnInit(): void {
-    this.credentialsFile = null;
+    this.credentials = null;
     this.setMessage();
+    this.setAvailableRegions();
   }
 
   setMessage() {
@@ -27,10 +35,12 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
+    this.inProgress = true;
     this.message = 'Trying to log in ...';
 
-    this.authService.login().subscribe(() => {
+    this.authService.login(this.credentials).subscribe((r) => {
       this.setMessage();
+      this.inProgress = false;
       if (this.authService.isLoggedIn) {
         // Get the redirect URL from our auth service
         // If no redirect has been set, use the default
@@ -38,6 +48,8 @@ export class LoginComponent implements OnInit {
 
         // Redirect the user
         this.router.navigate([redirect]);
+      }else {
+        this.message = 'Login failed!';
       }
     });
   }
@@ -48,14 +60,16 @@ export class LoginComponent implements OnInit {
   }
 
   fileSelected(file) {
-    const fr = new FileReader();
-    fr.onload = receivedText;
-    fr.readAsText(file);
+    this.csvService.parse(file).then(credentials => {
+      this.credentials = credentials;
+    });
+  }
 
-    const self = this;
-    function receivedText(e) {
-      self.credentialsFile = e.target.result;
-    }
-}
+  setAvailableRegions() {
+
+    this.regionService.getAvailableRegions().subscribe( regions => {
+      this.availableRegions = regions;
+    });
+  }
 
 }

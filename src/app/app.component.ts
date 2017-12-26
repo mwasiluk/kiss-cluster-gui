@@ -1,21 +1,42 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AuthService} from './auth.service';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import {HelpDialogComponent} from './help-dialog/help-dialog.component';
-import {AboutDialogComponent} from "./about-dialog/about-dialog.component";
+import {AboutDialogComponent} from './about-dialog/about-dialog.component';
+import {RegionService} from './region.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent  implements OnInit {
   title = 'KissCluster';
-  region = 'us-east-2';
-  availableRegions = ['us-east-1', 'us-east-2'];
+  availableRegions = [];
   outputS3 = 's3://kissc-ohio/';
 
-  constructor(public dialog: MatDialog, public authService: AuthService) {}
+  public notificationOptions = {
+    position: ['bottom', 'right'],
+    timeOut: 7000,
+    lastOnBottom: true,
+    showProgressBar: true,
+    pauseOnHover: true,
+    theClass: 'notification'
+  };
+
+  constructor(private router: Router, public dialog: MatDialog, public authService: AuthService, public regionService: RegionService) {}
+
+  ngOnInit(): void {
+
+    this.setAvailableRegions();
+    this.regionService.subscribe(r => setTimeout(() => {
+      if (this.authService.isLoggedIn) {
+        this.router.navigate(['/dashboard']);
+      }
+
+    }, 200));
+  }
 
   showBreadcrumb() {
     return this.authService.isLoggedIn;
@@ -32,6 +53,13 @@ export class AppComponent {
     const dialogRef = this.dialog.open(AboutDialogComponent, {
       width: '500px',
       data: { }
+    });
+  }
+
+  private setAvailableRegions() {
+
+    this.regionService.getAvailableRegions().subscribe( regions => {
+      this.availableRegions = regions;
     });
   }
 }

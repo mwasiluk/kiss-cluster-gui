@@ -1,22 +1,22 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {MatDialog, MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {Queue} from '../queue';
 import {Router} from '@angular/router';
 import {QueueService} from '../queue.service';
 import {Cluster} from '../cluster';
-import {QueueDetailsDialogComponent} from "../queue-details-dialog/queue-details-dialog.component";
+import {QueueDetailsDialogComponent} from '../queue-details-dialog/queue-details-dialog.component';
 
 @Component({
   selector: 'app-queue-list',
   templateUrl: './queue-list.component.html',
   styleUrls: ['./queue-list.component.scss']
 })
-export class QueueListComponent implements OnInit {
+export class QueueListComponent implements OnInit, AfterViewInit {
 
   @Input() cluster: Cluster;
   queues: Queue[];
 
-  displayedColumns = ['name', 's3LocationProgram', 'command', 'creator', 'date', 'jobId', 'maxJobId', 'minJobId', 'status'];
+  displayedColumns = ['name', 'S3_location', 'command', 'creator', 'date', 'jobid', 'maxjobid', 'minjobid', 'status'];
   dataSource = new MatTableDataSource<Queue>();
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -25,7 +25,7 @@ export class QueueListComponent implements OnInit {
   constructor(private router: Router, private dialog: MatDialog, private queueService: QueueService) {}
 
   ngOnInit() {
-    this.getClusters();
+    this.getQueues();
   }
 
   ngAfterViewInit() {
@@ -33,8 +33,8 @@ export class QueueListComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
 
-  getClusters(): void {
-    this.queueService.getQueues(this.cluster.id).subscribe(queues => {
+  getQueues(): void {
+    this.queueService.getQueues(this.cluster.clustername).subscribe(queues => {
       this.queues = queues;
       this.dataSource.data = queues;
     });
@@ -44,13 +44,17 @@ export class QueueListComponent implements OnInit {
     const dialogRef = this.dialog.open(QueueDetailsDialogComponent, {
       width: '500px',
       data: {
-        queue: new Queue(),
+        queue: this.queueService.getNewQueueForCluster(this.cluster),
+        cluster: this.cluster,
         mode: 'create'
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed' , result);
+      if (result) {
+        this.getQueues();
+      }
     });
   }
 

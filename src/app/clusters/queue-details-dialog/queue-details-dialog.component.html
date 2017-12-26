@@ -1,11 +1,36 @@
-<h1 mat-dialog-title>Queue {{ queue.name }}</h1>
+<h1 mat-dialog-title><span *ngIf="mode=='create'">New</span> Queue {{ queue.queue_name }}</h1>
 <div mat-dialog-content>
-  <mat-form-field>
-    <input matInput placeholder="Name" [(ngModel)]="queue.name" [readonly]="mode==='view'">
-  </mat-form-field>
+
+  <form #queueForm="ngForm">
+    <mat-form-field>
+      <input name="queue_name" matInput placeholder="Name" [(ngModel)]="queue.queue_name" required
+             [readonly]="mode==='view'">
+    </mat-form-field>
+    <mat-form-field>
+      <input name="command" matInput placeholder="Job command" [(ngModel)]="queue.command" required
+             [readonly]="mode==='view'">
+    </mat-form-field>
+    <mat-form-field>
+      <input name="S3_bucket" matInput placeholder="S3 bucket" [(ngModel)]="queue.$S3_bucket" required
+             [readonly]="mode==='view'">
+    </mat-form-field>
+    <mat-form-field>
+      <input name="folder" matInput placeholder="Folder" [(ngModel)]="queue.$folder" required
+             [readonly]="mode==='view'">
+    </mat-form-field>
+    <mat-form-field>
+      <input name="minjobid" matInput placeholder="minjobid" [(ngModel)]="queue.minjobid"
+             [readonly]="mode==='view'">
+    </mat-form-field>
+    <mat-form-field>
+      <input name="maxjobid" matInput placeholder="maxjobid" [(ngModel)]="queue.maxjobid"
+             [readonly]="mode==='view'">
+    </mat-form-field>
+  </form>
+
 
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="close()" tabindex="-1">Close</button>
-  <button mat-button (click)="close()" tabindex="-1" color="primary" *ngIf="mode!=='view'">Save</button>
+  <button mat-button (click)="onSubmit()" tabindex="-1" color="primary" [disabled]="!queueForm.form.valid" *ngIf="mode!=='view'">Submit</button>
 </div>

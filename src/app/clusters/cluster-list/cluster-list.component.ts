@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import {MatPaginator, MatTableDataSource, MatSort} from '@angular/material';
 import {Cluster} from '../cluster';
@@ -10,7 +10,7 @@ import {ClusterService} from '../cluster.service';
   templateUrl: './cluster-list.component.html',
   styleUrls: ['./cluster-list.component.scss']
 })
-export class ClusterListComponent implements OnInit {
+export class ClusterListComponent implements OnInit, AfterViewInit {
 
   clusters: Cluster[];
 

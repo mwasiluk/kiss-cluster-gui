@@ -1,13 +1,15 @@
 export class Queue {
-  id: any;
-  clusterId: any;
-  name: string;
-  s3LocationProgram: string;
-  command: string;
-  creator: string;
-  date: Date;
-  jobId: number;
-  maxJobId: number;
-  minJobId: number;
-  status: string;
+  queueid?: number;
+  creator?: string;
+  date?: string;
+  jobid?: number;
+  maxjobid?: number;
+  minjobid?: number;
+  queue_name?: string;
+  S3_location?: string;
+  command?: string;
+  qstatus?: string;
+
+  $S3_bucket?: string;
+  $folder?: string;
 }

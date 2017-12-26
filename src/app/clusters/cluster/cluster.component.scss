@@ -1,7 +1,32 @@
 .cluster-details-card {
   margin-bottom: 15px;
+  h1{
+    margin-top: 0;
+  }
+
+  .cluster-details-form{
+
+    mat-form-field{
+
+    }
+  }
 
   .cluster-id{
     margin-bottom: 15px;
+  }
+
+  app-node-list{
+    margin-top: 30px;
+    display: block;
+  }
+
+  .mat-expansion-panel{
+    margin: 15px 0;
+  }
+
+  .extended-info{
+    display: flex;
+    flex-direction: column;
+    max-width: 500px;
   }
 }

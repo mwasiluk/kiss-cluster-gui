@@ -1,4 +1,4 @@
-<!--The content below is only a placeholder and can be replaced.-->
+
 <div>
   <mat-toolbar class="toolbar" *ngIf="authService.isLoggedIn">
 
@@ -19,7 +19,7 @@
     <div class="toolbar-group region-select">
       <label>Region:</label>
       <mat-form-field class="region-form-field">
-        <mat-select [(value)]="region">
+        <mat-select [(value)]="regionService.region" (change)="regionService.update()">
           <mat-option *ngFor="let r of availableRegions" [value]="r">{{r}}</mat-option>
         </mat-select>
       </mat-form-field>
@@ -50,7 +50,8 @@
 
 
   <router-outlet></router-outlet>
+  <simple-notifications [options]="notificationOptions"></simple-notifications>
 </div>
 
 
-<router-outlet></router-outlet>
+
