@@ -5,6 +5,7 @@ import {HelpDialogComponent} from './help-dialog/help-dialog.component';
 import {AboutDialogComponent} from './about-dialog/about-dialog.component';
 import {RegionService} from './region.service';
 import {Router} from '@angular/router';
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-root',
@@ -14,11 +15,11 @@ import {Router} from '@angular/router';
 export class AppComponent  implements OnInit {
   title = 'KissCluster';
   availableRegions = [];
-  outputS3 = 's3://kissc-ohio/';
+
 
   public notificationOptions = {
     position: ['bottom', 'right'],
-    timeOut: 7000,
+    timeOut: 10000,
     lastOnBottom: true,
     showProgressBar: true,
     pauseOnHover: true,
@@ -32,7 +33,7 @@ export class AppComponent  implements OnInit {
     this.setAvailableRegions();
     this.regionService.subscribe(r => setTimeout(() => {
       if (this.authService.isLoggedIn) {
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/']);
       }
 
     }, 200));

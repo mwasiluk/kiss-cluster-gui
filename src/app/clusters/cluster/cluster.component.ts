@@ -7,7 +7,7 @@ import {Cluster} from '../cluster';
 import {ClusterService} from '../cluster.service';
 import {BreadcrumbsService} from 'ng2-breadcrumbs';
 import {MatDialog} from '@angular/material';
-import {NotificationsService} from "angular2-notifications";
+import {NotificationsService} from 'angular2-notifications';
 
 @Component({
   selector: 'app-cluster',
@@ -18,9 +18,10 @@ export class ClusterComponent implements OnInit {
 
   cluster: Cluster;
   mode: string;
-
   submitted = false;
   workInProgress = false;
+  operationLog = '';
+  isNewCluster = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -34,6 +35,7 @@ export class ClusterComponent implements OnInit {
 
   ngOnInit() {
     this.getCluster();
+    this.operationLog = '';
   }
 
   private getCluster() {
@@ -41,7 +43,12 @@ export class ClusterComponent implements OnInit {
       .subscribe((data: { cluster: Cluster, mode: string }) => {
         this.cluster = data.cluster;
         this.mode = data.mode;
+
       });
+    // http://localhost:4200/#/cluster/dddddddddddd?is_new=true
+    this.route.queryParams.subscribe(params => {
+      this.isNewCluster = !!params['is_new'];
+    });
   }
 
   goBack(): void {
@@ -61,10 +68,26 @@ export class ClusterComponent implements OnInit {
         this.notificationsService.error('Cluster creation failure!');
       }else {
         this.notificationsService.success('The cluster ' + c.clustername + ' has been successfully created');
-        this.router.navigate(['/cluster', this.cluster.clustername]);
+        this.router.navigate(['/cluster', this.cluster.clustername], { queryParams: { is_new: true } });
       }
     });
 
+  }
+
+  onDelete(){
+    if (!window.confirm(`Are sure you want to delete cluster ${this.cluster.clustername}?`)) {
+      return;
+    }
+    this.workInProgress = true;
+    this.clusterService.deleteCluster(this.cluster).subscribe(c => {
+      this.workInProgress = false;
+      if (!c) {
+        this.notificationsService.error('Cluster deletion failure!');
+      }else {
+        this.notificationsService.success('The cluster ' + this.cluster.clustername + ' has been successfully deleted');
+        this.router.navigate(['/']);
+      }
+    });
   }
 
 }

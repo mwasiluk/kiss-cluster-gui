@@ -9,6 +9,7 @@ export class RegionService {
   public regionChanged$: EventEmitter<string>;
 
   public region = 'us-east-2';
+  public outputS3 = '';
 
   constructor() {
     this.regionChanged$ = new EventEmitter();

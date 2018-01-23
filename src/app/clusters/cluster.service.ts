@@ -15,21 +15,20 @@ import {AppConfig} from '../app-config';
 import {NodeService} from './node.service';
 import {JobService} from './job.service';
 import {message} from 'aws-sdk/clients/sns';
-import {queue} from "rxjs/scheduler/queue";
+import {queue} from 'rxjs/scheduler/queue';
+import {S3Service} from './s3.service';
+import {AssetsService} from '../assets.service';
 
 
 @Injectable()
 export class ClusterService {
 
   db: AWS.DynamoDB;
-  private readCapacityUnits: any;
-  private writeCapacityUnits: any;
 
   constructor(private notificationsService: NotificationsService, private regionService: RegionService,
-              private queueService: QueueService, private nodeService: NodeService, private jobService: JobService, private utilsService: UtilsService) {
+              private queueService: QueueService, private nodeService: NodeService, private jobService: JobService,
+              private utilsService: UtilsService, private s3Service: S3Service, private assetsService: AssetsService) {
 
-    this.readCapacityUnits = 2;
-    this.writeCapacityUnits = 2;
     this.regionService.subscribe(r => this.initAWS());
     this.initAWS();
   }
@@ -103,8 +102,8 @@ export class ClusterService {
           KeyType: 'HASH'
         }],
         ProvisionedThroughput: {
-          ReadCapacityUnits: this.readCapacityUnits,
-          WriteCapacityUnits: this.writeCapacityUnits
+          ReadCapacityUnits: AppConfig.CLUSTERS_TABLE_ReadCapacityUnits,
+          WriteCapacityUnits: AppConfig.CLUSTERS_TABLE_WriteCapacityUnits
         }
       }, (err, data) => {
         if (data && data.TableDescription && data.TableDescription.TableName) {
@@ -165,6 +164,43 @@ export class ClusterService {
     return AWS.DynamoDB.Converter.marshall(q);
   }
 
+  deleteCluster(cluster: Cluster): Observable<boolean> {
+    this.notificationsService.info(`Deleting the counters and configuration for ${cluster.clustername}`);
+
+    return new Observable<boolean>(observer => {
+      this.db.deleteItem({
+        TableName: ClusterService.getTableName(),
+        Key: ClusterService.getClusterKey(cluster.clustername)
+      }, (err, data) => {
+        if (err) {
+          this.notificationsService.info(`Deleting cluster ${cluster.clustername} from table ${ClusterService.getTableName()} failed!`);
+          console.log(`Deleting cluster ${cluster.clustername} from table ${ClusterService.getTableName()} failed!`, err.message);
+          observer.next(false);
+          observer.complete();
+          return;
+        }
+
+        console.log(`Cluster ${cluster.clustername} deleted from table ${ClusterService.getTableName()}`);
+        observer.next(true);
+        observer.complete();
+
+      });
+    }).flatMap(r => {
+
+      return Observable.forkJoin([
+        this.nodeService.deleteTable(cluster.clustername),
+        this.queueService.deleteTable(cluster.clustername),
+        this.jobService.deleteTable(cluster.clustername)
+      ]);
+    }).flatMap(result => {
+      console.log('dynamodb tables removed', result);
+      if (!result || !result.every(r => r)) {
+        return of(false);
+      }
+      return of(true);
+    });
+  }
+
   createCluster(cluster: Cluster): Observable<Cluster> {
 
     return this.getCluster(cluster.clustername).flatMap(c => {
@@ -173,12 +209,12 @@ export class ClusterService {
         return of(null);
       }
 
-      cluster.S3_location = cluster.$s3_bucket + '/' + cluster.clustername;
+      cluster.S3_location = Cluster.getS3Location(cluster);
       cluster.publickey = '-';
       cluster.privatekey = '-';
       cluster.date = this.utilsService.transformDate(new Date());
 
-      let message = `Setting the counters and configuration for ${cluster.clustername}`;
+      const message = `Setting the counters and configuration for ${cluster.clustername}`;
       this.notificationsService.info(message);
       console.log(message);
 
@@ -195,7 +231,9 @@ export class ClusterService {
         return of(null);
       }
 
-      // TODO upload to s3
+      return this.assetsService.getAllScripts();
+
+    }).flatMap(scripts => {
 
       cluster.nodeid = 0;
       cluster.queueid = 0;
@@ -206,7 +244,16 @@ export class ClusterService {
       cluster.workers_in_a_node = AppConfig.WORKERS_IN_A_NODE;
       cluster.creator = this.utilsService.getCreator();
 
+      return Observable.forkJoin([
+        this.s3Service.putObject(cluster.$s3_bucket,
+          `${Cluster.getS3KeyLocation(cluster)}/${AppConfig.get_CLOUD_INIT_FILE_NAME(cluster.clustername)}`,
+          AppConfig.getCloudInitFileContent(this.regionService.region, cluster.S3_location, cluster.clustername, cluster.username, scripts['cloud_init_template.sh'])),
 
+        this.s3Service.putObject(cluster.$s3_bucket, AppConfig.get_S3_RUN_NODE_SCRIPT(Cluster.getS3KeyLocation(cluster), cluster.clustername), scripts['run_node.sh']),
+        this.s3Service.putObject(cluster.$s3_bucket, AppConfig.get_S3_JOB_ENVELOPE_SCRIPT(Cluster.getS3KeyLocation(cluster)), scripts['job_envelope.sh']),
+        this.s3Service.putObject(cluster.$s3_bucket, AppConfig.get_S3_QUEUE_UPDATE_SCRIPT(Cluster.getS3KeyLocation(cluster)), scripts['queue_update.sh'])
+      ]);
+    }).flatMap(result => {
       return new Observable(observer => {
         this.db.putItem({
           TableName: ClusterService.getTableName(),
@@ -225,11 +272,12 @@ export class ClusterService {
       });
     });
 
-
-
   }
 
-
-
+  getNewCluster(): Cluster {
+    return {
+      $s3_bucket: this.regionService.outputS3
+    };
+  }
 }
 

@@ -10,14 +10,21 @@
       <input name="command" matInput placeholder="Job command" [(ngModel)]="queue.command" required
              [readonly]="mode==='view'">
     </mat-form-field>
+
     <mat-form-field>
       <input name="S3_bucket" matInput placeholder="S3 bucket" [(ngModel)]="queue.$S3_bucket" required
              [readonly]="mode==='view'">
+      <span matPrefix>s3:// </span>
     </mat-form-field>
-    <mat-form-field>
-      <input name="folder" matInput placeholder="Folder" [(ngModel)]="queue.$folder" required
-             [readonly]="mode==='view'">
-    </mat-form-field>
+
+      <input  *ngIf="mode!=='view'"
+        #folderInput
+        type="file"
+        (change)="filesPicked(folderInput.files)"
+        webkitDirectory
+      >
+    <br/>
+
     <mat-form-field>
       <input name="minjobid" matInput placeholder="minjobid" [(ngModel)]="queue.minjobid"
              [readonly]="mode==='view'">

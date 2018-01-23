@@ -19,7 +19,7 @@
     <div class="toolbar-group region-select">
       <label>Region:</label>
       <mat-form-field class="region-form-field">
-        <mat-select [(value)]="regionService.region" (change)="regionService.update()">
+        <mat-select [(ngModel)]="regionService.region" (ngModelChange)="regionService.update()">
           <mat-option *ngFor="let r of availableRegions" [value]="r">{{r}}</mat-option>
         </mat-select>
       </mat-form-field>
@@ -27,7 +27,8 @@
     <div class="separator"></div>
     <div class="toolbar-group output-s3-info">
       <label>Output S3:</label>
-      <span>{{ outputS3 }}</span>
+      s3://
+      <input [(ngModel)]="regionService.outputS3">
     </div>
 
     <span class="fill-remaining-space"></span>

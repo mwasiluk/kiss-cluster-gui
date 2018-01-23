@@ -29,6 +29,8 @@ import { AboutDialogComponent } from './about-dialog/about-dialog.component';
 import {RegionService} from './region.service';
 import {CredentialsCsvService} from './csv.service';
 import {SimpleNotificationsModule} from "angular2-notifications";
+import {HttpClientModule} from "@angular/common/http";
+import {AssetsService} from "./assets.service";
 
 
 @NgModule({
@@ -44,6 +46,7 @@ import {SimpleNotificationsModule} from "angular2-notifications";
   imports: [
     BrowserModule,
     FormsModule,
+    HttpClientModule,
     BrowserAnimationsModule,
     MatButtonModule, MatCheckboxModule, MatCardModule, MatFormFieldModule, MatInputModule, MatTableModule,
     MatPaginatorModule, MatToolbarModule, MatSortModule, MatSelectModule, MatMenuModule, MatDialogModule, MatProgressSpinnerModule,
@@ -53,7 +56,7 @@ import {SimpleNotificationsModule} from "angular2-notifications";
     LoginRoutingModule,
     AppRoutingModule
   ],
-  providers: [SpotFleetService, RegionService, CredentialsCsvService],
+  providers: [SpotFleetService, RegionService, CredentialsCsvService, AssetsService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

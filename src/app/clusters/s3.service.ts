@@ -81,5 +81,64 @@ export class S3Service {
 
   }
 
+  putObject(bucketName, fileKey, fileBody): Observable<boolean> {
+    const params = {
+      Body: fileBody,
+      Bucket: bucketName,
+      Key: fileKey,
+    };
+    return new Observable(observer => {
+      this.s3.putObject(params, function(err, data) {
+        if (err) {
+          console.log(err, err.stack);
+          observer.next(false);
+          observer.complete();
+          return;
+        } else   {
+          console.log(data);           // successful response
+          observer.next(true);
+          observer.complete();
+          return;
+        }
+
+      });
+    });
+
+
+
+    /*const params = {Bucket: bucketName, Key: 'key', Body: fileContent};
+    this.s3.upload(params, function(err, data) {
+      console.log(err, data);
+    });*/
+  }
+
+  upload(bucketName, fileKey, fileBody): Observable<boolean> {
+    const params = {
+      Body: fileBody,
+      Bucket: bucketName,
+      Key: fileKey,
+    };
+    return new Observable(observer => {
+      this.s3.upload(params, function(err, data) {
+        if (err) {
+          console.log('upload', fileKey, err, err.stack);
+          observer.next(false);
+          observer.complete();
+          return;
+        } else   {
+          console.log('upload', fileKey, data);           // successful response
+          observer.next(true);
+          observer.complete();
+          return;
+        }
+
+      });
+    });
+  }
+
+  uploadFiles(bucketName, fileKeyPrefix, files): Observable<Array<boolean>> {
+    return Observable.forkJoin(Array.from(files).map(file => this.upload(bucketName, `${fileKeyPrefix}/${file['webkitRelativePath']}`, file)));
+  }
+
 }
 

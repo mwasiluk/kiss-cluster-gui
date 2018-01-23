@@ -1,4 +1,15 @@
 
+<mat-card  class="new-cluster-msg-panel" *ngIf="isNewCluster">
+  <mat-card-header>SUCCESS!</mat-card-header>
+  <mat-card-content>
+    <br/>
+    <p>The Servless master of cluster {{ cluster.clustername }} has been successfully build!</p>
+    <p>Now you can simply run {{ cluster.S3_node_init_script }} on any Linux machine having AWS CLI configured to start processing on your cluster</p>
+    <p>{{ cluster.S3_node_init_script }} can also be used as a cloud-init configuration for AWS EC2 instances.</p>
+  </mat-card-content>
+</mat-card>
+
+
 <mat-card class="cluster-details-card">
   <mat-card-header>
     <mat-card-title><h1><span *ngIf="mode=='create'">New</span> Cluster: {{ cluster.clustername }}   </h1></mat-card-title>
@@ -7,6 +18,11 @@
     <div class="spinner-container">
       <mat-spinner *ngIf="!cluster || workInProgress"></mat-spinner>
     </div>
+
+    <div class="operation-log-panel" [hidden]="!operationLog">
+      {{ operationLog }}
+    </div>
+
     <div [hidden]="!cluster || workInProgress">
 
       <form class="cluster-details-form" #clusterForm="ngForm">
@@ -27,6 +43,7 @@
         <div *ngIf="mode=='create'">
           <mat-form-field>
             <input matInput name="$s3_bucket" placeholder="s3_bucket" [(ngModel)]="cluster.$s3_bucket">
+            <span matPrefix>s3:// </span>
           </mat-form-field>
         </div>
 
@@ -59,6 +76,10 @@
           <mat-form-field>
             <input matInput placeholder="S3_queue_update_script" [(ngModel)]="cluster.S3_queue_update_script" [readonly]="true">
           </mat-form-field>
+
+          <mat-form-field>
+            <input matInput placeholder="S3_job_envelope_script" [(ngModel)]="cluster.S3_job_envelope_script" [readonly]="true">
+          </mat-form-field>
           <mat-form-field>
             <input matInput placeholder="S3_run_node_script" [(ngModel)]="cluster.S3_run_node_script" [readonly]="true">
           </mat-form-field>
@@ -77,6 +98,7 @@
 
     <button mat-button (click)="goBack()">GO BACK</button>
     <button mat-button (click)="onSubmit()" tabindex="-1" color="primary" [disabled]="!clusterForm.form.valid" *ngIf="mode!=='view'">SUBMIT</button>
+    <button mat-button (click)="onDelete()" tabindex="-1" color="warn" *ngIf="mode==='view'">DELETE</button>
     <!--<button mat-button *ngIf="mode=='view'" (click)="edit()">EDIT</button>-->
   </mat-card-actions>
 </mat-card>

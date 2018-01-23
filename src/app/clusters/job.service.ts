@@ -96,8 +96,8 @@ export class JobService {
             KeyType: 'RANGE'
           }],
         ProvisionedThroughput: {
-          ReadCapacityUnits: AppConfig.NODES_TABLE_ReadCapacityUnits,
-          WriteCapacityUnits: AppConfig.NODES_TABLE_WriteCapacityUnits
+          ReadCapacityUnits: AppConfig.JOBS_TABLE_ReadCapacityUnits,
+          WriteCapacityUnits: AppConfig.JOBS_TABLE_WriteCapacityUnits
         }
       }, (err, data) => {
         if (data && data.TableDescription && data.TableDescription.TableName) {
@@ -113,6 +113,25 @@ export class JobService {
         }else {
           this.notificationsService.error(`Error creating ${tableName} DynamoDB table: ${err.message}`);
           console.log('Error creating table ', err);
+          observer.next(false);
+          observer.complete();
+        }
+      });
+    });
+  }
+
+  deleteTable(clustername): Observable<boolean> {
+    const tableName = this.getTableName(clustername);
+    return new Observable(observer => {
+      this.db.deleteTable({
+        TableName: tableName,
+      }, (err, data) => {
+        if (!err) {
+          observer.next(true);
+          observer.complete();
+        }else {
+          this.notificationsService.error(`Error deleting ${tableName} DynamoDB table: ${err.message}`);
+          console.log('Error deleting table ', err);
           observer.next(false);
           observer.complete();
         }

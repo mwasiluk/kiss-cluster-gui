@@ -6,9 +6,9 @@ import {Node} from './node';
 
 import * as AWS from 'aws-sdk';
 import {ClusterService} from './cluster.service';
-import {AppConfig} from "../app-config";
-import {RegionService} from "../region.service";
-import {NotificationsService} from "angular2-notifications";
+import {AppConfig} from '../app-config';
+import {RegionService} from '../region.service';
+import {NotificationsService} from 'angular2-notifications';
 
 @Injectable()
 export class NodeService {
@@ -107,6 +107,25 @@ export class NodeService {
         }else {
           this.notificationsService.error(`Error creating ${tableName} DynamoDB table: ${err.message}`);
           console.log('Error creating table ', err);
+          observer.next(false);
+          observer.complete();
+        }
+      });
+    });
+  }
+
+  deleteTable(clustername): Observable<boolean> {
+    const tableName = this.getTableName(clustername);
+    return new Observable(observer => {
+      this.db.deleteTable({
+        TableName: tableName,
+      }, (err, data) => {
+        if (!err) {
+          observer.next(true);
+          observer.complete();
+        }else {
+          this.notificationsService.error(`Error deleting ${tableName} DynamoDB table: ${err.message}`);
+          console.log('Error deleting table ', err);
           observer.next(false);
           observer.complete();
         }

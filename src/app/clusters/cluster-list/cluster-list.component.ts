@@ -1,8 +1,9 @@
 import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
-import { Router } from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {MatPaginator, MatTableDataSource, MatSort} from '@angular/material';
 import {Cluster} from '../cluster';
 import {ClusterService} from '../cluster.service';
+import {RegionService} from "../../region.service";
 
 
 @Component({
@@ -20,9 +21,10 @@ export class ClusterListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private router: Router, private clusterService: ClusterService) {}
+  constructor(private router: Router, private clusterService: ClusterService, private regionService: RegionService) {}
 
   ngOnInit() {
+    this.regionService.subscribe(r => this.getClusters());
     this.getClusters();
   }
 

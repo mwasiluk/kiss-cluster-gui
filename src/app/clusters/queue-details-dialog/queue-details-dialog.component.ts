@@ -18,6 +18,7 @@ export class QueueDetailsDialogComponent implements OnInit {
   public mode = 'view';
 
   submitted = false;
+  appFiles = [];
 
   constructor(
     private notificationsService: NotificationsService,
@@ -38,7 +39,7 @@ export class QueueDetailsDialogComponent implements OnInit {
 
   onSubmit() {
     this.submitted = true;
-    this.queueService.createQueue(this.queue, this.cluster).subscribe(q => {
+    this.queueService.createQueue(this.queue, this.cluster, this.appFiles).subscribe(q => {
       if (!q) {
         this.notificationsService.error('Queue creation failure!');
         return;
@@ -47,5 +48,9 @@ export class QueueDetailsDialogComponent implements OnInit {
       this.dialogRef.close(q);
     });
 
+  }
+
+  filesPicked(files) {
+    this.appFiles = files;
   }
 }

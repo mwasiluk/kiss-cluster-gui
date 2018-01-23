@@ -122,6 +122,25 @@ export class QueueService {
     });
   }
 
+  deleteTable(clustername): Observable<boolean> {
+    const tableName = this.getTableName(clustername);
+    return new Observable(observer => {
+      this.db.deleteTable({
+        TableName: tableName,
+      }, (err, data) => {
+        if (!err) {
+          observer.next(true);
+          observer.complete();
+        }else {
+          this.notificationsService.error(`Error deleting ${tableName} DynamoDB table: ${err.message}`);
+          console.log('Error deleting table ', err);
+          observer.next(false);
+          observer.complete();
+        }
+      });
+    });
+  }
+
   getQueues(clustername): Observable<Queue[]> {
     return this.getQueuesForCluster(clustername);
   }
@@ -182,7 +201,7 @@ export class QueueService {
 
       }, (err, data) => {
 
-        console.log(err, data);
+        console.log('getNewQueueId', err, data, data.Attributes.queueid.N);
 
         observer.next(parseInt(data.Attributes.queueid.N));
         observer.complete();
@@ -191,33 +210,35 @@ export class QueueService {
     });
   }
 
-  printQueueID(queue): string {
-    return 'Q' + String(queue.queueId).padStart(6, '0') + '_' + queue.queue_name;
+  printQueueID(queue: Queue): string {
+    return 'Q' + (String(queue.queueid)).padStart(6, '0') + '_' + queue.queue_name;
   }
 
-  createQueue(queue: Queue, cluster: Cluster): Observable<Queue> {
+  createQueue(queue: Queue, cluster: Cluster, appFiles): Observable<Queue> {
 
     return this.getNewQueueId(cluster).flatMap(queueId => {
       queue.queueid = queueId;
       const queueIdF = this.printQueueID(queue);
 
 
-      const queueFilesDir = `/${cluster.clustername}/${queueIdF}`;
-      queue.S3_location = queue.$S3_bucket + queueFilesDir;
+
+      const queueFilesDir = `${cluster.clustername}/${queueIdF}`;
+      queue.S3_location = `${queue.$S3_bucket}/${queueFilesDir}`;
 
 
       this.notificationsService.info(`Creating a queue ${queueIdF} at ${queue.S3_location}`);
-      const appFolder = queue.S3_location + '/app';
+      const appFolder = queueFilesDir + '/app';
+
       this.notificationsService.info('Deleting S3 folder ' + appFolder);
 
-      return this.s3Service.emptyBucket(queue.$S3_bucket, queueFilesDir).flatMap(r => {
+      return this.s3Service.emptyBucket(queue.$S3_bucket, appFolder).flatMap(r => {
         if (!r) {
           console.log('App files upload failed');
           this.notificationsService.error('Deleting S3 folder failed!');
         }
         // TODO upload app files
 
-        return of(r);
+        return this.s3Service.uploadFiles(queue.$S3_bucket, appFolder, appFiles);
       });
 
     }).flatMap(result => {
@@ -249,9 +270,11 @@ export class QueueService {
 
   }
 
+
   getNewQueueForCluster(cluster: Cluster): Queue {
+    console.log('getNewQueueForCluster', Cluster.getS3Bucket(cluster.S3_location))
     return {
-      $S3_bucket: cluster.S3_location,
+      $S3_bucket: Cluster.getS3Bucket(cluster.S3_location),
       minjobid: AppConfig.MINJOBID,
       maxjobid: AppConfig.MAXJOBID
     };

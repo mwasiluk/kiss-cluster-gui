@@ -13,9 +13,11 @@ const routes: Routes = [
       {
         path: 'create',
         component: ClusterComponent,
+        resolve: {
+          cluster: ClusterDetailResolver,
+        },
         data: {
           mode: 'create',
-          cluster: new Cluster(),
           breadcrumb: 'Cluster - create'
         }
       },
