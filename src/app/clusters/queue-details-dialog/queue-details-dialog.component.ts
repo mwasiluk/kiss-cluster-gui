@@ -2,9 +2,9 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {AboutDialogComponent} from '../../about-dialog/about-dialog.component';
 import {Queue} from '../queue';
-import {QueueService} from "../queue.service";
-import {Cluster} from "../cluster";
-import {NotificationsService} from "angular2-notifications";
+import {QueueService} from '../queue.service';
+import {Cluster} from '../cluster';
+import {NotificationsService} from 'angular2-notifications';
 
 @Component({
   selector: 'app-queue-details-dialog',
@@ -35,7 +35,9 @@ export class QueueDetailsDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.appFiles = [];
+  }
 
   onSubmit() {
     this.submitted = true;

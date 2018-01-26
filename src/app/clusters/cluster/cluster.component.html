@@ -98,6 +98,7 @@
 
     <button mat-button (click)="goBack()">GO BACK</button>
     <button mat-button (click)="onSubmit()" tabindex="-1" color="primary" [disabled]="!clusterForm.form.valid" *ngIf="mode!=='view'">SUBMIT</button>
+    <button mat-button (click)="onSaveJson()" tabindex="-1"  *ngIf="mode==='view'">SAVE</button>
     <button mat-button (click)="onDelete()" tabindex="-1" color="warn" *ngIf="mode==='view'">DELETE</button>
     <!--<button mat-button *ngIf="mode=='view'" (click)="edit()">EDIT</button>-->
   </mat-card-actions>

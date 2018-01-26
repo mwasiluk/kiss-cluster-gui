@@ -31,6 +31,7 @@ import {CredentialsCsvService} from './csv.service';
 import {SimpleNotificationsModule} from "angular2-notifications";
 import {HttpClientModule} from "@angular/common/http";
 import {AssetsService} from "./assets.service";
+import {DataService} from "./data.service";
 
 
 @NgModule({
@@ -56,7 +57,7 @@ import {AssetsService} from "./assets.service";
     LoginRoutingModule,
     AppRoutingModule
   ],
-  providers: [SpotFleetService, RegionService, CredentialsCsvService, AssetsService],
+  providers: [SpotFleetService, RegionService, CredentialsCsvService, AssetsService, DataService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

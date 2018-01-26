@@ -3,8 +3,8 @@
   <mat-toolbar class="toolbar" *ngIf="authService.isLoggedIn">
 
       <mat-menu #appMenu="matMenu">
-        <button mat-menu-item> Open </button>
-        <button mat-menu-item> Save </button>
+        <button mat-menu-item (click)="openFile()"> Open </button>
+        <button mat-menu-item > Save </button>
       </mat-menu>
 
 
@@ -52,6 +52,7 @@
 
   <router-outlet></router-outlet>
   <simple-notifications [options]="notificationOptions"></simple-notifications>
+  <input type="file" style="display:none" id="kissc-file-input" accept=".json"/>
 </div>
 
 

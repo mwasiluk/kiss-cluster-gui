@@ -5,7 +5,9 @@ import {HelpDialogComponent} from './help-dialog/help-dialog.component';
 import {AboutDialogComponent} from './about-dialog/about-dialog.component';
 import {RegionService} from './region.service';
 import {Router} from '@angular/router';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient} from '@angular/common/http';
+import {FileLoader} from './file-loader';
+import {DataService} from "./data.service";
 
 @Component({
   selector: 'app-root',
@@ -26,7 +28,7 @@ export class AppComponent  implements OnInit {
     theClass: 'notification'
   };
 
-  constructor(private router: Router, public dialog: MatDialog, public authService: AuthService, public regionService: RegionService) {}
+  constructor(private router: Router, public dialog: MatDialog, public authService: AuthService, public regionService: RegionService, private dataService: DataService) {}
 
   ngOnInit(): void {
 
@@ -54,6 +56,16 @@ export class AppComponent  implements OnInit {
     const dialogRef = this.dialog.open(AboutDialogComponent, {
       width: '500px',
       data: { }
+    });
+  }
+
+  openFile() {
+    FileLoader.openFile(c => {
+      const data = JSON.parse(c);
+      console.log(data);
+      this.dataService.clusterData = data;
+      this.router.navigate(['./cluster/create']);
+
     });
   }
 

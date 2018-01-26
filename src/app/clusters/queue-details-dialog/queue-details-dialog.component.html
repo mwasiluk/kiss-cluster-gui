@@ -18,6 +18,7 @@
     </mat-form-field>
 
       <input  *ngIf="mode!=='view'"
+        required
         #folderInput
         type="file"
         (change)="filesPicked(folderInput.files)"
@@ -39,5 +40,5 @@
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="close()" tabindex="-1">Close</button>
-  <button mat-button (click)="onSubmit()" tabindex="-1" color="primary" [disabled]="!queueForm.form.valid" *ngIf="mode!=='view'">Submit</button>
+  <button mat-button (click)="onSubmit()" tabindex="-1" color="primary" [disabled]="!queueForm.form.valid || !appFiles.length" *ngIf="mode!=='view'">Submit</button>
 </div>

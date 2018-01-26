@@ -7,7 +7,7 @@ export class UtilsService {
   constructor(private datePipe: DatePipe) { }
 
   transformDate(date): string {
-    return this.datePipe.transform(date, 'YmdTHMSZ');
+    return this.datePipe.transform(date, 'yMMddTZ');
   }
 
 

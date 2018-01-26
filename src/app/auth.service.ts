@@ -25,13 +25,6 @@ export class AuthService {
     AWS.config.region = this.regionService.region;
     this.regionService.update();
 
-    // const s3 = new AWS.S3();
-    // s3.config.region = this.regionService.region;
-    // console.log(s3.config);
-    //
-    // s3.listBuckets((err, data) => {
-    //   console.log(err, data);
-    // });
     return this.clusterService.createTableIfNotExists().flatMap(r => {
       if (r) {
         this.isLoggedIn = true;

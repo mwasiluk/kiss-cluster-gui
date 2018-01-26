@@ -137,7 +137,8 @@ export class S3Service {
   }
 
   uploadFiles(bucketName, fileKeyPrefix, files): Observable<Array<boolean>> {
-    return Observable.forkJoin(Array.from(files).map(file => this.upload(bucketName, `${fileKeyPrefix}/${file['webkitRelativePath']}`, file)));
+    return Observable.forkJoin(Array.from(files)
+      .map(file => this.upload(bucketName, `${fileKeyPrefix}/${(file['webkitRelativePath'] || '/').split('/').slice(1)}`, file)));
   }
 
 }

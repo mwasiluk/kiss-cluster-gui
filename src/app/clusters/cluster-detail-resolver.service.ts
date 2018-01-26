@@ -8,16 +8,17 @@ import { Router, Resolve, RouterStateSnapshot,
 import { Cluster } from './cluster';
 import { ClusterService } from './cluster.service';
 import {of} from "rxjs/observable/of";
+import {DataService} from "../data.service";
 
 @Injectable()
 export class ClusterDetailResolver implements Resolve<Cluster> {
-  constructor(private cs: ClusterService, private router: Router) {}
+  constructor(private cs: ClusterService, private router: Router, private dataService: DataService) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Cluster> {
     const id = route.paramMap.get('id');
 
     if (!id) {
-      return of(this.cs.getNewCluster());
+      return of(this.cs.getNewCluster(this.dataService.clusterData));
     }
 
     const cluster = this.cs.getCluster(id);

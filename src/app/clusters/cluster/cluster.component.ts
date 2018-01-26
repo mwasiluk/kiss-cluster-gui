@@ -8,6 +8,7 @@ import {ClusterService} from '../cluster.service';
 import {BreadcrumbsService} from 'ng2-breadcrumbs';
 import {MatDialog} from '@angular/material';
 import {NotificationsService} from 'angular2-notifications';
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'app-cluster',
@@ -74,7 +75,7 @@ export class ClusterComponent implements OnInit {
 
   }
 
-  onDelete(){
+  onDelete() {
     if (!window.confirm(`Are sure you want to delete cluster ${this.cluster.clustername}?`)) {
       return;
     }
@@ -88,6 +89,11 @@ export class ClusterComponent implements OnInit {
         this.router.navigate(['/']);
       }
     });
+  }
+
+  onSaveJson() {
+    let blob = new Blob([JSON.stringify(this.cluster)], {type: 'application/json'});
+    FileSaver.saveAs(blob, `${this.cluster.clustername}.kissc.json`);
   }
 
 }

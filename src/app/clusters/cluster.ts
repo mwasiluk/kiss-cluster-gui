@@ -36,7 +36,7 @@ export class Cluster {
     if (!S3_location) {
       return null;
     }
-    const exec = /s3:\/\/([a-zA-Z0-9_\-\.]+)\/[a-zA-Z0-9_\-\.]+/g.exec(S3_location);
+    const exec = /s3:\/\/([a-zA-Z0-9_\-\.]+)\/.+/g.exec(S3_location);
     if (!exec || exec.length < 2) {
       return null;
     }

@@ -57,6 +57,12 @@ export class ClusterService {
       this.db.scan({
         TableName: ClusterService.getTableName()
       }, (err, data) => {
+        if (err) {
+          console.log(err.message);
+          observer.next([]);
+          observer.complete();
+          return;
+        }
         observer.next(data.Items.map(this.mapCluster));
         observer.complete();
 
@@ -274,10 +280,14 @@ export class ClusterService {
 
   }
 
-  getNewCluster(): Cluster {
-    return {
-      $s3_bucket: this.regionService.outputS3
-    };
+  getNewCluster(data: any): Cluster {
+    if (!data) {
+      return {
+        $s3_bucket: this.regionService.outputS3
+      };
+    }
+
+    return data;
   }
 }
 

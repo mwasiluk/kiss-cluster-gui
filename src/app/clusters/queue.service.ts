@@ -223,7 +223,7 @@ export class QueueService {
 
 
       const queueFilesDir = `${cluster.clustername}/${queueIdF}`;
-      queue.S3_location = `${queue.$S3_bucket}/${queueFilesDir}`;
+      queue.S3_location = `s3://${queue.$S3_bucket}/${queueFilesDir}`;
 
 
       this.notificationsService.info(`Creating a queue ${queueIdF} at ${queue.S3_location}`);
@@ -233,12 +233,16 @@ export class QueueService {
 
       return this.s3Service.emptyBucket(queue.$S3_bucket, appFolder).flatMap(r => {
         if (!r) {
-          console.log('App files upload failed');
+          console.log('Deleting S3 folder failed!');
           this.notificationsService.error('Deleting S3 folder failed!');
         }
-        // TODO upload app files
 
-        return this.s3Service.uploadFiles(queue.$S3_bucket, appFolder, appFiles);
+
+        console.log('Uploading app files!');
+        return Observable.forkJoin([
+          this.s3Service.putObject(queue.$S3_bucket, `${appFolder}/job.sh`, `#!/bin/bash\n\n${queue.command} \$1`),
+          this.s3Service.uploadFiles(queue.$S3_bucket, appFolder, appFiles)
+        ]);
       });
 
     }).flatMap(result => {
