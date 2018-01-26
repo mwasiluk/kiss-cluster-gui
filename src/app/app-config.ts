@@ -25,6 +25,9 @@ export class AppConfig {
   public static CLOUD_INIT_TEMPLATE = '';
 
 
+
+  public static polling_interval = 3000;
+
   public static get_CLOUD_INIT_FILE_NAME(CLUSTERNAME) {
     return `cloud_init_node_${CLUSTERNAME}.sh`;
   }

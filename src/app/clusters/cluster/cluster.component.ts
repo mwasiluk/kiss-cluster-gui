@@ -53,7 +53,8 @@ export class ClusterComponent implements OnInit {
   }
 
   goBack(): void {
-    this.location.back();
+    // this.location.back();
+    this.router.navigate(['/']);
   }
 
   edit() {

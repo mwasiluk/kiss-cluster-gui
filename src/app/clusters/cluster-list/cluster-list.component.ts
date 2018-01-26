@@ -1,9 +1,15 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatPaginator, MatTableDataSource, MatSort} from '@angular/material';
 import {Cluster} from '../cluster';
 import {ClusterService} from '../cluster.service';
-import {RegionService} from "../../region.service";
+import {RegionService} from '../../region.service';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/observable/interval';
+import 'rxjs/add/operator/switchMap';
+import {ReplaySubject} from 'rxjs/ReplaySubject';
+import 'rxjs/add/operator/takeUntil';
+import {AppConfig} from "../../app-config";
 
 
 @Component({
@@ -11,7 +17,9 @@ import {RegionService} from "../../region.service";
   templateUrl: './cluster-list.component.html',
   styleUrls: ['./cluster-list.component.scss']
 })
-export class ClusterListComponent implements OnInit, AfterViewInit {
+export class ClusterListComponent implements OnInit, OnDestroy, AfterViewInit {
+
+  private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   clusters: Cluster[];
 
@@ -28,15 +36,23 @@ export class ClusterListComponent implements OnInit, AfterViewInit {
     this.getClusters();
   }
 
+  ngOnDestroy() {
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
+  }
+
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
 
   getClusters(): void {
-    this.clusterService.getClusters().subscribe(clusters => {
-      this.clusters = clusters;
-      this.dataSource.data = clusters;
+    Observable.interval(AppConfig.polling_interval)
+      .takeUntil(this.destroyed$)
+      .switchMap(() => this.clusterService.getClusters())
+      .subscribe(clusters => {
+        this.clusters = clusters;
+        this.dataSource.data = clusters;
     });
   }
 
