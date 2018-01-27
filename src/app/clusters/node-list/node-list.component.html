@@ -8,7 +8,7 @@
       <mat-spinner *ngIf="!nodes"></mat-spinner>
     </div>
     <div class="node-table-container mat-elevation-z8" [hidden]="!nodes">
-      <mat-table #table [dataSource]="dataSource" matSort>
+      <mat-table #table [dataSource]="dataSource" matSort [hidden]="!dataSource.data || !dataSource.data.length">
 
 
 
@@ -44,6 +44,10 @@
                      [pageSizeOptions]="[5, 10, 20]"
                      [hidden]="!dataSource.data || dataSource.data.length<=5">
       </mat-paginator>
+
+      <div class="no-data-available-msg" *ngIf="!dataSource.data || !dataSource.data.length">
+        There are no nodes defined.
+      </div>
     </div>
   </mat-card>
 </div>

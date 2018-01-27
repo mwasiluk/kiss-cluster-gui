@@ -8,8 +8,8 @@
       <mat-spinner *ngIf="!clusters"></mat-spinner>
     </div>
 
-    <div class="cluster-table-container mat-elevation-z8" >
-      <mat-table #table [dataSource]="dataSource" matSort [hidden]="!clusters">
+    <div class="cluster-table-container mat-elevation-z8" [hidden]="!clusters">
+      <mat-table #table [dataSource]="dataSource" matSort [hidden]="!dataSource.data || !dataSource.data.length">
 
 
         <ng-container matColumnDef="name">
@@ -56,6 +56,12 @@
                      [hidden]="!dataSource.data || dataSource.data.length<=5">
       >
       </mat-paginator>
+
+      <div class="no-data-available-msg" *ngIf="!dataSource.data || !dataSource.data.length">
+        There are no clusters defined.
+      </div>
+
+
     </div>
   </mat-card>
 </div>

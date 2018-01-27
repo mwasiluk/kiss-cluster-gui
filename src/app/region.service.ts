@@ -2,6 +2,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {of} from 'rxjs/observable/of';
 import * as AWS from 'aws-sdk';
+import {AppConfig} from "./app-config";
 
 @Injectable()
 export class RegionService {
@@ -21,7 +22,7 @@ export class RegionService {
   }
 
   getAvailableRegions(): Observable<string[]> {
-    return of(['us-east-1', 'us-east-2']);
+    return of(AppConfig.AWS_REGIONS);
   }
 
   subscribe(callback): any {

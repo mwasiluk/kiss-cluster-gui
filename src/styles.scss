@@ -47,3 +47,11 @@ simple-notifications .simple-notification .sn-title{
   font-size: 12px;
   line-height: 1.1em;
 }
+
+[hidden]{
+  display: none!important;
+}
+
+.no-data-available-msg{
+  padding: 15px 10px
+}
