@@ -28,7 +28,7 @@
 
         <ng-container matColumnDef="S3_location">
           <mat-header-cell *matHeaderCellDef mat-sort-header> s3LocationProgram</mat-header-cell>
-          <mat-cell *matCellDef="let queue"> {{ queue.S3_location }}</mat-cell>
+          <mat-cell *matCellDef="let queue" (click)="this.openS3(queue.S3_location)" class="clickable"> {{ queue.S3_location }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="command">

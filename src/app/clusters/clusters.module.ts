@@ -14,14 +14,13 @@ import {
 
 import { QueueListComponent } from './queue-list/queue-list.component';
 import {QueueService} from './queue.service';
-import {BreadcrumbsModule} from "ng2-breadcrumbs";
+import {BreadcrumbsModule} from 'ng2-breadcrumbs';
 import { QueueDetailsDialogComponent } from './queue-details-dialog/queue-details-dialog.component';
 import { NodeListComponent } from './node-list/node-list.component';
 import { NodeDetailsDialogComponent } from './node-details-dialog/node-details-dialog.component';
-import {NodeService} from "./node.service";
-import {UtilsService} from "./utils.service";
-import {JobService} from "./job.service";
-import {S3Service} from "./s3.service";
+import {NodeService} from './node.service';
+import {JobService} from './job.service';
+import {SpotFleetsModule} from '../spot-fleets/spot-fleets.module';
 
 
 @NgModule({
@@ -32,6 +31,7 @@ import {S3Service} from "./s3.service";
     MatPaginatorModule, MatToolbarModule, MatSortModule, MatDialogModule, MatProgressSpinnerModule, MatExpansionModule,
     MatSnackBarModule,
     BreadcrumbsModule,
+    SpotFleetsModule,
     ClustersRoutingModule,
   ],
   declarations: [
@@ -40,7 +40,7 @@ import {S3Service} from "./s3.service";
     QueueListComponent,
     QueueDetailsDialogComponent,
     NodeListComponent,
-    NodeDetailsDialogComponent,
+    NodeDetailsDialogComponent
   ],
   entryComponents: [
     QueueDetailsDialogComponent,
@@ -51,9 +51,7 @@ import {S3Service} from "./s3.service";
     ClusterService,
     QueueService,
     NodeService,
-    JobService,
-    UtilsService,
-    S3Service
+    JobService
   ],
   exports: [
     ClusterListComponent

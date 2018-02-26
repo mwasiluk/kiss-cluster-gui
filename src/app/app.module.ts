@@ -15,8 +15,8 @@ import { AppRoutingModule } from './app-routing.module';
 import {ClustersModule} from './clusters/clusters.module';
 
 import { AppComponent } from './app.component';
-import { SpotFleetListComponent } from './spot-fleet-list/spot-fleet-list.component';
-import {SpotFleetService} from './spot-fleet.service';
+import { SpotFleetListComponent } from './spot-fleets/spot-fleet-list/spot-fleet-list.component';
+import {SpotFleetService} from './spot-fleets/spot-fleet.service';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoginComponent } from './login/login.component';
 import {Router} from '@angular/router';
@@ -28,16 +28,18 @@ import { HelpDialogComponent } from './help-dialog/help-dialog.component';
 import { AboutDialogComponent } from './about-dialog/about-dialog.component';
 import {RegionService} from './region.service';
 import {CredentialsCsvService} from './csv.service';
-import {SimpleNotificationsModule} from "angular2-notifications";
-import {HttpClientModule} from "@angular/common/http";
-import {AssetsService} from "./assets.service";
-import {DataService} from "./data.service";
+import {SimpleNotificationsModule} from 'angular2-notifications';
+import {HttpClientModule} from '@angular/common/http';
+import {AssetsService} from './assets.service';
+import {DataService} from './data.service';
+import {UtilsService} from './utils.service';
+import {S3Service} from './s3.service';
+import {SpotFleetsModule} from './spot-fleets/spot-fleets.module';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    SpotFleetListComponent,
     DashboardComponent,
     LoginComponent,
     HelpDialogComponent,
@@ -54,10 +56,11 @@ import {DataService} from "./data.service";
     SimpleNotificationsModule.forRoot(),
     BreadcrumbsModule,
     ClustersModule,
+    SpotFleetsModule,
     LoginRoutingModule,
     AppRoutingModule
   ],
-  providers: [SpotFleetService, RegionService, CredentialsCsvService, AssetsService, DataService],
+  providers: [RegionService, CredentialsCsvService, AssetsService, DataService, UtilsService, S3Service],
   bootstrap: [AppComponent]
 })
 export class AppModule {

@@ -4,6 +4,7 @@ import {AuthService} from '../auth.service';
 import {RegionService} from '../region.service';
 import {CredentialsCsvService} from '../csv.service';
 import {Credentials} from 'aws-sdk';
+import {forEach} from '@angular/router/src/utils/collection';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +12,6 @@ import {Credentials} from 'aws-sdk';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-
 
   message: string;
   credentials: Credentials;
@@ -43,15 +43,41 @@ export class LoginComponent implements OnInit {
       this.inProgress = false;
       if (this.authService.isLoggedIn) {
         // Get the redirect URL from our auth service
-        // If no redirect has been set, use the default
+        // If no redirect has been set, use the
+
         const redirect = this.authService.redirectUrl ? this.authService.redirectUrl : '';
 
         // Redirect the user
-        this.router.navigate([redirect]);
+        if (redirect) {
+          const {url, params} = this.getUrlParams(redirect);
+
+          this.router.navigate([url.pathname], {queryParams: params});
+        }else {
+          this.router.navigate([redirect]);
+        }
+
       }else {
         this.message = 'Login failed!';
       }
     });
+  }
+
+  private getUrlParams(redirect: string) {
+    const url = new URL(redirect, 'http://dummy.pl');
+    const params = {};
+    if (url.search) {
+
+      url.search.replace('?', '').split('&').forEach(p => {
+        const s = p.split('=', 2);
+
+        if (s.length === 1) {
+          params[s[0]] = '';
+        } else {
+          params[s[0]] = decodeURIComponent(s[1].replace(/\+/g, ' '));
+        }
+      });
+    }
+    return {url, params};
   }
 
   logout() {

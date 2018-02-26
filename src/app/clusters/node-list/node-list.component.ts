@@ -10,7 +10,8 @@ import 'rxjs/add/observable/interval';
 import 'rxjs/add/operator/switchMap';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/takeUntil';
-import {AppConfig} from "../../app-config";
+import {AppConfig} from '../../app-config';
+import {NotificationsService} from 'angular2-notifications';
 
 @Component({
   selector: 'app-node-list',
@@ -30,7 +31,8 @@ export class NodeListComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private router: Router, private dialog: MatDialog, private nodeService: NodeService) {}
+  constructor(private router: Router, private dialog: MatDialog, private nodeService: NodeService,
+              private notificationsService: NotificationsService) {}
 
   ngOnInit() {
     this.getNodes();
@@ -47,10 +49,6 @@ export class NodeListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getNodes(): void {
-    this.nodeService.getNodes(this.cluster.clustername).subscribe(nodes => {
-      this.nodes = nodes;
-      this.dataSource.data = nodes;
-    });
 
     Observable.interval(AppConfig.polling_interval)
       .takeUntil(this.destroyed$)
@@ -58,6 +56,10 @@ export class NodeListComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe(nodes => {
         this.nodes = nodes;
         this.dataSource.data = nodes;
+      }, e => {
+        this.notificationsService.error('Error loading nodes', e.message);
+        this.nodes = [];
+        this.dataSource.data = this.nodes;
       });
   }
 

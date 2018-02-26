@@ -2,16 +2,20 @@
   <mat-card>
     <mat-card-title>
       Spot fleets
-      <button mat-button color="primary"><i class="material-icons">add</i> new spot fleet</button>
+      <button mat-button color="primary" (click)="addBtnClick();"><i class="material-icons">add</i> new spot fleet</button>
     </mat-card-title>
 
 
-    <div class="spot-fleet-table-container mat-elevation-z8">
+    <div class="spinner-container">
+      <mat-spinner *ngIf="!spotFleets"></mat-spinner>
+    </div>
+
+    <div class="cluster-table-container mat-elevation-z8" [hidden]="!spotFleets">
       <mat-table #table [dataSource]="dataSource" matSort [hidden]="!dataSource.data || !dataSource.data.length">
 
         <ng-container matColumnDef="id">
           <mat-header-cell *matHeaderCellDef mat-sort-header> Id</mat-header-cell>
-          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.id }}</mat-cell>
+          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.data.SpotFleetRequestId }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="name">
@@ -21,28 +25,28 @@
 
         <ng-container matColumnDef="state">
           <mat-header-cell *matHeaderCellDef mat-sort-header> State</mat-header-cell>
-          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.state }}</mat-cell>
+          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.data.SpotFleetRequestState }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="targetCapacityCPU">
           <mat-header-cell *matHeaderCellDef mat-sort-header> Target capacity CPU</mat-header-cell>
-          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.targetCapacityCPU }}</mat-cell>
+          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.data.SpotFleetRequestConfig.TargetCapacity }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="currentCapacityCPU">
-          <mat-header-cell *matHeaderCellDef mat-sort-header> Current capacity CPU</mat-header-cell>
-          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.currentCapacityCPU }}</mat-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header> Fulfilled Capacity</mat-header-cell>
+          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.data.SpotFleetRequestConfig.FulfilledCapacity }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="instanceTypes">
           <mat-header-cell *matHeaderCellDef mat-sort-header> Instance types</mat-header-cell>
-          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.instanceTypes }}</mat-cell>
+          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.getInstanceTypes() }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="cluster">
           <mat-header-cell *matHeaderCellDef mat-sort-header> Cluster</mat-header-cell>
           <mat-cell *matCellDef="let spotFleet">
-            <a *ngIf="spotFleet.cluster" routerLink="/cluster/{{spotFleet.cluster.id}}"> {{ spotFleet.cluster.name }}</a></mat-cell>
+            <a *ngIf="spotFleet.getClusterName()" routerLink="/cluster/{{spotFleet.getClusterName()}}"> {{ spotFleet.getClusterName() }}</a></mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="bidPerCPU">
@@ -52,7 +56,12 @@
 
         <ng-container matColumnDef="amiId">
           <mat-header-cell *matHeaderCellDef mat-sort-header> AMI-id</mat-header-cell>
-          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.amiId }}</mat-cell>
+          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.getAmiId() }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          <mat-cell *matCellDef="let spotFleet"><button mat-raised-button color="warn" (click)="terminateBtnClick(spotFleet);" *ngIf="spotFleet.data.SpotFleetRequestState==='active' || spotFleet.data.SpotFleetRequestState==='submitted'">Terminate</button></mat-cell>
         </ng-container>
 
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

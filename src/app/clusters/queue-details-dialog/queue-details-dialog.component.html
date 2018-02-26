@@ -1,7 +1,9 @@
 <h1 mat-dialog-title><span *ngIf="mode=='create'">New</span> Queue {{ queue.queue_name }}</h1>
 <div mat-dialog-content>
-
-  <form #queueForm="ngForm">
+  <div class="spinner-container">
+    <mat-spinner *ngIf="!queue || workInProgress"></mat-spinner>
+  </div>
+  <form #queueForm="ngForm" [hidden]="workInProgress">
     <mat-form-field>
       <input name="queue_name" matInput placeholder="Name" [(ngModel)]="queue.queue_name" required
              [readonly]="mode==='view'">

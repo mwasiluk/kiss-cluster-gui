@@ -7,7 +7,12 @@ import {RegionService} from './region.service';
 import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
 import {FileLoader} from './file-loader';
-import {DataService} from "./data.service";
+import {DataService} from './data.service';
+import {S3Service} from './s3.service';
+import 'rxjs/add/operator/catch';
+import {Observable} from 'rxjs/Observable';
+import {NotificationsService} from 'angular2-notifications';
+import {ClusterService} from './clusters/cluster.service';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +22,7 @@ import {DataService} from "./data.service";
 export class AppComponent  implements OnInit {
   title = 'KissCluster';
   availableRegions = [];
-
+  workInProgress = false;
 
   public notificationOptions = {
     position: ['bottom', 'right'],
@@ -28,17 +33,64 @@ export class AppComponent  implements OnInit {
     theClass: 'notification'
   };
 
-  constructor(private router: Router, public dialog: MatDialog, public authService: AuthService, public regionService: RegionService, private dataService: DataService) {}
+  constructor(private router: Router, public dialog: MatDialog, public authService: AuthService, public regionService: RegionService,
+              private dataService: DataService, private s3Service: S3Service, private notificationsService: NotificationsService,
+              private clusterService: ClusterService) {}
 
   ngOnInit(): void {
 
     this.setAvailableRegions();
-    this.regionService.subscribe(r => setTimeout(() => {
+    this.regionService.subscribe(r => {
       if (this.authService.isLoggedIn) {
-        this.router.navigate(['/']);
+        console.log('region switched, checking dynamoDB db tables..')
+        this.workInProgress = true;
+        this.clusterService.createTableIfNotExists().map(res => {
+          if (res) {
+            return Observable.of(true);
+          }else {
+            return Observable.throw('Region switching error (Problem while creating the cluster DynamoDB table)');
+          }
+        }).finally(() => {
+          setTimeout(() => {
+            this.workInProgress = false;
+            this.router.navigate(['/']);
+          }, 200);
+        }).subscribe(res => {
+          console.log('res', res);
+        }, e => {
+          this.notificationsService.error(e);
+        });
+
       }
 
-    }, 200));
+    });
+
+    this.authService.subscribe(loggedIn => {
+      console.log(loggedIn);
+      if (!loggedIn) {
+        return;
+      }
+      /*this.s3Service.listBuckets().catch(e => {
+        console.log('catch', e);
+        this.notificationsService.error(e);
+        return Observable.throw(e);
+      }).subscribe(
+        function (x) {
+          console.log('Next: ', x);
+        },
+        function (err) {
+          console.log('Error: ' + err);
+        },
+        function () {
+          console.log('Completed');
+        });
+      */
+    },  (err) => {
+      console.log('Error: ' + err);
+    }, () => {
+      console.log('Completed');
+    });
+
   }
 
   showBreadcrumb() {

@@ -1,4 +1,5 @@
 
 export class Job {
-  nodeid?: number;
+  jobid?: number;
+  queueid?: number;
 }

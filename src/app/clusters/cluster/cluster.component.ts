@@ -9,6 +9,10 @@ import {BreadcrumbsService} from 'ng2-breadcrumbs';
 import {MatDialog} from '@angular/material';
 import {NotificationsService} from 'angular2-notifications';
 import * as FileSaver from 'file-saver';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/finally';
+import {S3Service} from '../../s3.service';
 
 @Component({
   selector: 'app-cluster',
@@ -32,6 +36,7 @@ export class ClusterComponent implements OnInit {
     private dialog: MatDialog,
     private clusterService: ClusterService,
     private breadcrumbs: BreadcrumbsService,
+    protected s3Service: S3Service
   ) { }
 
   ngOnInit() {
@@ -44,7 +49,6 @@ export class ClusterComponent implements OnInit {
       .subscribe((data: { cluster: Cluster, mode: string }) => {
         this.cluster = data.cluster;
         this.mode = data.mode;
-
       });
     // http://localhost:4200/#/cluster/dddddddddddd?is_new=true
     this.route.queryParams.subscribe(params => {
@@ -64,14 +68,14 @@ export class ClusterComponent implements OnInit {
   onSubmit() {
     this.submitted = true;
     this.workInProgress = true;
-    this.clusterService.createCluster(this.cluster).subscribe(c => {
+    this.clusterService.createCluster(this.cluster).finally(() => {
       this.workInProgress = false;
-      if (!c) {
-        this.notificationsService.error('Cluster creation failure!');
-      }else {
+    }).subscribe(c => {
         this.notificationsService.success('The cluster ' + c.clustername + ' has been successfully created');
         this.router.navigate(['/cluster', this.cluster.clustername], { queryParams: { is_new: true } });
-      }
+    }, (e) => {
+      this.notificationsService.error('Cluster creation failure!');
+      this.notificationsService.error(e);
     });
 
   }
@@ -81,20 +85,27 @@ export class ClusterComponent implements OnInit {
       return;
     }
     this.workInProgress = true;
-    this.clusterService.deleteCluster(this.cluster).subscribe(c => {
+    this.clusterService.deleteCluster(this.cluster).finally(() => {
       this.workInProgress = false;
-      if (!c) {
-        this.notificationsService.error('Cluster deletion failure!');
-      }else {
-        this.notificationsService.success('The cluster ' + this.cluster.clustername + ' has been successfully deleted');
-        this.router.navigate(['/']);
-      }
+    }).subscribe(c => {
+
+      this.notificationsService.success('The cluster ' + this.cluster.clustername + ' has been successfully deleted');
+      this.router.navigate(['/']);
+
+    }, (e) => {
+      this.notificationsService.error('Cluster deletion failure!');
+      this.notificationsService.error(e);
+
     });
   }
 
   onSaveJson() {
-    let blob = new Blob([JSON.stringify(this.cluster)], {type: 'application/json'});
+    const blob = new Blob([JSON.stringify(this.cluster)], {type: 'application/json'});
     FileSaver.saveAs(blob, `${this.cluster.clustername}.kissc.json`);
+  }
+
+  openS3(location, file = false) {
+    window.open(this.s3Service.getConsoleUrl(location, file), '_blank');
   }
 
 }

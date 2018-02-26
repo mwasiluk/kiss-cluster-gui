@@ -17,14 +17,14 @@ export class AssetsService {
       return of(this.cache[assetName]);
     }
 
-    return this.http.get(`assets/sh/${assetName}`, {responseType: 'text'}).flatMap(data => {
+    return this.http.get(`assets/${assetName}`, {responseType: 'text'}).flatMap(data => {
       this.cache[assetName] = data;
       return of(data);
     });
   }
 
   public getAllScripts(): Observable<object> {
-    return Observable.forkJoin(AppConfig.SCRIPT_NAMES.map(s => this.get(s))).flatMap(r => of(this.cache));
+    return Observable.forkJoin(AppConfig.SCRIPT_NAMES.map(s => this.get(`sh/${s}`))).flatMap(r => of(this.cache));
   }
 
 }

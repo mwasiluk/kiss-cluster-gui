@@ -1,4 +1,4 @@
-import {SpotFleet} from './spot-fleet';
+import {SpotFleet} from './spot-fleets/spot-fleet';
 import {CLUSTERS} from './clusters/mock-clusters';
 
 

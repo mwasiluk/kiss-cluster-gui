@@ -49,8 +49,11 @@
 
   <breadcrumb [hidden]="!showBreadcrumb()"></breadcrumb>
 
+  <div class="spinner-container">
+    <mat-spinner *ngIf="workInProgress"></mat-spinner>
+  </div>
 
-  <router-outlet></router-outlet>
+  <router-outlet *ngIf="!workInProgress"></router-outlet>
   <simple-notifications [options]="notificationOptions"></simple-notifications>
   <input type="file" style="display:none" id="kissc-file-input" accept=".json"/>
 </div>

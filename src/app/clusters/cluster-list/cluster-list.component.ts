@@ -9,7 +9,8 @@ import 'rxjs/add/observable/interval';
 import 'rxjs/add/operator/switchMap';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/takeUntil';
-import {AppConfig} from "../../app-config";
+import {AppConfig} from '../../app-config';
+import {NotificationsService} from 'angular2-notifications';
 
 
 @Component({
@@ -29,7 +30,8 @@ export class ClusterListComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private router: Router, private clusterService: ClusterService, private regionService: RegionService) {}
+  constructor(private router: Router, private clusterService: ClusterService, private regionService: RegionService,
+              private notificationsService: NotificationsService) {}
 
   ngOnInit() {
     this.regionService.subscribe(r => this.getClusters());
@@ -53,7 +55,10 @@ export class ClusterListComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe(clusters => {
         this.clusters = clusters;
         this.dataSource.data = clusters;
-    });
+      }, e => {
+        this.notificationsService.error('Error loading clusters', e.message);
+        this.clusters = [];
+      });
   }
 
   createClusterBtnClick() {

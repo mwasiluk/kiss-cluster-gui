@@ -4,15 +4,15 @@
   <mat-card-content>
     <br/>
     <p>The Servless master of cluster {{ cluster.clustername }} has been successfully build!</p>
-    <p>Now you can simply run {{ cluster.S3_node_init_script }} on any Linux machine having AWS CLI configured to start processing on your cluster</p>
-    <p>{{ cluster.S3_node_init_script }} can also be used as a cloud-init configuration for AWS EC2 instances.</p>
+    <p>Now you can simply run <a [href]="s3Service.getConsoleUrl(cluster.S3_node_init_script, true)" target="_blank">{{ cluster.S3_node_init_script }}</a> on any Linux machine having AWS CLI configured to start processing on your cluster</p>
+    <p><a [href]="s3Service.getConsoleUrl(cluster.S3_node_init_script, true)" target="_blank">{{ cluster.S3_node_init_script }}</a> can also be used as a cloud-init configuration for AWS EC2 instances.</p>
   </mat-card-content>
 </mat-card>
 
 
 <mat-card class="cluster-details-card">
   <mat-card-header>
-    <mat-card-title><h1><span *ngIf="mode=='create'">New</span> Cluster: {{ cluster.clustername }}   </h1></mat-card-title>
+    <mat-card-title><h1><span *ngIf="mode=='create'">New</span> Cluster: <span  *ngIf="cluster">{{ cluster.clustername }}</span>   </h1></mat-card-title>
   </mat-card-header>
   <mat-card-content>
     <div class="spinner-container">
@@ -24,73 +24,77 @@
     </div>
 
     <div [hidden]="!cluster || workInProgress">
+      <div>
 
-      <form class="cluster-details-form" #clusterForm="ngForm">
+        <form class="cluster-details-form" #clusterForm="ngForm">
 
-        <div>
-          <mat-form-field>
-            <input matInput name="clustername" placeholder="Name" [(ngModel)]="cluster.clustername" [readonly]="mode=='view'" required>
-          </mat-form-field>
-        </div>
-
-
-
-        <div>
-          <mat-form-field>
-            <input matInput name="username" placeholder="Username" [(ngModel)]="cluster.username" [readonly]="mode=='view'">
-          </mat-form-field>
-        </div>
-        <div *ngIf="mode=='create'">
-          <mat-form-field>
-            <input matInput name="$s3_bucket" placeholder="s3_bucket" [(ngModel)]="cluster.$s3_bucket">
-            <span matPrefix>s3:// </span>
-          </mat-form-field>
-        </div>
-
-      </form>
-
-      <mat-expansion-panel *ngIf="mode=='view'">
-        <mat-expansion-panel-header>
-          Details
-        </mat-expansion-panel-header>
-
-        <div class="extended-info">
-          <mat-form-field>
-            <input matInput placeholder="creator" [(ngModel)]="cluster.creator" [readonly]="true">
-          </mat-form-field>
-          <mat-form-field>
-            <input matInput placeholder="nodeid" [(ngModel)]="cluster.nodeid" [readonly]="true">
-          </mat-form-field>
-          <mat-form-field>
-            <input matInput placeholder="queueid" [(ngModel)]="cluster.queueid" [readonly]="true">
-          </mat-form-field>
-
-          <mat-form-field>
-            <input matInput placeholder="S3_location" [(ngModel)]="cluster.S3_location" [readonly]="true">
-          </mat-form-field>
-
-          <mat-form-field>
-            <input matInput placeholder="S3_node_init_script" [(ngModel)]="cluster.S3_node_init_script" [readonly]="true">
-          </mat-form-field>
-
-          <mat-form-field>
-            <input matInput placeholder="S3_queue_update_script" [(ngModel)]="cluster.S3_queue_update_script" [readonly]="true">
-          </mat-form-field>
-
-          <mat-form-field>
-            <input matInput placeholder="S3_job_envelope_script" [(ngModel)]="cluster.S3_job_envelope_script" [readonly]="true">
-          </mat-form-field>
-          <mat-form-field>
-            <input matInput placeholder="S3_run_node_script" [(ngModel)]="cluster.S3_run_node_script" [readonly]="true">
-          </mat-form-field>
-        </div>
-
-      </mat-expansion-panel>
-
-      <app-queue-list *ngIf="mode=='view'" [cluster]="cluster"></app-queue-list>
+          <div>
+            <mat-form-field>
+              <input matInput name="clustername" placeholder="Name" [(ngModel)]="cluster.clustername" [readonly]="mode=='view'" required>
+            </mat-form-field>
+          </div>
 
 
-      <app-node-list *ngIf="mode=='view'" [cluster]="cluster"></app-node-list>
+
+          <div>
+            <mat-form-field>
+              <input matInput name="username" placeholder="Username" [(ngModel)]="cluster.username" [readonly]="mode=='view'">
+            </mat-form-field>
+          </div>
+          <div *ngIf="mode=='create'">
+            <mat-form-field>
+              <input matInput name="$s3_bucket" placeholder="s3_bucket" [(ngModel)]="cluster.$s3_bucket">
+              <span matPrefix>s3:// </span>
+            </mat-form-field>
+          </div>
+
+        </form>
+
+        <mat-expansion-panel *ngIf="mode=='view'">
+          <mat-expansion-panel-header>
+            Details
+          </mat-expansion-panel-header>
+
+          <div class="extended-info">
+            <mat-form-field>
+              <input matInput placeholder="creator" [(ngModel)]="cluster.creator" [readonly]="true">
+            </mat-form-field>
+            <mat-form-field>
+              <input matInput placeholder="nodeid" [(ngModel)]="cluster.nodeid" [readonly]="true">
+            </mat-form-field>
+            <mat-form-field>
+              <input matInput placeholder="queueid" [(ngModel)]="cluster.queueid" [readonly]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="S3_location" [(ngModel)]="cluster.S3_location" [readonly]="true" (click)="openS3(cluster.S3_location)" class="clickable">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="S3_node_init_script" [(ngModel)]="cluster.S3_node_init_script" [readonly]="true" (click)="openS3(cluster.S3_node_init_script, true)" class="clickable">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="S3_queue_update_script" [(ngModel)]="cluster.S3_queue_update_script" [readonly]="true" (click)="openS3(cluster.S3_queue_update_script, true)" class="clickable">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="S3_job_envelope_script" [(ngModel)]="cluster.S3_job_envelope_script" [readonly]="true" (click)="openS3(cluster.S3_job_envelope_script, true)" class="clickable">
+            </mat-form-field>
+            <mat-form-field>
+              <input matInput placeholder="S3_run_node_script" [(ngModel)]="cluster.S3_run_node_script" [readonly]="true" (click)="openS3(cluster.S3_run_node_script, true)" class="clickable">
+            </mat-form-field>
+          </div>
+
+        </mat-expansion-panel>
+
+        <app-queue-list *ngIf="mode==='view'" [cluster]="cluster"></app-queue-list>
+
+
+        <app-node-list *ngIf="mode==='view'" [cluster]="cluster"></app-node-list>
+
+        <app-spot-fleet-list *ngIf="mode==='view'" [cluster]="cluster"></app-spot-fleet-list>
+      </div>
     </div>
 
   </mat-card-content>

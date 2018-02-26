@@ -11,6 +11,8 @@ import 'rxjs/add/operator/switchMap';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/takeUntil';
 import {AppConfig} from "../../app-config";
+import {S3Service} from "../../s3.service";
+import {NotificationsService} from "angular2-notifications";
 @Component({
   selector: 'app-queue-list',
   templateUrl: './queue-list.component.html',
@@ -29,7 +31,8 @@ export class QueueListComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private router: Router, private dialog: MatDialog, private queueService: QueueService) {}
+  constructor(private router: Router, private dialog: MatDialog, private queueService: QueueService, private s3Service: S3Service,
+              private notificationsService: NotificationsService) {}
 
   ngOnInit() {
     this.getQueues();
@@ -53,6 +56,10 @@ export class QueueListComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe(queues => {
         this.queues = queues;
         this.dataSource.data = queues;
+      }, e => {
+        this.notificationsService.error('Error loading queues', e.message);
+        this.queues = [];
+        this.dataSource.data = this.queues;
       });
   }
 
@@ -86,6 +93,10 @@ export class QueueListComponent implements OnInit, OnDestroy, AfterViewInit {
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
     });
+  }
+
+  openS3(location, file = false) {
+    window.open(this.s3Service.getConsoleUrl(location, file), '_blank');
   }
 
 }

@@ -5,6 +5,9 @@ import {Queue} from '../queue';
 import {QueueService} from '../queue.service';
 import {Cluster} from '../cluster';
 import {NotificationsService} from 'angular2-notifications';
+import {Observable} from "rxjs/Observable";
+import 'rxjs/add/operator/catch';
+import {S3Service} from "../../s3.service";
 
 @Component({
   selector: 'app-queue-details-dialog',
@@ -19,11 +22,13 @@ export class QueueDetailsDialogComponent implements OnInit {
 
   submitted = false;
   appFiles = [];
+  workInProgress = false;
 
   constructor(
     private notificationsService: NotificationsService,
     private queueService: QueueService,
     public dialogRef: MatDialogRef<QueueDetailsDialogComponent>,
+    private s3Service: S3Service,
     @Inject(MAT_DIALOG_DATA) public data: any) {
 
     this.queue = data.queue;
@@ -41,18 +46,24 @@ export class QueueDetailsDialogComponent implements OnInit {
 
   onSubmit() {
     this.submitted = true;
-    this.queueService.createQueue(this.queue, this.cluster, this.appFiles).subscribe(q => {
-      if (!q) {
-        this.notificationsService.error('Queue creation failure!');
-        return;
-      }
+    this.workInProgress =  true;
+    this.queueService.createQueue(this.queue, this.cluster, this.appFiles).finally(() => {
+      this.workInProgress = false;
+    }).subscribe(q => {
       this.notificationsService.success('The queue ' + this.queueService.printQueueID(q) + ' has been successfully created');
       this.dialogRef.close(q);
+    }, (e) => {
+      this.notificationsService.error('Queue creation failure!');
+      this.notificationsService.error(e);
     });
 
   }
 
   filesPicked(files) {
     this.appFiles = files;
+  }
+
+  openS3(location, file = false) {
+    window.open(this.s3Service.getConsoleUrl(location, file), '_blank');
   }
 }

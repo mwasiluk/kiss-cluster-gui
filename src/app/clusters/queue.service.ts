@@ -1,42 +1,33 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
-import {of} from 'rxjs/observable/of';
 import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/catch';
 
 import {Queue} from './queue';
 import * as AWS from 'aws-sdk';
 import {Cluster} from './cluster';
-import {DatePipe} from '@angular/common';
 import {NotificationsService} from 'angular2-notifications';
 import {RegionService} from '../region.service';
-import {UtilsService} from './utils.service';
-import {ClusterService} from './cluster.service';
+import {UtilsService} from '../utils.service';
 import {AppConfig} from '../app-config';
-import {S3Service} from './s3.service';
+import {S3Service} from '../s3.service';
+import {CrudBaseService} from '../crud-base.service';
 
 
 @Injectable()
-export class QueueService {
+export class QueueService extends CrudBaseService<Queue> {
 
-  db: AWS.DynamoDB;
   s3: AWS.S3;
 
-  private readCapacityUnits: any; // TODO move to config
-  private writeCapacityUnits: any;
+  constructor(protected notificationsService: NotificationsService, protected regionService: RegionService,
+              protected utilsService: UtilsService, private s3Service: S3Service) {
 
-  constructor(private notificationsService: NotificationsService, private regionService: RegionService,
-              private utilsService: UtilsService, private s3Service: S3Service) {
-
-    this.regionService.subscribe(r => this.initAWS());
-    this.initAWS();
+    super(notificationsService, regionService, utilsService);
 
   }
 
-  private initAWS() {
-    this.db = new AWS.DynamoDB({
-      credentials: AWS.config.credentials,
-      region: AWS.config.region
-    });
+  protected initAWS() {
+    super.initAWS();
 
     this.s3 = new AWS.S3({
       credentials: AWS.config.credentials,
@@ -44,147 +35,76 @@ export class QueueService {
     });
   }
 
+
+  map(data: any): Queue {
+    return AWS.DynamoDB.Converter.unmarshall(data);
+  }
+
+  mapQueue(data: any): Queue {
+    return this.map(data);
+  }
+
+  getQueueKey(id): AWS.DynamoDB.Key {
+    return {queueid: {S: id}};
+  }
+
+  getItemKey(item: Queue): AWS.DynamoDB.Key {
+    return this.getQueueKey(item.queueid);
+  }
+
+  getCreateTableInput(clustername): AWS.DynamoDB.CreateTableInput {
+    return {
+      TableName: this.getTableName(clustername),
+      AttributeDefinitions: [
+        {
+          AttributeName: 'queueid',
+          AttributeType: 'N'
+        }
+      ],
+      KeySchema: [{
+        AttributeName: 'queueid',
+        KeyType: 'HASH'
+      }],
+      ProvisionedThroughput: {
+        ReadCapacityUnits: AppConfig.QUEUES_TABLE_ReadCapacityUnits,
+        WriteCapacityUnits: AppConfig.QUEUES_TABLE_WriteCapacityUnits
+      }
+    };
+  }
+
+  getNewItem(data: any): Queue {
+    return data;
+  }
+
+  getNewQueueForCluster(cluster: Cluster): Queue {
+    console.log('getNewQueueForCluster', Cluster.getS3Bucket(cluster.S3_location));
+    return {
+      $S3_bucket: Cluster.getS3Bucket(cluster.S3_location),
+      minjobid: AppConfig.MINJOBID,
+      maxjobid: AppConfig.MAXJOBID
+    };
+  }
+
+  getShortDescription(item: Queue): string {
+    return `queue ${this.printQueueID(item)}`;
+  }
+
+
   getTableName(clustername) {
     return AppConfig.QUEUES_TABLE_NAME_PREFIX + clustername;
-  }
-
-  createTableIfNotExists(clustername): Observable<boolean> {
-    const tableName = this.getTableName(clustername);
-    return this.checkIfTableExists(clustername).flatMap(r => {
-      if (r) {
-
-        console.log(tableName + ' DynamoDB table already exists.');
-        return of(true);
-      }
-      console.log(tableName + ' DynamoDB table not exists. Creating...');
-      return this.createTable(clustername);
-    });
-
-  }
-
-  checkIfTableExists(clustername): Observable<boolean> {
-    const tableName = this.getTableName(clustername);
-    return new Observable(observer => {
-      this.db.describeTable({
-        TableName: tableName
-      }, (err, data) => {
-        console.log(err, data);
-        if (data && data.Table && data.Table.TableName) {
-          observer.next(true);
-
-        }else {
-          observer.next(false);
-        }
-        observer.complete();
-
-      });
-    });
-
-  }
-
-  createTable(clustername): Observable<boolean> {
-    const tableName = this.getTableName(clustername);
-    return new Observable(observer => {
-      this.db.createTable({
-        TableName: tableName,
-        AttributeDefinitions: [
-          {
-            AttributeName: 'queueid',
-            AttributeType: 'N'
-          }
-        ],
-        KeySchema: [{
-          AttributeName: 'queueid',
-          KeyType: 'HASH'
-        }],
-        ProvisionedThroughput: {
-          ReadCapacityUnits: AppConfig.QUEUES_TABLE_ReadCapacityUnits,
-          WriteCapacityUnits: AppConfig.QUEUES_TABLE_WriteCapacityUnits
-        }
-      }, (err, data) => {
-        if (data && data.TableDescription && data.TableDescription.TableName) {
-          this.db.waitFor('tableExists', {TableName: tableName}, (err2, data2) => {
-            if (err2) {
-              console.log(err2);
-              observer.next(false);
-            }else {
-              observer.next(true);
-            }
-            observer.complete();
-          });
-        }else {
-          console.log('Error creating table ', err);
-          this.notificationsService.error(`Error creating ${tableName} DynamoDB table: ${err.message}`);
-          observer.next(false);
-          observer.complete();
-        }
-      });
-    });
-  }
-
-  deleteTable(clustername): Observable<boolean> {
-    const tableName = this.getTableName(clustername);
-    return new Observable(observer => {
-      this.db.deleteTable({
-        TableName: tableName,
-      }, (err, data) => {
-        if (!err) {
-          observer.next(true);
-          observer.complete();
-        }else {
-          this.notificationsService.error(`Error deleting ${tableName} DynamoDB table: ${err.message}`);
-          console.log('Error deleting table ', err);
-          observer.next(false);
-          observer.complete();
-        }
-      });
-    });
   }
 
   getQueues(clustername): Observable<Queue[]> {
     return this.getQueuesForCluster(clustername);
   }
 
-
-
-
   getQueuesForCluster(clustername): Observable<Queue[]> {
-
-    return new Observable(observer => {
-
-      this.db.scan({
-        TableName: this.getTableName(clustername)
-      }, (err, data) => {
-        observer.next(data.Items.map(this.mapQueue));
-        observer.complete();
-
-      });
-    });
+    return this.getAll(clustername);
   }
+
 
   getQueue(id: string, clustername: string): Observable<Queue> {
-    return new Observable(observer => {
-
-      this.db.getItem({
-        TableName: this.getTableName(clustername),
-        Key: {queueid: {S: id}}
-      }, (err, data) => {
-        const item = this.mapQueue(data.Item);
-        console.log(data.Item, item);
-        observer.next(item);
-        observer.complete();
-
-      });
-    });
-
-  }
-
-  mapQueue(data: any): Queue {
-    return AWS.DynamoDB.Converter.unmarshall(data);
-  }
-
-  marshallQueue(q: Queue): AWS.DynamoDB.AttributeMap {
-    return AWS.DynamoDB.Converter.marshall(q);
+    return this.get(this.getQueueKey(id), clustername);
   }
 
   getNewQueueId(cluster: Cluster): Observable<number> {
@@ -201,6 +121,9 @@ export class QueueService {
 
       }, (err, data) => {
 
+        if (err || !data){
+          return Observable.throw(err);
+        }
         console.log('getNewQueueId', err, data, data.Attributes.queueid.N);
 
         observer.next(parseInt(data.Attributes.queueid.N));
@@ -231,12 +154,11 @@ export class QueueService {
 
       this.notificationsService.info('Deleting S3 folder ' + appFolder);
 
-      return this.s3Service.emptyBucket(queue.$S3_bucket, appFolder).flatMap(r => {
-        if (!r) {
-          console.log('Deleting S3 folder failed!');
-          this.notificationsService.error('Deleting S3 folder failed!');
-        }
-
+      return this.s3Service.emptyBucket(queue.$S3_bucket, appFolder).catch(e => {
+          console.log('Deleting S3 folder failed!', e, e.code);
+        this.notificationsService.warn('Deleting S3 folder failed!');
+        return Observable.of(false);
+      }).flatMap(r => {
 
         console.log('Uploading app files!');
         return Observable.forkJoin([
@@ -253,36 +175,14 @@ export class QueueService {
       queue.creator = this.utilsService.getCreator();
       queue.jobid = queue.minjobid - 1;
 
-      return new Observable(observer => {
-        this.db.putItem({
-          TableName: this.getTableName(cluster.clustername),
-          Item:  this.marshallQueue(queue)
-        }, (err, data) => {
-          if (err) {
-            console.log('Error putting item', err);
-            observer.next(null);
-          }else {
-            console.log(data);
-            observer.next(queue);
-          }
-
-          observer.complete();
-        });
-      });
+      return this.putItem(queue, cluster.clustername);
 
     });
 
   }
 
 
-  getNewQueueForCluster(cluster: Cluster): Queue {
-    console.log('getNewQueueForCluster', Cluster.getS3Bucket(cluster.S3_location))
-    return {
-      $S3_bucket: Cluster.getS3Bucket(cluster.S3_location),
-      minjobid: AppConfig.MINJOBID,
-      maxjobid: AppConfig.MAXJOBID
-    };
-  }
+
 
 }
 

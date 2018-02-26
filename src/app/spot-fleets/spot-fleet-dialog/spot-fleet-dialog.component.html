@@ -1,0 +1,119 @@
+<h1 mat-dialog-title><span *ngIf="mode=='create'">New</span> Spot Fleet</h1>
+<div mat-dialog-content>
+  <div class="spinner-container">
+    <mat-spinner *ngIf="workInProgress"></mat-spinner>
+  </div>
+
+  <form #spotFleetForm="ngForm" [hidden]="workInProgress">
+
+    <div *ngIf="!cluster && mode!=='view'">
+      <mat-form-field>
+        <mat-select placeholder="Select cluster" [(ngModel)]="cluster" name="cluster" (selectionChange)="setCluster(cluster)">
+          <mat-option *ngFor="let c of clusters" [value]="c">
+            {{ c.clustername }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+    </div>
+
+    <div *ngIf="cluster">
+
+      <div class="cluster-info">
+        Cluster: {{ cluster.clustername }}
+      </div>
+
+      <div *ngIf="spotFleet" class="spot-fleet-config">
+
+        <div class="advanced-users-info">
+          <a [href]="getSpotRequestConsoleUrl()" target="_blank">For advances users only - you can use AWS Spot Fleet GUI instead of KissCluster GUI</a>
+        </div>
+
+        <mat-form-field>
+          <input name="request_type" matInput placeholder="Spot Fleet Request Type" [(ngModel)]="spotFleet.data.SpotFleetRequestConfig.Type" readonly>
+        </mat-form-field>
+
+        <mat-form-field>
+          <input name="TargetCapacity" matInput placeholder="Target Capacity" [(ngModel)]="spotFleet.data.SpotFleetRequestConfig.TargetCapacity" [readonly]="mode==='view'">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-select placeholder="Instance types" [(ngModel)]="instanceTypes" name="instance_types" multiple required>
+            <mat-option *ngFor="let i of availableInstanceTypes" [value]="i">
+              {{ i }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <br/>
+        <mat-form-field>
+          <mat-select placeholder="AMI " [(ngModel)]="amiId" name="ami_ids" required>
+            <mat-option *ngFor="let ami of availableAMIs" [value]="ami.ImageId">
+              {{ ami.ImageId}}  ({{ ami.Description }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <br/>
+
+
+        <mat-form-field>
+          <input name="interruption_behavior" matInput placeholder="Interruption behavior" value="Terminate" readonly>
+        </mat-form-field>
+
+
+        <br/>
+        <mat-form-field>
+          <mat-select placeholder="Security group" [(ngModel)]="securityGroup" name="security_group" required>
+            <mat-option *ngFor="let s of availableSecurityGroups" [value]="s.GroupName">
+              {{ s.GroupName}}  ({{ s.Description }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-select placeholder="Key pair name" [(ngModel)]="keyPairName" name="keyPairName" required>
+            <mat-option *ngFor="let s of availableKeyPairs" [value]="s.KeyName">
+              {{ s.KeyName}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <br/>
+
+        <mat-form-field>
+          <mat-select placeholder="IAM instance profile" [(ngModel)]="iamInstanceProfile" name="iamInstanceProfile" required>
+            <mat-option *ngFor="let s of availableIamInstanceProfiles" [value]="s.InstanceProfileId">
+              {{ s.InstanceProfileId }} ({{s.InstanceProfileName}})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <textarea class="user-data" name="user_data" matInput placeholder="User data" matTextareaAutosize matAutosizeMinRows="2" [(ngModel)]="spotFleet.userData"
+            matAutosizeMaxRows="15"></textarea>
+        </mat-form-field>
+       <br/>
+
+        <mat-form-field>
+          <input name="allocation_strategy" matInput placeholder="Allocation strategy" value="Lowest price" readonly>
+        </mat-form-field>
+
+
+        <mat-form-field>
+          <input name="max_price" matInput placeholder="Maximum price" value="The on demand priced will be used" readonly>
+        </mat-form-field>
+
+      </div>
+    </div>
+
+
+
+
+  </form>
+
+
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="close()" tabindex="-1">Close</button>
+  <button mat-button (click)="onSubmit()" tabindex="-1" color="primary" [disabled]="!spotFleetForm.form.valid" *ngIf="mode!=='view'">Submit</button>
+</div>

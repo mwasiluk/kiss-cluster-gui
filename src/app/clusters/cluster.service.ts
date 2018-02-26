@@ -4,194 +4,97 @@ import { of } from 'rxjs/observable/of';
 import 'rxjs/add/observable/forkJoin';
 
 import {Cluster} from './cluster';
-import {CLUSTERS} from './mock-clusters';
 import * as AWS from 'aws-sdk';
 import {NotificationsService} from 'angular2-notifications';
-import {DatePipe} from '@angular/common';
 import {RegionService} from '../region.service';
 import {QueueService} from './queue.service';
-import {UtilsService} from './utils.service';
+import {UtilsService} from '../utils.service';
 import {AppConfig} from '../app-config';
 import {NodeService} from './node.service';
 import {JobService} from './job.service';
-import {message} from 'aws-sdk/clients/sns';
-import {queue} from 'rxjs/scheduler/queue';
-import {S3Service} from './s3.service';
+import {S3Service} from '../s3.service';
 import {AssetsService} from '../assets.service';
-
+import 'rxjs/add/observable/throw';
+import {CrudBaseService} from '../crud-base.service';
 
 @Injectable()
-export class ClusterService {
+export class ClusterService extends CrudBaseService<Cluster> {
 
-  db: AWS.DynamoDB;
-
-  constructor(private notificationsService: NotificationsService, private regionService: RegionService,
+  constructor(protected notificationsService: NotificationsService, protected regionService: RegionService,
               private queueService: QueueService, private nodeService: NodeService, private jobService: JobService,
-              private utilsService: UtilsService, private s3Service: S3Service, private assetsService: AssetsService) {
-
-    this.regionService.subscribe(r => this.initAWS());
-    this.initAWS();
-  }
-  public static getClusterKey(clustername: string): AWS.DynamoDB.Key {
-    return {clustername: {S: clustername}};
+              protected utilsService: UtilsService, private s3Service: S3Service, private assetsService: AssetsService) {
+    super(notificationsService, regionService, utilsService);
   }
 
   public static getTableName(): string {
     return AppConfig.CLUSTERS_TABLE_NAME;
   }
-  private initAWS() {
-    this.db = new AWS.DynamoDB({
-      credentials: AWS.config.credentials,
-      region: AWS.config.region
-    });
+
+  public static getClusterKey(clustername: string): AWS.DynamoDB.Key {
+    return {clustername: {S: clustername}};
   }
 
 
 
-
-
-  getClusters(): Observable<Cluster[]> {
-
-    return new Observable(observer => {
-
-      this.db.scan({
-        TableName: ClusterService.getTableName()
-      }, (err, data) => {
-        if (err) {
-          console.log(err.message);
-          observer.next([]);
-          observer.complete();
-          return;
-        }
-        observer.next(data.Items.map(this.mapCluster));
-        observer.complete();
-
-      });
-    });
-
+  public getTableName(): string {
+    return ClusterService.getTableName();
   }
 
-  getCluster(name: string): Observable<Cluster> {
-
-    return new Observable(observer => {
-
-      this.db.getItem({
-        TableName: ClusterService.getTableName(),
-        Key: ClusterService.getClusterKey(name)
-      }, (err, data) => {
-        if (err || !data.Item) {
-          observer.next(null);
-          observer.complete();
-          return;
-        }
-        const cluster = this.mapCluster(data.Item);
-        console.log(data.Item, cluster);
-        observer.next(cluster);
-        observer.complete();
-
-      });
-    });
-  }
-
-  createTable(): Observable<boolean> {
-    return new Observable(observer => {
-      this.db.createTable({
-        TableName: ClusterService.getTableName(),
-        AttributeDefinitions: [
-          {
-            AttributeName: 'clustername',
-            AttributeType: 'S'
-          }
-        ],
-        KeySchema: [{
-          AttributeName: 'clustername',
-          KeyType: 'HASH'
-        }],
-        ProvisionedThroughput: {
-          ReadCapacityUnits: AppConfig.CLUSTERS_TABLE_ReadCapacityUnits,
-          WriteCapacityUnits: AppConfig.CLUSTERS_TABLE_WriteCapacityUnits
-        }
-      }, (err, data) => {
-        if (data && data.TableDescription && data.TableDescription.TableName) {
-          this.db.waitFor('tableExists', {TableName: ClusterService.getTableName()}, (err2, data2) => {
-            if (err2) {
-              console.log(err2);
-              observer.next(false);
-            }else {
-              observer.next(true);
-            }
-            observer.complete();
-          });
-        }else {
-          console.log('Error creating table ', err);
-          observer.next(false);
-        }
-      });
-    });
-  }
-
-  createTableIfNotExists(): Observable<boolean> {
-
-    return this.checkIfTableExists().flatMap(r => {
-      if (r) {
-        console.log(ClusterService.getTableName() + ' DynamoDB table already exists.');
-        return of(true);
-      }
-      console.log(ClusterService.getTableName() + ' DynamoDB table not exists. Creating...');
-      return this.createTable();
-    });
-
-  }
-
-  checkIfTableExists(): Observable<boolean> {
-    return new Observable(observer => {
-      this.db.describeTable({
-        TableName: ClusterService.getTableName()
-      }, (err, data) => {
-        console.log(err, data);
-        if (data && data.Table && data.Table.TableName) {
-          observer.next(true);
-
-        }else {
-          observer.next(false);
-        }
-        observer.complete();
-
-      });
-    });
-
-  }
-
-  mapCluster(data: any): Cluster {
+  map(data: any): Cluster {
     return AWS.DynamoDB.Converter.unmarshall(data);
   }
 
-  marshallCluster(q: Cluster): AWS.DynamoDB.AttributeMap {
-    return AWS.DynamoDB.Converter.marshall(q);
+  getItemKey(item: Cluster): AWS.DynamoDB.Key {
+    return ClusterService.getClusterKey(item.clustername);
+  }
+
+  getCreateTableInput(): AWS.DynamoDB.CreateTableInput {
+    return {
+      TableName: this.getTableName(),
+      AttributeDefinitions: [
+        {
+          AttributeName: 'clustername',
+          AttributeType: 'S'
+        }
+      ],
+      KeySchema: [{
+        AttributeName: 'clustername',
+        KeyType: 'HASH'
+      }],
+      ProvisionedThroughput: {
+        ReadCapacityUnits: AppConfig.CLUSTERS_TABLE_ReadCapacityUnits,
+        WriteCapacityUnits: AppConfig.CLUSTERS_TABLE_WriteCapacityUnits
+      }
+    };
+  }
+
+  getNewItem(data: any): Cluster {
+    if (!data) {
+      return {
+        $s3_bucket: this.regionService.outputS3,
+        username: 'ubuntu'
+      };
+    }
+
+    return data;
+  }
+
+  getShortDescription(item: Cluster): string {
+    return `Cluster: ${item.clustername}`;
+  }
+
+  getClusters(): Observable<Cluster[]> {
+    return this.getAll();
+  }
+
+  getCluster(name: string): Observable<Cluster> {
+    return this.get(ClusterService.getClusterKey(name));
   }
 
   deleteCluster(cluster: Cluster): Observable<boolean> {
     this.notificationsService.info(`Deleting the counters and configuration for ${cluster.clustername}`);
 
-    return new Observable<boolean>(observer => {
-      this.db.deleteItem({
-        TableName: ClusterService.getTableName(),
-        Key: ClusterService.getClusterKey(cluster.clustername)
-      }, (err, data) => {
-        if (err) {
-          this.notificationsService.info(`Deleting cluster ${cluster.clustername} from table ${ClusterService.getTableName()} failed!`);
-          console.log(`Deleting cluster ${cluster.clustername} from table ${ClusterService.getTableName()} failed!`, err.message);
-          observer.next(false);
-          observer.complete();
-          return;
-        }
-
-        console.log(`Cluster ${cluster.clustername} deleted from table ${ClusterService.getTableName()}`);
-        observer.next(true);
-        observer.complete();
-
-      });
-    }).flatMap(r => {
+    return this.deleteItem(cluster).flatMap(r => {
 
       return Observable.forkJoin([
         this.nodeService.deleteTable(cluster.clustername),
@@ -211,8 +114,9 @@ export class ClusterService {
 
     return this.getCluster(cluster.clustername).flatMap(c => {
       if (c) {
-        this.notificationsService.error(`The cluster ${cluster.clustername} already exist. Please use a different cluster name or delete the cluster first`);
-        return of(null);
+        const msg = `The cluster ${cluster.clustername} already exist. Please use a different cluster name or delete the cluster first`;
+        // this.notificationsService.error(msg);
+        return Observable.throw(msg);
       }
 
       cluster.S3_location = Cluster.getS3Location(cluster);
@@ -234,7 +138,7 @@ export class ClusterService {
     }).flatMap(result => {
       console.log('dynamodb tables created', result);
       if (!result || !result.every(r => r)) {
-        return of(null);
+        return Observable.throw('Error creating DynamoDB tables');
       }
 
       return this.assetsService.getAllScripts();
@@ -253,41 +157,27 @@ export class ClusterService {
       return Observable.forkJoin([
         this.s3Service.putObject(cluster.$s3_bucket,
           `${Cluster.getS3KeyLocation(cluster)}/${AppConfig.get_CLOUD_INIT_FILE_NAME(cluster.clustername)}`,
-          AppConfig.getCloudInitFileContent(this.regionService.region, cluster.S3_location, cluster.clustername, cluster.username, scripts['cloud_init_template.sh'])),
+          AppConfig.getCloudInitFileContent(this.regionService.region, cluster.S3_location, cluster.clustername, cluster.username, scripts['sh/cloud_init_template.sh'])),
 
-        this.s3Service.putObject(cluster.$s3_bucket, AppConfig.get_S3_RUN_NODE_SCRIPT(Cluster.getS3KeyLocation(cluster), cluster.clustername), scripts['run_node.sh']),
-        this.s3Service.putObject(cluster.$s3_bucket, AppConfig.get_S3_JOB_ENVELOPE_SCRIPT(Cluster.getS3KeyLocation(cluster)), scripts['job_envelope.sh']),
-        this.s3Service.putObject(cluster.$s3_bucket, AppConfig.get_S3_QUEUE_UPDATE_SCRIPT(Cluster.getS3KeyLocation(cluster)), scripts['queue_update.sh'])
+        this.s3Service.putObject(cluster.$s3_bucket, AppConfig.get_S3_RUN_NODE_SCRIPT(Cluster.getS3KeyLocation(cluster), cluster.clustername), scripts['sh/run_node.sh']),
+        this.s3Service.putObject(cluster.$s3_bucket, AppConfig.get_S3_JOB_ENVELOPE_SCRIPT(Cluster.getS3KeyLocation(cluster)), scripts['sh/job_envelope.sh']),
+        this.s3Service.putObject(cluster.$s3_bucket, AppConfig.get_S3_QUEUE_UPDATE_SCRIPT(Cluster.getS3KeyLocation(cluster)), scripts['sh/queue_update.sh'])
       ]);
     }).flatMap(result => {
-      return new Observable(observer => {
-        this.db.putItem({
-          TableName: ClusterService.getTableName(),
-          Item:  this.marshallCluster(cluster)
-        }, (err, data) => {
-          if (err) {
-            console.log('Error putting item', err);
-            observer.next(null);
-          }else {
-            console.log(data);
-            observer.next(cluster);
-          }
-
-          observer.complete();
-        });
-      });
+      return this.putItem(cluster);
     });
 
   }
 
-  getNewCluster(data: any): Cluster {
-    if (!data) {
-      return {
-        $s3_bucket: this.regionService.outputS3
-      };
-    }
+  getCloudInitFileContent(cluster): Observable<string> {
+    return this.assetsService.get('sh/cloud_init_template.sh')
+      .map(script => AppConfig.getCloudInitFileContent(this.regionService.region, cluster.S3_location, cluster.clustername,
+        cluster.username, script));
 
-    return data;
+  }
+
+  getNewCluster(data: any): Cluster {
+    return this.getNewItem(data);
   }
 }
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
@@ -13,8 +13,11 @@ import {ClusterService} from './clusters/cluster.service';
 export class AuthService {
 
   isLoggedIn = false;
+  public authChanged$: EventEmitter<boolean>;
 
-  constructor(private regionService: RegionService, private clusterService: ClusterService) { }
+  constructor(private regionService: RegionService, private clusterService: ClusterService) {
+    this.authChanged$ = new EventEmitter();
+  }
 
   // store the URL so we can redirect after logging in
   redirectUrl: string;
@@ -28,8 +31,10 @@ export class AuthService {
     return this.clusterService.createTableIfNotExists().flatMap(r => {
       if (r) {
         this.isLoggedIn = true;
+        this.emit();
         return Observable.of(true);
       }
+      this.emit();
       return Observable.of(false);
     });
 
@@ -37,5 +42,14 @@ export class AuthService {
 
   logout(): void {
     this.isLoggedIn = false;
+    this.emit();
+  }
+
+  private emit() {
+    this.authChanged$.emit(this.isLoggedIn);
+  }
+
+  subscribe(callback, err, complete): any {
+    return this.authChanged$.subscribe(callback, err, complete);
   }
 }
