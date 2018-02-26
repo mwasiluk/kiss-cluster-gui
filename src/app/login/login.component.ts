@@ -5,6 +5,7 @@ import {RegionService} from '../region.service';
 import {CredentialsCsvService} from '../csv.service';
 import {Credentials} from 'aws-sdk';
 import {forEach} from '@angular/router/src/utils/collection';
+import {NotificationsService} from 'angular2-notifications';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +21,7 @@ export class LoginComponent implements OnInit {
   inProgress = false;
 
   constructor(public authService: AuthService, public router: Router, public regionService: RegionService,
-              private csvService: CredentialsCsvService) {
+              private csvService: CredentialsCsvService, protected notificationsService: NotificationsService) {
 
   }
 
@@ -38,9 +39,8 @@ export class LoginComponent implements OnInit {
     this.inProgress = true;
     this.message = 'Trying to log in ...';
 
-    this.authService.login(this.credentials).subscribe((r) => {
+    this.authService.login(this.credentials).finally(() => this.inProgress = false).subscribe((r) => {
       this.setMessage();
-      this.inProgress = false;
       if (this.authService.isLoggedIn) {
         // Get the redirect URL from our auth service
         // If no redirect has been set, use the
@@ -59,6 +59,9 @@ export class LoginComponent implements OnInit {
       }else {
         this.message = 'Login failed!';
       }
+    }, e => {
+      this.message = 'Login failed!';
+      this.notificationsService.error(e.message);
     });
   }
 
