@@ -14,3 +14,26 @@ form, .spot-fleet-config{
 .user-data{
   font-size: 11px;
 }
+.read-only-info-panel{
+  margin-bottom: 25px;
+  .read-only-item{
+    font-family: Roboto,"Helvetica Neue",sans-serif;
+    margin-bottom: 5px;
+    .item-name {
+      color: rgba(0,0,0,.54);
+      display: inline-block;
+      &:after{
+        content: ":";
+      }
+    }
+    .item-value{
+      display: inline-block;
+      margin-left: 10px;
+    }
+  }
+}
+
+.advanced-config{
+  display: flex;
+  flex-direction: column;
+}

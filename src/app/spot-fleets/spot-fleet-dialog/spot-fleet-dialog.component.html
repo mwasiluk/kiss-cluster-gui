@@ -28,17 +28,36 @@
         <div class="advanced-users-info">
           <a [href]="getSpotRequestConsoleUrl()" target="_blank">For advances users only - you can use AWS Spot Fleet GUI instead of KissCluster GUI</a>
         </div>
+        <div class="read-only-info-panel">
+
+
+          <div class="read-only-item">
+            <div class="item-name">Spot Fleet Request Type</div>
+            <div class="item-value">{{spotFleet.data.SpotFleetRequestConfig.Type}}</div>
+          </div>
+          <div class="read-only-item">
+            <div class="item-name">Interruption behavior</div>
+            <div class="item-value">Terminate</div>
+          </div>
+          <div class="read-only-item">
+            <div class="item-name">Allocation strategy</div>
+            <div class="item-value">Lowest price</div>
+          </div>
+          <div class="read-only-item">
+            <div class="item-name">Maximum price</div>
+            <div class="item-value">The on demand priced will be used</div>
+          </div>
+
+
+        </div>
+
 
         <mat-form-field>
-          <input name="request_type" matInput placeholder="Spot Fleet Request Type" [(ngModel)]="spotFleet.data.SpotFleetRequestConfig.Type" readonly>
+          <input name="TargetCapacity" matInput placeholder="Target Capacity (vCPUs)" [(ngModel)]="spotFleet.data.SpotFleetRequestConfig.TargetCapacity" [readonly]="mode==='view'" required>
         </mat-form-field>
 
         <mat-form-field>
-          <input name="TargetCapacity" matInput placeholder="Target Capacity" [(ngModel)]="spotFleet.data.SpotFleetRequestConfig.TargetCapacity" [readonly]="mode==='view'">
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-select placeholder="Instance types" [(ngModel)]="instanceTypes" name="instance_types" multiple required>
+          <mat-select placeholder="Instance types" [(ngModel)]="instanceTypes" name="instance_types" multiple required [disabled]="mode==='view'">
             <mat-option *ngFor="let i of availableInstanceTypes" [value]="i">
               {{ i }}
             </mat-option>
@@ -47,7 +66,7 @@
 
         <br/>
         <mat-form-field>
-          <mat-select placeholder="AMI " [(ngModel)]="amiId" name="ami_ids" required>
+          <mat-select placeholder="AMI " [(ngModel)]="amiId" name="ami_ids" required [disabled]="mode==='view'">
             <mat-option *ngFor="let ami of availableAMIs" [value]="ami.ImageId">
               {{ ami.ImageId}}  ({{ ami.Description }})
             </mat-option>
@@ -56,14 +75,10 @@
         <br/>
 
 
-        <mat-form-field>
-          <input name="interruption_behavior" matInput placeholder="Interruption behavior" value="Terminate" readonly>
-        </mat-form-field>
-
 
         <br/>
         <mat-form-field>
-          <mat-select placeholder="Security group" [(ngModel)]="securityGroup" name="security_group" required>
+          <mat-select placeholder="Security group" [(ngModel)]="securityGroup" name="security_group" required [disabled]="mode==='view'">
             <mat-option *ngFor="let s of availableSecurityGroups" [value]="s.GroupName">
               {{ s.GroupName}}  ({{ s.Description }})
             </mat-option>
@@ -71,7 +86,7 @@
         </mat-form-field>
 
         <mat-form-field>
-          <mat-select placeholder="Key pair name" [(ngModel)]="keyPairName" name="keyPairName" required>
+          <mat-select placeholder="Key pair name" [(ngModel)]="keyPairName" name="keyPairName" required [disabled]="mode==='view'">
             <mat-option *ngFor="let s of availableKeyPairs" [value]="s.KeyName">
               {{ s.KeyName}}
             </mat-option>
@@ -81,28 +96,30 @@
         <br/>
 
         <mat-form-field>
-          <mat-select placeholder="IAM instance profile" [(ngModel)]="iamInstanceProfile" name="iamInstanceProfile" required>
+          <mat-select placeholder="IAM instance profile" [(ngModel)]="iamInstanceProfile" name="iamInstanceProfile" required [disabled]="mode==='view'">
             <mat-option *ngFor="let s of availableIamInstanceProfiles" [value]="s.InstanceProfileId">
               {{ s.InstanceProfileId }} ({{s.InstanceProfileName}})
             </mat-option>
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field>
-          <textarea class="user-data" name="user_data" matInput placeholder="User data" matTextareaAutosize matAutosizeMinRows="2" [(ngModel)]="spotFleet.userData"
-            matAutosizeMaxRows="15"></textarea>
-        </mat-form-field>
-       <br/>
-
-        <mat-form-field>
-          <input name="allocation_strategy" matInput placeholder="Allocation strategy" value="Lowest price" readonly>
-        </mat-form-field>
 
 
-        <mat-form-field>
-          <input name="max_price" matInput placeholder="Maximum price" value="The on demand priced will be used" readonly>
-        </mat-form-field>
 
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            Advanced configuration
+          </mat-expansion-panel-header>
+
+          <div class="advanced-config">
+            <mat-form-field>
+              <textarea class="user-data" name="user_data" matInput placeholder="User data - it will be run during instance launch" matTextareaAutosize matAutosizeMinRows="2" [(ngModel)]="spotFleet.userData"
+                        matAutosizeMaxRows="15" [readonly]="mode==='view'"></textarea>
+            </mat-form-field>
+          </div>
+
+        </mat-expansion-panel>
+        <br/>
       </div>
     </div>
 
