@@ -13,6 +13,7 @@ import 'rxjs/add/operator/catch';
 import {Observable} from 'rxjs/Observable';
 import {NotificationsService} from 'angular2-notifications';
 import {ClusterService} from './clusters/cluster.service';
+import {BreadcrumbsService} from 'ng2-breadcrumbs'
 
 @Component({
   selector: 'app-root',
@@ -35,10 +36,11 @@ export class AppComponent  implements OnInit {
 
   constructor(private router: Router, public dialog: MatDialog, public authService: AuthService, public regionService: RegionService,
               private dataService: DataService, private s3Service: S3Service, private notificationsService: NotificationsService,
-              private clusterService: ClusterService) {}
+              private clusterService: ClusterService, private breadcrumbs: BreadcrumbsService) {}
 
   ngOnInit(): void {
 
+    this.breadcrumbs.storePrefixed({label: 'Home' , url: '/', params: []})
     this.setAvailableRegions();
     this.regionService.subscribe(r => {
       if (this.authService.isLoggedIn) {
