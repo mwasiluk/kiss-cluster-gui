@@ -26,9 +26,11 @@ export class SpotFleetService {
   }
 
   protected initAWS() {
+
     this.ec2 = new AWS.EC2({
       credentials: AWS.config.credentials,
       region: AWS.config.region
+      // endpoint: AWS.config.apigateway.endpoint
     });
 
     this.iam = new IAM({
@@ -62,10 +64,47 @@ export class SpotFleetService {
     return new SpotFleet(data);
   }
 
-  requestSpotFleet(spotFleet: SpotFleet): Observable<any> {
+  requestSpotFleet(spotFleet: SpotFleet, cluster:Cluster, instanceTypes: any[],  iamId: string, amiId:string, iamInstanceProfileArn: string, securityGroupId: string , keyPairName: string): Observable<any> {
+
+    const userDataB64 = btoa(spotFleet.userData);
+    const blockDeviceMappings = spotFleet.data.SpotFleetRequestConfig.LaunchSpecifications[0].BlockDeviceMappings;
+
+    spotFleet.data.SpotFleetRequestConfig.IamFleetRole = spotFleet.data.SpotFleetRequestConfig.IamFleetRole.replace('${iamId}', iamId);
+
+    if (!iamInstanceProfileArn.startsWith('arn:aws:iam')){
+      iamInstanceProfileArn = `arn:aws:iam::${iamId}:instance-profile/${iamInstanceProfileArn}`;
+    }
+    spotFleet.data.SpotFleetRequestConfig.LaunchSpecifications = instanceTypes.map(t => {
+
+      return {
+        ImageId: amiId,
+        InstanceType: t.InstanceType,
+        WeightedCapacity: t.WeightedCapacity,
+        UserData: userDataB64,
+        KeyName: keyPairName,
+        IamInstanceProfile: {
+          Arn: iamInstanceProfileArn
+        },
+        SecurityGroups: [{
+          GroupId: securityGroupId
+        }],
+        TagSpecifications: [{
+          ResourceType: 'instance',
+          Tags: [{
+            Key: AppConfig.SPOT_FLEET_TAG,
+            Value: cluster.clustername
+          }]
+        }]
+      };
+    });
+
+    return this.doRequestSpotFleet(spotFleet);
+  }
+
+  doRequestSpotFleet(spotFleet: SpotFleet): Observable<any> {
     return new Observable(observer => {
       this.ec2.requestSpotFleet({
-        DryRun: true,
+        DryRun: false,
         SpotFleetRequestConfig: spotFleet.data.SpotFleetRequestConfig
       }, (err, data) => {
         console.log(err, data);
@@ -124,8 +163,8 @@ export class SpotFleetService {
     });
   }
 
-  getAvailableInstanceTypes(): Observable<string[]> {
-    return of(AppConfig.SPOT_FLEET_INSTANCE_TYPES);
+  getAvailableInstanceTypes(): Observable<any[]> {
+    return this.getInstanceTypes();
   }
 
   describeSpotPriceHistory() {
@@ -134,9 +173,13 @@ export class SpotFleetService {
       Filters: [{
         Name: 'availability-zone',
         Values: [this.regionService.region + '*']
-      }]
+      }],
+      // InstanceTypes: AppConfig.SPOT_FLEET_INSTANCE_TYPES
     }, (err, data) => {
-      err.message = 'EC2.describeSpotPriceHistory - ' + err.message;
+      if(err){
+        err.message = 'EC2.describeSpotPriceHistory - ' + err.message;
+      }
+
       console.log(err, data);
     });
   }
@@ -217,4 +260,9 @@ export class SpotFleetService {
     // });
   }
 
+  getInstanceTypes(): Observable<any>{
+    return this.assetsService.get('instance-types.json').map(s => JSON.parse(s)
+      .sort((a, b) => parseFloat(a.SpotPrice)*parseInt(a.WeightedCapacity||1) - parseFloat(b.SpotPrice)*parseInt(b.WeightedCapacity||1)))
+  }
 }
+

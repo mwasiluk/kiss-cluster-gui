@@ -15,7 +15,7 @@
 
         <ng-container matColumnDef="id">
           <mat-header-cell *matHeaderCellDef mat-sort-header> Id</mat-header-cell>
-          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.data.SpotFleetRequestId }}</mat-cell>
+          <mat-cell *matCellDef="let spotFleet"> <a [href]="getSpotRequestConsoleUrl()" target="_blank">{{ spotFleet.data.SpotFleetRequestId }}</a></mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="name">
@@ -26,6 +26,11 @@
         <ng-container matColumnDef="state">
           <mat-header-cell *matHeaderCellDef mat-sort-header> State</mat-header-cell>
           <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.data.SpotFleetRequestState }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> Status</mat-header-cell>
+          <mat-cell *matCellDef="let spotFleet"> {{ spotFleet.data.ActivityStatus }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="targetCapacityCPU">
@@ -46,7 +51,7 @@
         <ng-container matColumnDef="cluster">
           <mat-header-cell *matHeaderCellDef mat-sort-header> Cluster</mat-header-cell>
           <mat-cell *matCellDef="let spotFleet">
-            <a *ngIf="spotFleet.getClusterName()" routerLink="/cluster/{{spotFleet.getClusterName()}}"> {{ spotFleet.getClusterName() }}</a></mat-cell>
+            <a *ngFor="let item of spotFleet.getClusterName()"   routerLink="/cluster/{{item}}"> {{ spotFleet.getClusterName() }}</a></mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="bidPerCPU">

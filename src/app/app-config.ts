@@ -1,5 +1,8 @@
 
 
+import {ServiceConfigurationOptions} from "aws-sdk/lib/service";
+import * as AWS from 'aws-sdk';
+
 export class AppConfig {
 
   public static AWS_REGIONS= ['us-east-1', 'us-east-2', 'us-west-1', 'us-west-2', 'ca-central-1', 'ap-south-1',
@@ -34,14 +37,17 @@ export class AppConfig {
 
   public static polling_interval = 3000;
   static SPOT_FLEET_TAG= 'kissc-cluster';
-  static SPOT_FLEET_INSTANCE_TYPES = [
-    't2.micro', 't2.small', 't2.medium',
-    'c4.large', 'm5.large', 'c5.large',
-    'r4.large',  'm4.large', 'r3.large',
-    't2.large', 'c5.xlarge', 'm5.xlarge',
-    'r3.xlarge', 'm4.xlarge', 'c4.xlarge',
-    'r4.xlarge', 't2.xlarge'
-  ];
+
+  static awsEndpoint = null;
+  public static updateAwsServiceConfig(c?: ServiceConfigurationOptions): ServiceConfigurationOptions{
+    c.credentials = AWS.config.credentials;
+    c.region = AWS.config.region;
+    if( AppConfig.awsEndpoint){
+      c.endpoint = AppConfig.awsEndpoint;
+    }
+
+    return c;
+  }
 
   public static getSpotRequestConsoleUrl(region: string) {
     return `https://${region}.console.aws.amazon.com/ec2sp/v1/spot/home`;

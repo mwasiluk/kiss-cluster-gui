@@ -8,6 +8,7 @@ import {Credentials, S3} from 'aws-sdk';
 import * as AWS from 'aws-sdk';
 import {RegionService} from './region.service';
 import {ClusterService} from './clusters/cluster.service';
+import {AppConfig} from "./app-config";
 
 @Injectable()
 export class AuthService {
@@ -26,6 +27,7 @@ export class AuthService {
     // AWS.config.region
     AWS.config.credentials = credentials;
     AWS.config.region = this.regionService.region;
+
     this.regionService.update();
 
     return this.clusterService.createTableIfNotExists().flatMap(r => {

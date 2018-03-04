@@ -34,7 +34,7 @@ export class SpotFleet  {
     if (this.clustername) {
       return this.clustername;
     }
-    this.clustername =  this.data.SpotFleetRequestConfig.LaunchSpecifications.map(ls => {
+    this.clustername =  Array.from(new Set(this.data.SpotFleetRequestConfig.LaunchSpecifications.map(ls => {
       if (!ls.TagSpecifications.length) {
         return null;
       }
@@ -44,7 +44,7 @@ export class SpotFleet  {
       }
 
       return tags[0].Value;
-    });
+    }).filter(c=>!!c)));
 
     return this.clustername;
   }

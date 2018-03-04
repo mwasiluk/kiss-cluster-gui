@@ -7,6 +7,7 @@ import {NotificationsService} from 'angular2-notifications';
 import {RegionService} from './region.service';
 import {UtilsService} from './utils.service';
 import 'rxjs/add/observable/throw';
+import {AppConfig} from "./app-config";
 
 
 
@@ -33,10 +34,8 @@ export abstract class CrudBaseService<E> {
 
 
   protected initAWS() {
-    this.db = new AWS.DynamoDB({
-      credentials: AWS.config.credentials,
-      region: AWS.config.region
-    });
+    this.db = new AWS.DynamoDB();
+    AppConfig.updateAwsServiceConfig(this.db.config);
   }
 
 

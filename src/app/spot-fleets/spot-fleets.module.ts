@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {
   MatButtonModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatInputModule, MatPaginatorModule,
   MatTableModule, MatToolbarModule, MatSortModule, MatDialogModule, MatProgressSpinnerModule, MatExpansionModule,
-  MatSnackBarModule, MatSelectModule
+  MatSnackBarModule, MatSelectModule, MatAutocompleteModule
 } from '@angular/material';
 import {SpotFleetListComponent} from './spot-fleet-list/spot-fleet-list.component';
 import {SpotFleetService} from './spot-fleet.service';
@@ -14,10 +14,10 @@ import { SpotFleetDialogComponent } from './spot-fleet-dialog/spot-fleet-dialog.
 @NgModule({
   imports: [
     CommonModule,
-    FormsModule,
+    FormsModule, ReactiveFormsModule,
     MatButtonModule, MatCheckboxModule, MatCardModule, MatFormFieldModule, MatInputModule, MatTableModule,
     MatPaginatorModule, MatToolbarModule, MatSortModule, MatDialogModule, MatProgressSpinnerModule, MatExpansionModule,
-    MatSnackBarModule, MatSelectModule,
+    MatSnackBarModule, MatSelectModule, MatAutocompleteModule,
     RouterModule
   ],
   declarations: [

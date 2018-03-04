@@ -41,7 +41,7 @@ export class ClusterService extends CrudBaseService<Cluster> {
   }
 
   map(data: any): Cluster {
-    return AWS.DynamoDB.Converter.unmarshall(data);
+    return <Cluster>AWS.DynamoDB.Converter.unmarshall(data);
   }
 
   getItemKey(item: Cluster): AWS.DynamoDB.Key {

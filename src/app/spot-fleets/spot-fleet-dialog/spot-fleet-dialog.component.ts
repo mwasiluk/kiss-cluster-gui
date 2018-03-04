@@ -9,6 +9,8 @@ import {Cluster} from '../../clusters/cluster';
 import {AppConfig} from '../../app-config';
 import {ClusterService} from '../../clusters/cluster.service';
 import * as AWS from 'aws-sdk';
+import {FormControl} from "@angular/forms";
+import * as _ from "lodash";
 
 @Component({
   selector: 'app-spot-fleet-dialog',
@@ -28,15 +30,21 @@ export class SpotFleetDialogComponent implements OnInit {
   availableKeyPairs: AWS.EC2.KeyPair[];
   availableIamInstanceProfiles: AWS.IAM.InstanceProfile[];
 
+
+  iamId: string;
   instanceTypes = [];
   amiId: string;
-  securityGroup = 'default';
+  securityGroup: AWS.EC2.SecurityGroup;
   keyPairName: string;
-  iamInstanceProfile: string;
+  iamInstanceProfileArn: string;
   userData = '';
 
   submitted = false;
   workInProgress = false;
+
+  amiCtrl: FormControl;
+  iamProfileCtrl: FormControl;
+  filteredAmis: Observable<string[]>;
 
   constructor(private notificationsService: NotificationsService,
               private spotFleetService: SpotFleetService,
@@ -46,7 +54,8 @@ export class SpotFleetDialogComponent implements OnInit {
 
     this.spotFleet = data.spotFleet;
     this.mode = data.mode;
-
+    this.amiCtrl = new FormControl();
+    this.iamProfileCtrl = new FormControl();
     this.setCluster(data.cluster);
   }
 
@@ -89,6 +98,7 @@ export class SpotFleetDialogComponent implements OnInit {
         this.availableKeyPairs = r[3];
         this.availableIamInstanceProfiles = r[4];
         this.spotFleet = r[5];
+        this.setDefaults();
         console.log('result', r);
       }, e => {
         this.notificationsService.error(e);
@@ -99,12 +109,15 @@ export class SpotFleetDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-
+  private setDefaults() {
+    this.securityGroup = _.find(this.availableSecurityGroups, sg => sg.GroupName == 'default')
+  }
 
   onSubmit() {
     this.submitted = true;
     this.workInProgress = true;
-    this.spotFleetService.requestSpotFleet(this.spotFleet).finally(() => {
+
+    this.spotFleetService.requestSpotFleet(this.spotFleet, this.cluster, this.instanceTypes, this.iamId, this.amiId, this.iamInstanceProfileArn, this.securityGroup.GroupId, this.keyPairName).finally(() => {
       this.workInProgress = false;
     }).subscribe(r => {
       this.notificationsService.success(r);
@@ -120,4 +133,6 @@ export class SpotFleetDialogComponent implements OnInit {
   getSpotRequestConsoleUrl(): string {
     return this.spotFleetService.getSpotRequestConsoleUrl();
   }
+
+
 }

@@ -23,7 +23,7 @@ export class SpotFleetListComponent implements OnInit, OnDestroy, AfterViewInit 
 
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  displayedColumns = ['id', 'state', 'targetCapacityCPU', 'currentCapacityCPU', 'instanceTypes', 'cluster', 'amiId', 'actions'];
+  displayedColumns = ['id', 'state', 'status', 'targetCapacityCPU', 'currentCapacityCPU', 'instanceTypes', 'cluster', 'amiId', 'actions'];
   dataSource = new MatTableDataSource<SpotFleet>(SPOT_FLEETS);
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -49,7 +49,6 @@ export class SpotFleetListComponent implements OnInit, OnDestroy, AfterViewInit 
     this.destroyed$.complete();
     this.destroyed$ = new ReplaySubject(1);
   }
-
 
   getSpotFleets(): void {
     this.resetPolling();
@@ -105,5 +104,7 @@ export class SpotFleetListComponent implements OnInit, OnDestroy, AfterViewInit 
 
     });
   }
-
+  getSpotRequestConsoleUrl(): string {
+    return this.spotFleetService.getSpotRequestConsoleUrl();
+  }
 }

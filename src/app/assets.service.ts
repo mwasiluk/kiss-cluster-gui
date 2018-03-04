@@ -23,7 +23,7 @@ export class AssetsService {
     });
   }
 
-  public getAllScripts(): Observable<object> {
+  public getAllScripts(): Observable<any> {
     return Observable.forkJoin(AppConfig.SCRIPT_NAMES.map(s => this.get(`sh/${s}`))).flatMap(r => of(this.cache));
   }
 

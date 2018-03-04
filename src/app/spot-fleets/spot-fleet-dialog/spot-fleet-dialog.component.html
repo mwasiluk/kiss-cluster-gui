@@ -50,7 +50,9 @@
 
 
         </div>
-
+        <mat-form-field>
+          <input name="IAM id" matInput placeholder="IAM id" [(ngModel)]="iamId" [readonly]="mode==='view'" required>
+        </mat-form-field>
 
         <mat-form-field>
           <input name="TargetCapacity" matInput placeholder="Target Capacity (vCPUs)" [(ngModel)]="spotFleet.data.SpotFleetRequestConfig.TargetCapacity" [readonly]="mode==='view'" required>
@@ -59,19 +61,29 @@
         <mat-form-field>
           <mat-select placeholder="Instance types" [(ngModel)]="instanceTypes" name="instance_types" multiple required [disabled]="mode==='view'">
             <mat-option *ngFor="let i of availableInstanceTypes" [value]="i">
-              {{ i }}
+              {{ i.InstanceType }} ({{i.WeightedCapacity ? i.WeightedCapacity : 1}} vCPU)
             </mat-option>
           </mat-select>
         </mat-form-field>
 
         <br/>
-        <mat-form-field>
+        <!--<mat-form-field>
           <mat-select placeholder="AMI " [(ngModel)]="amiId" name="ami_ids" required [disabled]="mode==='view'">
             <mat-option *ngFor="let ami of availableAMIs" [value]="ami.ImageId">
               {{ ami.ImageId}}  ({{ ami.Description }})
             </mat-option>
           </mat-select>
+        </mat-form-field>-->
+
+        <mat-form-field>
+          <input matInput placeholder="AMI" aria-label="AMI" [matAutocomplete]="autoAMI" [formControl]="amiCtrl" [(ngModel)]="amiId" name="ami_ids" required [readonly]="mode==='view'">
+          <mat-autocomplete #autoAMI="matAutocomplete">
+            <mat-option *ngFor="let ami of availableAMIs" [value]="ami.ImageId">
+              {{ ami.ImageId}}  ({{ ami.Description }})
+            </mat-option>
+          </mat-autocomplete>
         </mat-form-field>
+
         <br/>
 
 
@@ -79,7 +91,7 @@
         <br/>
         <mat-form-field>
           <mat-select placeholder="Security group" [(ngModel)]="securityGroup" name="security_group" required [disabled]="mode==='view'">
-            <mat-option *ngFor="let s of availableSecurityGroups" [value]="s.GroupName">
+            <mat-option *ngFor="let s of availableSecurityGroups" [value]="s">
               {{ s.GroupName}}  ({{ s.Description }})
             </mat-option>
           </mat-select>
@@ -96,15 +108,14 @@
         <br/>
 
         <mat-form-field>
-          <mat-select placeholder="IAM instance profile" [(ngModel)]="iamInstanceProfile" name="iamInstanceProfile" required [disabled]="mode==='view'">
-            <mat-option *ngFor="let s of availableIamInstanceProfiles" [value]="s.InstanceProfileId">
-              {{ s.InstanceProfileId }} ({{s.InstanceProfileName}})
+          <input required matInput placeholder="IAM instance profile arn" aria-label="IAM instance profile" [matAutocomplete]="autoIamProfile" [formControl]="iamProfileCtrl" [(ngModel)]="iamInstanceProfileArn" name="iamInstanceProfile"
+                 [readonly]="mode==='view'">
+          <mat-autocomplete #autoIamProfile="matAutocomplete">
+            <mat-option *ngFor="let iam of availableIamInstanceProfiles" [value]="iam.Arn">
+              {{ iam.InstanceProfileId}}
             </mat-option>
-          </mat-select>
+          </mat-autocomplete>
         </mat-form-field>
-
-
-
 
         <mat-expansion-panel>
           <mat-expansion-panel-header>
