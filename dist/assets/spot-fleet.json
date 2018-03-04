@@ -1,10 +1,7 @@
 {
-  "IamFleetRole": "arn:aws:iam::518693498655:role/aws-ec2-spot-fleet-tagging-role",
+  "IamFleetRole": "arn:aws:iam::${iamId}:role/aws-ec2-spot-fleet-tagging-role",
   "AllocationStrategy": "lowestPrice",
   "TargetCapacity": 10,
-  "SpotPrice": "0.015",
-  "ValidFrom": "2018-01-26T19:55:06Z",
-  "ValidUntil": "2019-01-26T19:55:06Z",
   "TerminateInstancesWithExpiration": true,
   "LaunchSpecifications": [
     {
@@ -13,114 +10,6 @@
       "KeyName": "ohio-cluster",
       "WeightedCapacity": 2,
       "SpotPrice": "0.05",
-      "IamInstanceProfile": {
-        "Arn": "arn:aws:iam::518693498655:instance-profile/juliademorole"
-      },
-      "BlockDeviceMappings": [
-        {
-          "DeviceName": "/dev/sda1",
-          "Ebs": {
-            "DeleteOnTermination": true,
-            "VolumeType": "gp2",
-            "VolumeSize": 8,
-            "SnapshotId": "snap-055b7609cb0e52065"
-          }
-        }
-      ],
-      "SecurityGroups": [
-        {
-          "GroupId": "sg-6fd12006"
-        }
-      ],
-      "UserData": "IyEvYmluL2Jhc2gKCmVjaG8gImhlcmUgc29tZSBjb2RlIg=="
-    },
-    {
-      "ImageId": "ami-ba614cdf",
-      "InstanceType": "c4.xlarge",
-      "KeyName": "ohio-cluster",
-      "WeightedCapacity": 4,
-      "SpotPrice": "0.04975",
-      "IamInstanceProfile": {
-        "Arn": "arn:aws:iam::518693498655:instance-profile/juliademorole"
-      },
-      "BlockDeviceMappings": [
-        {
-          "DeviceName": "/dev/sda1",
-          "Ebs": {
-            "DeleteOnTermination": true,
-            "VolumeType": "gp2",
-            "VolumeSize": 8,
-            "SnapshotId": "snap-055b7609cb0e52065"
-          }
-        }
-      ],
-      "SecurityGroups": [
-        {
-          "GroupId": "sg-6fd12006"
-        }
-      ],
-      "UserData": "IyEvYmluL2Jhc2gKCmVjaG8gImhlcmUgc29tZSBjb2RlIg=="
-    },
-    {
-      "ImageId": "ami-ba614cdf",
-      "InstanceType": "c4.2xlarge",
-      "KeyName": "ohio-cluster",
-      "WeightedCapacity": 8,
-      "SpotPrice": "0.04975",
-      "IamInstanceProfile": {
-        "Arn": "arn:aws:iam::518693498655:instance-profile/juliademorole"
-      },
-      "BlockDeviceMappings": [
-        {
-          "DeviceName": "/dev/sda1",
-          "Ebs": {
-            "DeleteOnTermination": true,
-            "VolumeType": "gp2",
-            "VolumeSize": 8,
-            "SnapshotId": "snap-055b7609cb0e52065"
-          }
-        }
-      ],
-      "SecurityGroups": [
-        {
-          "GroupId": "sg-6fd12006"
-        }
-      ],
-      "UserData": "IyEvYmluL2Jhc2gKCmVjaG8gImhlcmUgc29tZSBjb2RlIg=="
-    },
-    {
-      "ImageId": "ami-ba614cdf",
-      "InstanceType": "c4.4xlarge",
-      "KeyName": "ohio-cluster",
-      "WeightedCapacity": 16,
-      "SpotPrice": "0.04975",
-      "IamInstanceProfile": {
-        "Arn": "arn:aws:iam::518693498655:instance-profile/juliademorole"
-      },
-      "BlockDeviceMappings": [
-        {
-          "DeviceName": "/dev/sda1",
-          "Ebs": {
-            "DeleteOnTermination": true,
-            "VolumeType": "gp2",
-            "VolumeSize": 8,
-            "SnapshotId": "snap-055b7609cb0e52065"
-          }
-        }
-      ],
-      "SecurityGroups": [
-        {
-          "GroupId": "sg-6fd12006"
-        }
-      ],
-      "UserData": "IyEvYmluL2Jhc2gKCmVjaG8gImhlcmUgc29tZSBjb2RlIg=="
-    },
-    {
-      "ImageId": "ami-ba614cdf",
-      "InstanceType": "c4.8xlarge",
-      "KeyName": "ohio-cluster",
-      "WeightedCapacity": 36,
-      "SpotPrice": "0.044194",
       "IamInstanceProfile": {
         "Arn": "arn:aws:iam::518693498655:instance-profile/juliademorole"
       },
