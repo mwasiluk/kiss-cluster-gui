@@ -76,6 +76,8 @@ export class ClusterComponent implements OnInit {
     }, (e) => {
       this.notificationsService.error('Cluster creation failure!');
       this.notificationsService.error(e);
+      this.notificationsService.warn('Cleaning up...');
+      this.deleteCluster();
     });
 
   }
@@ -84,16 +86,25 @@ export class ClusterComponent implements OnInit {
     if (!window.confirm(`Are sure you want to delete cluster ${this.cluster.clustername}?`)) {
       return;
     }
+    this.deleteCluster();
+  }
+
+  private deleteCluster(cleanUp = false) {
     this.workInProgress = true;
     this.clusterService.deleteCluster(this.cluster).finally(() => {
       this.workInProgress = false;
     }).subscribe(c => {
+      if(cleanUp) {
 
-      this.notificationsService.success('The cluster ' + this.cluster.clustername + ' has been successfully deleted');
+      }else{
+        this.notificationsService.success('The cluster ' + this.cluster.clustername + ' has been successfully deleted');
+      }
+
       this.router.navigate(['/']);
 
     }, (e) => {
-      this.notificationsService.error('Cluster deletion failure!');
+      var msg = cleanUp ? 'Cluster cleanup failed' : 'Cluster deletion failure!';
+      this.notificationsService.error(msg);
       this.notificationsService.error(e);
 
     });
