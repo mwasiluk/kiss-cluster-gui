@@ -13,6 +13,7 @@ import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/finally';
 import {S3Service} from '../../s3.service';
+import {Queue} from '../queue';
 
 @Component({
   selector: 'app-cluster',
@@ -22,6 +23,9 @@ import {S3Service} from '../../s3.service';
 export class ClusterComponent implements OnInit {
 
   cluster: Cluster;
+  queues: Queue[] = [];
+  nodes: Node[] = [];
+
   mode: string;
   submitted = false;
   workInProgress = false;
@@ -94,7 +98,7 @@ export class ClusterComponent implements OnInit {
     this.clusterService.deleteCluster(this.cluster).finally(() => {
       this.workInProgress = false;
     }).subscribe(c => {
-      if(cleanUp) {
+      if (cleanUp) {
 
       }else{
         this.notificationsService.success('The cluster ' + this.cluster.clustername + ' has been successfully deleted');
@@ -103,7 +107,7 @@ export class ClusterComponent implements OnInit {
       this.router.navigate(['/']);
 
     }, (e) => {
-      var msg = cleanUp ? 'Cluster cleanup failed' : 'Cluster deletion failure!';
+      let msg = cleanUp ? 'Cluster cleanup failed' : 'Cluster deletion failure!';
       this.notificationsService.error(msg);
       this.notificationsService.error(e);
 

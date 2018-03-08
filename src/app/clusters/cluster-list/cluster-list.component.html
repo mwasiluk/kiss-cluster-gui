@@ -41,7 +41,7 @@
 
         <ng-container matColumnDef="currentQueue">
           <mat-header-cell *matHeaderCellDef mat-sort-header> Current queue</mat-header-cell>
-          <mat-cell *matCellDef="let cluster"> {{ cluster.$currentQueue }}</mat-cell>
+          <mat-cell *matCellDef="let cluster"> <span *ngIf="cluster.$currentQueue">{{ cluster.$currentQueue.queue_name }}</span></mat-cell>
         </ng-container>
 
 

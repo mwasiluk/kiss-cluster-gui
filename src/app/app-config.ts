@@ -16,12 +16,12 @@ export class AppConfig {
   public static NODES_TABLE_NAME_PREFIX= 'kissc_nodes_';
   public static JOBS_TABLE_NAME_PREFIX= 'kissc_jobs_';
 
-  public static CLUSTERS_TABLE_ReadCapacityUnits= 2;
-  public static CLUSTERS_TABLE_WriteCapacityUnits= 2;
-  public static NODES_TABLE_ReadCapacityUnits= 3;
-  public static NODES_TABLE_WriteCapacityUnits= 3;
-  public static QUEUES_TABLE_ReadCapacityUnits= 2;
-  public static QUEUES_TABLE_WriteCapacityUnits= 2;
+  public static CLUSTERS_TABLE_ReadCapacityUnits= 2; // 2
+  public static CLUSTERS_TABLE_WriteCapacityUnits= 2; // 2
+  public static NODES_TABLE_ReadCapacityUnits= 3; // 3
+  public static NODES_TABLE_WriteCapacityUnits= 3; // 3
+  public static QUEUES_TABLE_ReadCapacityUnits= 2; // 2
+  public static QUEUES_TABLE_WriteCapacityUnits= 2; // 2
   public static JOBS_TABLE_ReadCapacityUnits= 4;
   public static JOBS_TABLE_WriteCapacityUnits= 4;
 
@@ -35,7 +35,7 @@ export class AppConfig {
 
 
 
-  public static polling_interval = 3000;
+  public static polling_interval = 5000;
   static SPOT_FLEET_TAG= 'kissc-cluster';
 
   static awsEndpoint = null;

@@ -21,12 +21,14 @@ import {NotificationsService} from 'angular2-notifications';
 export class NodeListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Input() cluster: Cluster;
-  nodes: Node[];
+  @Input() nodes: Node[];
 
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  displayedColumns = ['nodeid', 'ami_id', 'currentqueueid', 'instance_type'];
+  displayedColumns = ['nodeid', 'ami_id', 'currentqueueid', 'instance_type', 'nproc'];
   dataSource = new MatTableDataSource<Node>();
+  loaded = false;
+  cpus: number;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -53,14 +55,24 @@ export class NodeListComponent implements OnInit, OnDestroy, AfterViewInit {
     Observable.interval(AppConfig.polling_interval)
       .takeUntil(this.destroyed$)
       .switchMap(() => this.nodeService.getNodes(this.cluster.clustername))
-      .subscribe(nodes => {
-        this.nodes = nodes;
-        this.dataSource.data = nodes;
-      }, e => {
+      .catch(e => {
         this.notificationsService.error('Error loading nodes', e.message);
-        this.nodes = [];
-        this.dataSource.data = this.nodes;
+        return [];
+      })
+      .subscribe(nodes => {
+        this.setNodes(nodes);
       });
+  }
+
+  private setNodes(nodes: Node[]) {
+    if (!this.nodes) {
+      this.nodes = [];
+    }
+    this.loaded = true;
+    this.nodes.length = 0;
+    this.nodes.push(...nodes);
+    this.dataSource.data = this.nodes;
+    this.cpus = this.nodeService.getCPUs(this.nodes);
   }
 
   createNodeBtnClick() {
@@ -90,4 +102,5 @@ export class NodeListComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log('The dialog was closed');
     });
   }
+
 }

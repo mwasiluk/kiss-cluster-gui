@@ -21,12 +21,13 @@ import {NotificationsService} from "angular2-notifications";
 export class QueueListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Input() cluster: Cluster;
-  queues: Queue[];
+  @Input() queues: Queue[];
 
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  displayedColumns = ['name', 'S3_location', 'command', 'creator', 'date', 'jobid', 'maxjobid', 'minjobid', 'status'];
+  displayedColumns = ['name', 'id', 'S3_location', 'command', 'creator', 'date', 'jobid', 'maxjobid', 'minjobid', 'status'];
   dataSource = new MatTableDataSource<Queue>();
+  loaded = false;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -53,14 +54,23 @@ export class QueueListComponent implements OnInit, OnDestroy, AfterViewInit {
     Observable.interval(AppConfig.polling_interval)
       .takeUntil(this.destroyed$)
       .switchMap(() => this.queueService.getQueues(this.cluster.clustername))
-      .subscribe(queues => {
-        this.queues = queues;
-        this.dataSource.data = queues;
-      }, e => {
+      .catch(e => {
         this.notificationsService.error('Error loading queues', e.message);
-        this.queues = [];
-        this.dataSource.data = this.queues;
+        return [];
+      })
+      .subscribe(queues => {
+        this.setQueues(queues);
       });
+  }
+
+  private setQueues(queues) {
+    if (!this.queues) {
+      this.queues = [];
+    }
+    this.loaded = true;
+    this.queues.length = 0;
+    this.queues.push(...queues);
+    this.dataSource.data = this.queues;
   }
 
   createQueueBtnClick() {

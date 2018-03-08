@@ -1,4 +1,6 @@
 
+import {Queue} from './queue';
+import {Node} from './node';
 export class Cluster {
   clustername?: string;
   nodeid?: number;
@@ -18,8 +20,11 @@ export class Cluster {
   $cpu?: number;
   $activeNodes?: number;
   $activeCPU?: number;
-  $currentQueue?: string;
+  $currentQueue?: Queue;
   $s3_bucket?: string;
+
+  $nodes?: Node[];
+  $queues?: Queue[];
 
   public static getS3KeyLocation(cluster: Cluster): string {
     return `${cluster.clustername}`;

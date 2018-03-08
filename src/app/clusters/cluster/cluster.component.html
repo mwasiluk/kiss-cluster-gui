@@ -88,10 +88,10 @@
 
         </mat-expansion-panel>
 
-        <app-queue-list *ngIf="mode==='view'" [cluster]="cluster"></app-queue-list>
 
+        <app-queue-list *ngIf="mode==='view'" [cluster]="cluster" [queues]="queues" ></app-queue-list>
 
-        <app-node-list *ngIf="mode==='view'" [cluster]="cluster"></app-node-list>
+        <app-node-list *ngIf="mode==='view'" [cluster]="cluster" [nodes]="nodes"></app-node-list>
 
         <app-spot-fleet-list *ngIf="mode==='view'" [cluster]="cluster"></app-spot-fleet-list>
       </div>

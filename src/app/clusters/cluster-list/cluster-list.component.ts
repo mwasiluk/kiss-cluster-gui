@@ -51,7 +51,7 @@ export class ClusterListComponent implements OnInit, OnDestroy, AfterViewInit {
   getClusters(): void {
     Observable.interval(AppConfig.polling_interval)
       .takeUntil(this.destroyed$)
-      .switchMap(() => this.clusterService.getClusters())
+      .switchMap(() => this.clusterService.getClusters(true, true))
       .subscribe(clusters => {
         this.clusters = clusters;
         this.dataSource.data = clusters;

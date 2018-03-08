@@ -120,7 +120,7 @@ export class SpotFleetDialogComponent implements OnInit {
     this.spotFleetService.requestSpotFleet(this.spotFleet, this.cluster, this.instanceTypes, this.iamId, this.amiId, this.iamInstanceProfileArn, this.securityGroup.GroupId, this.keyPairName).finally(() => {
       this.workInProgress = false;
     }).subscribe(r => {
-      this.notificationsService.success(r);
+      this.notificationsService.success('Spot fleet request success!');
       console.log(r);
       this.dialogRef.close(r);
     }, (e) => {

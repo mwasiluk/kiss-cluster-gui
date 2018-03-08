@@ -16,6 +16,7 @@ import {S3Service} from '../s3.service';
 import {AssetsService} from '../assets.service';
 import 'rxjs/add/observable/throw';
 import {CrudBaseService} from '../crud-base.service';
+import * as _ from "lodash";
 
 @Injectable()
 export class ClusterService extends CrudBaseService<Cluster> {
@@ -83,8 +84,44 @@ export class ClusterService extends CrudBaseService<Cluster> {
     return `Cluster: ${item.clustername}`;
   }
 
-  getClusters(): Observable<Cluster[]> {
-    return this.getAll();
+  getClusters(fetchNodes = false, fetchQueues = false): Observable<Cluster[]> {
+    let c_;
+    let res = this.getAll();
+    if (fetchNodes || fetchQueues) {
+      return res.flatMap(clusters => {
+        c_ = clusters;
+
+        const fork = [];
+        console.log(clusters, fetchNodes)
+        clusters.forEach(c => {
+          if (fetchNodes) {
+            fork.push(this.nodeService.getNodes(c.clustername).flatMap(nodes => {
+              console.log('nodes', nodes);
+              c.$nodes = nodes;
+              c.$cpu = this.nodeService.getCPUs(nodes);
+              console.log('nodes', nodes);
+              return nodes;
+            }).catch(e=>{
+              console.log(e);
+              return null;
+            }));
+          }
+          if (fetchQueues) {
+            fork.push(this.queueService.getQueues(c.clustername).flatMap(queues => {
+              c.$queues = queues;
+              c.$currentQueue = _.find(queues, q => q.queueid === c.queueid);
+              return queues;
+            }));
+          }
+        });
+        console.log('fork', fork);
+        return Observable.forkJoin(fork);
+      }).map(r => {
+        return c_;
+      });
+    }
+
+    return res;
   }
 
   getCluster(name: string): Observable<Cluster> {

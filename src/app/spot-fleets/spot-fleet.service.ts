@@ -12,26 +12,22 @@ import {Cluster} from '../clusters/cluster';
 import {AssetsService} from '../assets.service';
 import {AppConfig} from '../app-config';
 import {ClusterService} from '../clusters/cluster.service';
+import {Ec2Service} from "../ec2.service";
 
 @Injectable()
-export class SpotFleetService {
+export class SpotFleetService extends Ec2Service{
 
   ec2: AWS.EC2;
   iam: IAM;
 
   constructor(protected notificationsService: NotificationsService, protected regionService: RegionService,
               protected utilsService: UtilsService, protected assetsService: AssetsService, private clusterService: ClusterService) {
-    this.regionService.subscribe(r => this.initAWS());
-    this.initAWS();
+    super(notificationsService, regionService, assetsService);
   }
 
   protected initAWS() {
 
-    this.ec2 = new AWS.EC2({
-      credentials: AWS.config.credentials,
-      region: AWS.config.region
-      // endpoint: AWS.config.apigateway.endpoint
-    });
+    super.initAWS();
 
     this.iam = new IAM({
       credentials: AWS.config.credentials,
@@ -176,7 +172,7 @@ export class SpotFleetService {
       }],
       // InstanceTypes: AppConfig.SPOT_FLEET_INSTANCE_TYPES
     }, (err, data) => {
-      if(err){
+      if (err) {
         err.message = 'EC2.describeSpotPriceHistory - ' + err.message;
       }
 
@@ -184,83 +180,7 @@ export class SpotFleetService {
     });
   }
 
-  describeAMIs(): Observable<AWS.EC2.Image[]> {
-
-    return new Observable(observer => {
-      this.ec2.describeImages({
-        DryRun: false,
-        Owners: ['self'],
-        // ExecutableUsers: ['self']
-      }, (err, data) => {
-        console.log(err, data);
-        if (err) {
-          err.message = 'EC2.describeImages - ' + err.message;
-          observer.error(err);
-          return;
-        }
-        observer.next(data.Images);
-        observer.complete();
-
-      });
-    });
-  }
-
-  describeSecurityGroups(): Observable<AWS.EC2.SecurityGroup[]> {
-
-    return new Observable(observer => {
-      this.ec2.describeSecurityGroups({
-        DryRun: false
-      }, (err, data) => {
-        console.log(err, data);
-        if (err) {
-          err.message = 'EC2.describeSecurityGroups - ' + err.message;
-          observer.error(err);
-          return;
-        }
-        observer.next(data.SecurityGroups);
-        observer.complete();
-
-      });
-    });
-  }
-
-  describeKeyPairs(): Observable<AWS.EC2.KeyPair[]> {
-
-    return new Observable(observer => {
-      this.ec2.describeKeyPairs({
-        DryRun: false
-      }, (err, data) => {
-        console.log(err, data);
-        if (err) {
-          err.message = 'EC2.describeKeyPairs - ' + err.message;
-          observer.error(err);
-          return;
-        }
-        observer.next(data.KeyPairs);
-        observer.complete();
-
-      });
-    });
-  }
-
-  listIamInstanceProfiles(): Observable<IAM.InstanceProfile[]> {
-    return of([]); // TODO network error
-    // return new Observable(observer => {
-    //   this.iam.listInstanceProfiles((err, data) => {
-    //     console.log(err, data);
-    //     if (err) {
-    //       err.message = 'IAM.listInstanceProfiles - ' + err.message;
-    //       observer.error(err);
-    //       return;
-    //     }
-    //     observer.next(data.InstanceProfiles);
-    //     observer.complete();
-    //
-    //   });
-    // });
-  }
-
-  getInstanceTypes(): Observable<any>{
+  getInstanceTypes(): Observable<any> {
     return this.assetsService.get('instance-types.json').map(s => JSON.parse(s)
       .sort((a, b) => parseFloat(a.SpotPrice)*parseInt(a.WeightedCapacity||1) - parseFloat(b.SpotPrice)*parseInt(b.WeightedCapacity||1)))
   }

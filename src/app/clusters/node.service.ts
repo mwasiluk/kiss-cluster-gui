@@ -76,5 +76,13 @@ export class NodeService  extends CrudBaseService<Node> {
   getShortDescription(item: Node): string {
     return `node ${item.nodeid}`;
   }
+
+  getCPUs(nodes: Node[]): number {
+    if (!nodes) {
+      return 0;
+    }
+
+    return nodes.reduce((prev, n) => prev + parseInt(n.nproc), 0);
+  }
 }
 
