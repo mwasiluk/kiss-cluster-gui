@@ -36,6 +36,11 @@
           <mat-cell *matCellDef="let node"> {{ node.instance_type }}</mat-cell>
         </ng-container>
 
+        <ng-container matColumnDef="instance_state">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> Instance state</mat-header-cell>
+          <mat-cell *matCellDef="let node"> {{ node.$instance ? node.$instance.State.Name : '-' }}</mat-cell>
+        </ng-container>
+
         <ng-container matColumnDef="nproc">
           <mat-header-cell *matHeaderCellDef mat-sort-header> CPU</mat-header-cell>
           <mat-cell *matCellDef="let node"> {{ node.nproc }}</mat-cell>

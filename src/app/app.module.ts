@@ -35,6 +35,7 @@ import {DataService} from './data.service';
 import {UtilsService} from './utils.service';
 import {S3Service} from './s3.service';
 import {SpotFleetsModule} from './spot-fleets/spot-fleets.module';
+import {Ec2Service} from './ec2.service';
 
 
 @NgModule({
@@ -60,7 +61,7 @@ import {SpotFleetsModule} from './spot-fleets/spot-fleets.module';
     LoginRoutingModule,
     AppRoutingModule
   ],
-  providers: [RegionService, CredentialsCsvService, AssetsService, DataService, UtilsService, S3Service],
+  providers: [RegionService, CredentialsCsvService, AssetsService, DataService, UtilsService, S3Service, Ec2Service],
   bootstrap: [AppComponent]
 })
 export class AppModule {

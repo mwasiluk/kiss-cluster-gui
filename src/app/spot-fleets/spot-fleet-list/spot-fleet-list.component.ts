@@ -32,10 +32,6 @@ export class SpotFleetListComponent implements OnInit, OnDestroy, AfterViewInit 
   constructor(private dialog: MatDialog, private spotFleetService: SpotFleetService, private notificationsService: NotificationsService) { }
 
   ngOnInit() {
-    this.spotFleetService.describeInstances().subscribe(ir => {
-      console.log(ir);
-    });
-
     this.getSpotFleets();
   }
   ngAfterViewInit() {

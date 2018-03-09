@@ -25,7 +25,7 @@ export class NodeListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  displayedColumns = ['nodeid', 'ami_id', 'currentqueueid', 'instance_type', 'nproc'];
+  displayedColumns = ['nodeid', 'ami_id', 'currentqueueid', 'instance_type', 'nproc', 'instance_state'];
   dataSource = new MatTableDataSource<Node>();
   loaded = false;
   cpus: number;
@@ -54,7 +54,7 @@ export class NodeListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     Observable.interval(AppConfig.polling_interval)
       .takeUntil(this.destroyed$)
-      .switchMap(() => this.nodeService.getNodes(this.cluster.clustername))
+      .switchMap(() => this.nodeService.getNodes(this.cluster.clustername, true))
       .catch(e => {
         this.notificationsService.error('Error loading nodes', e.message);
         return [];

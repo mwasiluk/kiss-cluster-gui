@@ -9,12 +9,13 @@ import {RegionService} from '../region.service';
 import {NotificationsService} from 'angular2-notifications';
 import {CrudBaseService} from '../crud-base.service';
 import {UtilsService} from '../utils.service';
+import {Ec2Service} from "../ec2.service";
 
 @Injectable()
 export class NodeService  extends CrudBaseService<Node> {
 
   constructor(protected notificationsService: NotificationsService, protected regionService: RegionService,
-              protected utilsService: UtilsService) {
+              protected utilsService: UtilsService, protected ec2Service: Ec2Service) {
 
     super(notificationsService, regionService, utilsService);
 
@@ -24,12 +25,34 @@ export class NodeService  extends CrudBaseService<Node> {
     return AppConfig.NODES_TABLE_NAME_PREFIX + clustername;
   }
 
-  getNodes(clustername): Observable<Node[]> {
-    return this.getNodesForCluster(clustername);
+  getNodes(clustername, fetchInstanceInfo = false): Observable<Node[]> {
+    return this.getNodesForCluster(clustername, fetchInstanceInfo);
   }
 
-  getNodesForCluster(clustername): Observable<Node[]> {
-    return this.getAll(clustername);
+  getNodesForCluster(clustername, fetchInstanceInfo = false): Observable<Node[]> {
+    const all = this.getAll(clustername);
+    if (!fetchInstanceInfo) {
+      return all;
+    }
+    return Observable.forkJoin([all, this.ec2Service.describeInstances()]).map(r => {
+      let instances = <AWS.EC2.Reservation[]>r[1];
+
+      const nodes = <Node[]>r[0];
+      const nodesByInstanceId = {};
+      nodes.forEach(n => {
+        nodesByInstanceId[n.instance_id] = n;
+      });
+      instances.forEach(ir => {
+         ir.Instances.forEach(i => {
+           const n = nodesByInstanceId[i.InstanceId];
+           if (n) {
+             n.$instance = i;
+           }
+         });
+      });
+
+      return nodes;
+    });
   }
 
   getCreateTableInput(clustername): AWS.DynamoDB.CreateTableInput {
@@ -83,6 +106,14 @@ export class NodeService  extends CrudBaseService<Node> {
     }
 
     return nodes.reduce((prev, n) => prev + parseInt(n.nproc), 0);
+  }
+
+  getActiveCPUs(nodes: Node[]): number {
+    if (!nodes) {
+      return 0;
+    }
+
+    return nodes.reduce((prev, n) => prev + (Node.isActive(n) ? parseInt(n.nproc) : 0), 0);
   }
 }
 

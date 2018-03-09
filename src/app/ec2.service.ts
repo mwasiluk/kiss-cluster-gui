@@ -116,9 +116,9 @@ export class Ec2Service {
 
         // ExecutableUsers: ['self']
       }, (err, data) => {
-        console.log(err, data);
         if (err) {
           err.message = 'EC2.describeInstances - ' + err.message;
+          console.log(err, data);
           observer.error(err);
           return;
         }

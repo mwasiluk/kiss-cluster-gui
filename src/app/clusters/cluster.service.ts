@@ -4,6 +4,7 @@ import { of } from 'rxjs/observable/of';
 import 'rxjs/add/observable/forkJoin';
 
 import {Cluster} from './cluster';
+import {Node} from './node';
 import * as AWS from 'aws-sdk';
 import {NotificationsService} from 'angular2-notifications';
 import {RegionService} from '../region.service';
@@ -92,16 +93,16 @@ export class ClusterService extends CrudBaseService<Cluster> {
         c_ = clusters;
 
         const fork = [];
-        console.log(clusters, fetchNodes)
         clusters.forEach(c => {
           if (fetchNodes) {
-            fork.push(this.nodeService.getNodes(c.clustername).flatMap(nodes => {
-              console.log('nodes', nodes);
+            fork.push(this.nodeService.getNodes(c.clustername, true).flatMap(nodes => {
               c.$nodes = nodes;
               c.$cpu = this.nodeService.getCPUs(nodes);
+              c.$activeCPU = this.nodeService.getActiveCPUs(nodes);
+              c.$activeNodes = nodes.filter(n => Node.isActive(n)).length;
               console.log('nodes', nodes);
               return nodes;
-            }).catch(e=>{
+            }).catch(e => {
               console.log(e);
               return null;
             }));
@@ -114,7 +115,6 @@ export class ClusterService extends CrudBaseService<Cluster> {
             }));
           }
         });
-        console.log('fork', fork);
         return Observable.forkJoin(fork);
       }).map(r => {
         return c_;

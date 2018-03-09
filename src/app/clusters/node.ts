@@ -1,4 +1,4 @@
-
+import * as AWS from 'aws-sdk';
 export class Node {
   nodeid?: number;
   nodedate?: string;
@@ -15,4 +15,10 @@ export class Node {
   privateip?: string;
   publicip?: string;
   security_groups?: string;
+
+  $instance?: AWS.EC2.Instance;
+
+  static isActive?(node: Node): boolean {
+    return node.$instance && node.$instance.State.Name === 'running';
+  }
 }
