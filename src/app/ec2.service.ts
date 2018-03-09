@@ -40,9 +40,9 @@ export class Ec2Service {
         Owners: ['self'],
         // ExecutableUsers: ['self']
       }, (err, data) => {
-        console.log(err, data);
         if (err) {
           err.message = 'EC2.describeImages - ' + err.message;
+          console.log(err, data);
           observer.error(err);
           return;
         }
@@ -59,9 +59,9 @@ export class Ec2Service {
       this.ec2.describeSecurityGroups({
         DryRun: false
       }, (err, data) => {
-        console.log(err, data);
         if (err) {
           err.message = 'EC2.describeSecurityGroups - ' + err.message;
+          console.log(err, data);
           observer.error(err);
           return;
         }
@@ -78,9 +78,9 @@ export class Ec2Service {
       this.ec2.describeKeyPairs({
         DryRun: false
       }, (err, data) => {
-        console.log(err, data);
         if (err) {
           err.message = 'EC2.describeKeyPairs - ' + err.message;
+          console.log(err, data);
           observer.error(err);
           return;
         }

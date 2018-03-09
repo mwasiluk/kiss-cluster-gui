@@ -46,6 +46,8 @@ export class SpotFleetDialogComponent implements OnInit {
   iamProfileCtrl: FormControl;
   filteredAmis: Observable<string[]>;
 
+  arnPattern = AppConfig.AWS_ARN_PATTERN;
+
   constructor(private notificationsService: NotificationsService,
               private spotFleetService: SpotFleetService,
               private clusterService: ClusterService,
@@ -110,12 +112,22 @@ export class SpotFleetDialogComponent implements OnInit {
   }
 
   private setDefaults() {
-    this.securityGroup = _.find(this.availableSecurityGroups, sg => sg.GroupName == 'default')
+    this.securityGroup = _.find(this.availableSecurityGroups, sg => sg.GroupName == 'default');
   }
 
   onSubmit() {
     this.submitted = true;
     this.workInProgress = true;
+
+    const regex = new RegExp(this.arnPattern);
+    const match = regex.exec(this.iamInstanceProfileArn);
+    if (match.length < 4) {
+      this.notificationsService.error('Error parsing IAM Instance Profile ARN!');
+      return;
+    }
+    this.iamId = match[1];
+
+    console.log('Extracted IAM:', this.iamId);
 
     this.spotFleetService.requestSpotFleet(this.spotFleet, this.cluster, this.instanceTypes, this.iamId, this.amiId, this.iamInstanceProfileArn, this.securityGroup.GroupId, this.keyPairName).finally(() => {
       this.workInProgress = false;

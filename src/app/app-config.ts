@@ -38,6 +38,8 @@ export class AppConfig {
   public static polling_interval = 5000;
   static SPOT_FLEET_TAG= 'kissc-cluster';
 
+  public static AWS_ARN_PATTERN = 'arn:aws:iam::([0-9]+):([a-z0-9\-A-Z]+)\/([a-z0-9\-A-Z]+)';
+
   static awsEndpoint = null;
   public static updateAwsServiceConfig(c?: ServiceConfigurationOptions): ServiceConfigurationOptions{
     c.credentials = AWS.config.credentials;
