@@ -115,6 +115,10 @@ export class SpotFleetDialogComponent implements OnInit {
     this.securityGroup = _.find(this.availableSecurityGroups, sg => sg.GroupName == 'default');
   }
 
+  parseDate(s) {
+    return new Date(s);
+  }
+
   onSubmit() {
     this.submitted = true;
     this.workInProgress = true;
@@ -125,6 +129,7 @@ export class SpotFleetDialogComponent implements OnInit {
       this.notificationsService.error('Error parsing IAM Instance Profile ARN!');
       return;
     }
+
     this.iamId = match[1];
 
     console.log('Extracted IAM:', this.iamId);

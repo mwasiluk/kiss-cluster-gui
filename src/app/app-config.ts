@@ -41,6 +41,7 @@ export class AppConfig {
   public static AWS_ARN_PATTERN = 'arn:aws:iam::([0-9]+):([a-z0-9\-A-Z]+)\/([a-z0-9\-A-Z]+)';
 
   static awsEndpoint = null;
+  static SPOT_FLEET_VALID_UNTIL_HOURS_DEFAULT = 2;
   public static updateAwsServiceConfig(c?: ServiceConfigurationOptions): ServiceConfigurationOptions{
     c.credentials = AWS.config.credentials;
     c.region = AWS.config.region;

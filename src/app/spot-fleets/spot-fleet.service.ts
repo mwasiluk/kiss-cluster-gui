@@ -124,6 +124,9 @@ export class SpotFleetService extends Ec2Service{
       console.log(r);
       const spotFleet = this.map(this.test(r[0]));
       spotFleet.userData = r[1];
+      const date = new Date();
+      date.setHours(date.getHours() + AppConfig.SPOT_FLEET_VALID_UNTIL_HOURS_DEFAULT);
+      spotFleet.data.SpotFleetRequestConfig.ValidUntil = date;
       return spotFleet;
     });
 

@@ -117,6 +117,25 @@
           </mat-autocomplete>
         </mat-form-field>
 
+
+        <!--<mat-form-field>
+          <input  name="ValidUntil"   matInput [matDatepicker]="picker" placeholder="Valid Until Date" [(ngModel)]="spotFleet.data.SpotFleetRequestConfig.ValidUntil" [readonly]="mode==='view'">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>-->
+
+
+        <mat-form-field>
+          <input  name="ValidUntil"  type="datetime-local" matInput placeholder="Valid Until Date" [ngModel]="spotFleet.data.SpotFleetRequestConfig.ValidUntil | date:'yyyy-MM-ddTHH:mm'" [readonly]="mode==='view'" (ngModelChange)="spotFleet.data.SpotFleetRequestConfig.ValidUntil = parseDate($event)">
+        </mat-form-field>
+        <!--<div class="valid-until-form-group">
+
+          <mat-form-field>
+            <input  name="ValidUntilTime"  type="time" matInput placeholder="Valid Until Time" [ngModel]="spotFleet.data.SpotFleetRequestConfig.ValidUntil | date:'HH:mm'" [readonly]="mode==='view'" (ngModelChange)="spotFleet.data.SpotFleetRequestConfig.ValidUntil = $event ">
+          </mat-form-field>
+        </div>-->
+
+
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             Advanced configuration

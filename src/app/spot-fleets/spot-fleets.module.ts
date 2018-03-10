@@ -4,8 +4,9 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {
   MatButtonModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatInputModule, MatPaginatorModule,
   MatTableModule, MatToolbarModule, MatSortModule, MatDialogModule, MatProgressSpinnerModule, MatExpansionModule,
-  MatSnackBarModule, MatSelectModule, MatAutocompleteModule
+  MatSnackBarModule, MatSelectModule, MatAutocompleteModule, MatDatepickerModule, MatNativeDateModule
 } from '@angular/material';
+
 import {SpotFleetListComponent} from './spot-fleet-list/spot-fleet-list.component';
 import {SpotFleetService} from './spot-fleet.service';
 import {RouterModule} from '@angular/router';
@@ -17,7 +18,7 @@ import { SpotFleetDialogComponent } from './spot-fleet-dialog/spot-fleet-dialog.
     FormsModule, ReactiveFormsModule,
     MatButtonModule, MatCheckboxModule, MatCardModule, MatFormFieldModule, MatInputModule, MatTableModule,
     MatPaginatorModule, MatToolbarModule, MatSortModule, MatDialogModule, MatProgressSpinnerModule, MatExpansionModule,
-    MatSnackBarModule, MatSelectModule, MatAutocompleteModule,
+    MatSnackBarModule, MatSelectModule, MatAutocompleteModule, MatDatepickerModule, MatNativeDateModule,
     RouterModule
   ],
   declarations: [

@@ -3,6 +3,11 @@ form, .spot-fleet-config{
   flex-direction: column;
 }
 
+.valid-until-form-group{
+  display: flex;
+  flex-direction: row;
+}
+
 .cluster-info{
   margin-bottom: 25px;
   font-weight: bold;
