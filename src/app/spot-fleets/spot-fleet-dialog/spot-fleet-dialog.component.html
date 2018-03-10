@@ -76,7 +76,7 @@
         </mat-form-field>-->
 
         <mat-form-field>
-          <input matInput placeholder="AMI" aria-label="AMI" [matAutocomplete]="autoAMI" [formControl]="amiCtrl" [(ngModel)]="amiId" name="ami_ids" required [readonly]="mode==='view'">
+          <input matInput placeholder="AMI" aria-label="AMI" [matAutocomplete]="autoAMI" [(ngModel)]="amiId" name="ami_ids" required [readonly]="mode==='view'">
           <mat-autocomplete #autoAMI="matAutocomplete">
             <mat-option *ngFor="let ami of availableAMIs" [value]="ami.ImageId">
               {{ ami.ImageId}}  ({{ ami.Description }})
@@ -108,8 +108,8 @@
         <br/>
 
         <mat-form-field>
-          <input required matInput placeholder="IAM instance profile arn" aria-label="IAM instance profile" [matAutocomplete]="autoIamProfile" [formControl]="iamProfileCtrl" [(ngModel)]="iamInstanceProfileArn" name="iamInstanceProfile"
-                 [readonly]="mode==='view'" pattern="{{arnPattern}}">
+          <input  matInput placeholder="IAM instance profile arn" aria-label="IAM instance profile" [matAutocomplete]="autoIamProfile" [(ngModel)]="iamInstanceProfileArn" name="iamInstanceProfile"
+                 [readonly]="mode==='view'" pattern="{{arnPattern}}" required>
           <mat-autocomplete #autoIamProfile="matAutocomplete">
             <mat-option *ngFor="let iam of availableIamInstanceProfiles" [value]="iam.Arn">
               {{ iam.InstanceProfileId}}

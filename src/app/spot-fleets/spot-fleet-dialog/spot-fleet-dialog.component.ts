@@ -42,8 +42,7 @@ export class SpotFleetDialogComponent implements OnInit {
   submitted = false;
   workInProgress = false;
 
-  amiCtrl: FormControl;
-  iamProfileCtrl: FormControl;
+
   filteredAmis: Observable<string[]>;
 
   arnPattern = AppConfig.AWS_ARN_PATTERN;
@@ -56,8 +55,6 @@ export class SpotFleetDialogComponent implements OnInit {
 
     this.spotFleet = data.spotFleet;
     this.mode = data.mode;
-    this.amiCtrl = new FormControl();
-    this.iamProfileCtrl = new FormControl();
     this.setCluster(data.cluster);
   }
 
@@ -112,7 +109,7 @@ export class SpotFleetDialogComponent implements OnInit {
   }
 
   private setDefaults() {
-    this.securityGroup = _.find(this.availableSecurityGroups, sg => sg.GroupName == 'default');
+    this.securityGroup = _.find(this.availableSecurityGroups, sg => sg.GroupName === 'default');
   }
 
   parseDate(s) {
