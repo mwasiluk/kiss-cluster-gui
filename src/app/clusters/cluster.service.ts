@@ -91,16 +91,18 @@ export class ClusterService extends CrudBaseService<Cluster> {
     if (fetchNodes || fetchQueues) {
       return res.flatMap(clusters => {
         c_ = clusters;
+        if (!clusters.length) {
+          return of(clusters);
+        }
 
         const fork = [];
         clusters.forEach(c => {
           if (fetchNodes) {
-            fork.push(this.nodeService.getNodes(c.clustername, true).flatMap(nodes => {
+            fork.push(this.nodeService.getNodes(c.clustername, true).map(nodes => {
               c.$nodes = nodes;
               c.$cpu = this.nodeService.getCPUs(nodes);
               c.$activeCPU = this.nodeService.getActiveCPUs(nodes);
               c.$activeNodes = nodes.filter(n => Node.isActive(n)).length;
-              console.log('nodes', nodes);
               return nodes;
             }).catch(e => {
               console.log(e);
@@ -108,7 +110,7 @@ export class ClusterService extends CrudBaseService<Cluster> {
             }));
           }
           if (fetchQueues) {
-            fork.push(this.queueService.getQueues(c.clustername).flatMap(queues => {
+            fork.push(this.queueService.getQueues(c.clustername).map(queues => {
               c.$queues = queues;
               c.$currentQueue = _.find(queues, q => q.queueid === c.queueid);
               return queues;
