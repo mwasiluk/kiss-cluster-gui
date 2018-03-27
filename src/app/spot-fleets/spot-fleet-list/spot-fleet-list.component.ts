@@ -75,7 +75,8 @@ export class SpotFleetListComponent implements OnInit, OnDestroy, AfterViewInit 
       data: {
         cluster: this.cluster,
         mode: 'create'
-      }
+      },
+      disableClose: true
     };
 
     const dialogRef = this.dialog.open(SpotFleetDialogComponent, config);

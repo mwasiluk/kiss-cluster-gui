@@ -81,7 +81,8 @@ export class NodeListComponent implements OnInit, OnDestroy, AfterViewInit {
       data: {
         node: new Node(),
         mode: 'create'
-      }
+      },
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(result => {

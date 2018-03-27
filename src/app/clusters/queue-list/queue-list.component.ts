@@ -80,7 +80,8 @@ export class QueueListComponent implements OnInit, OnDestroy, AfterViewInit {
         queue: this.queueService.getNewQueueForCluster(this.cluster),
         cluster: this.cluster,
         mode: 'create'
-      }
+      },
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(result => {
