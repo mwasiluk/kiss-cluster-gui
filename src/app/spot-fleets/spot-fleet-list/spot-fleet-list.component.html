@@ -15,7 +15,7 @@
 
         <ng-container matColumnDef="id">
           <mat-header-cell *matHeaderCellDef mat-sort-header> Id</mat-header-cell>
-          <mat-cell *matCellDef="let spotFleet"> <a [href]="getSpotRequestConsoleUrl()" target="_blank">{{ spotFleet.data.SpotFleetRequestId }}</a></mat-cell>
+          <mat-cell *matCellDef="let spotFleet"> <a (click)="viewSpotFleet(spotFleet)" class="clickable">{{ spotFleet.data.SpotFleetRequestId }}</a></mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="name">

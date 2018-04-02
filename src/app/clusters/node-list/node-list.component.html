@@ -3,7 +3,9 @@
     <mat-card-title>
       Nodes
       <!--<button mat-button color="primary" (click)="createNodeBtnClick();"><i class="material-icons">add</i> new node</button>-->
-
+      <span class="advanced-users-info">
+        <a [href]="getInstancesConsoleUrl()" target="_blank">Open in AWS Console</a>
+      </span>
     </mat-card-title>
     <mat-card-subtitle>CPUs: {{cpus}}</mat-card-subtitle>
     <div class="spinner-container">

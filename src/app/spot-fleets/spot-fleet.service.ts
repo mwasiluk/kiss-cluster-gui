@@ -12,7 +12,7 @@ import {Cluster} from '../clusters/cluster';
 import {AssetsService} from '../assets.service';
 import {AppConfig} from '../app-config';
 import {ClusterService} from '../clusters/cluster.service';
-import {Ec2Service} from "../ec2.service";
+import {Ec2Service} from '../ec2.service';
 
 @Injectable()
 export class SpotFleetService extends Ec2Service{
@@ -60,7 +60,7 @@ export class SpotFleetService extends Ec2Service{
     return new SpotFleet(data);
   }
 
-  requestSpotFleet(spotFleet: SpotFleet, cluster:Cluster, instanceTypes: any[],  iamId: string, amiId:string, iamInstanceProfileArn: string, securityGroupId: string , keyPairName: string): Observable<any> {
+  requestSpotFleet(spotFleet: SpotFleet, cluster: Cluster, instanceTypes: any[],  iamId: string, amiId: string, iamInstanceProfileArn: string, securityGroupId: string , keyPairName: string): Observable<any> {
 
     const userDataB64 = btoa(spotFleet.userData);
     const blockDeviceMappings = spotFleet.data.SpotFleetRequestConfig.LaunchSpecifications[0].BlockDeviceMappings;
@@ -89,6 +89,9 @@ export class SpotFleetService extends Ec2Service{
           Tags: [{
             Key: AppConfig.SPOT_FLEET_TAG,
             Value: cluster.clustername
+          }, {
+            Key: 'Name',
+            Value: AppConfig.getNodeName(cluster)
           }]
         }]
       };
@@ -96,6 +99,8 @@ export class SpotFleetService extends Ec2Service{
 
     return this.doRequestSpotFleet(spotFleet);
   }
+
+
 
   doRequestSpotFleet(spotFleet: SpotFleet): Observable<any> {
     return new Observable(observer => {
@@ -110,6 +115,25 @@ export class SpotFleetService extends Ec2Service{
           return;
         }
         observer.next(data.SpotFleetRequestId);
+        observer.complete();
+      });
+    });
+  }
+
+  modifySpotFleetRequest(spotFleet: SpotFleet): Observable<any> {
+    return new Observable(observer => {
+      this.ec2.modifySpotFleetRequest({
+        SpotFleetRequestId: spotFleet.data.SpotFleetRequestId,
+        ExcessCapacityTerminationPolicy: 'default',
+        TargetCapacity: spotFleet.data.SpotFleetRequestConfig.TargetCapacity
+      }, (err, data) => {
+        console.log(err, data);
+        if (err) {
+          err.message = 'EC2.modifySpotFleetRequest - ' + err.message;
+          observer.error(err);
+          return;
+        }
+        observer.next(data.Return);
         observer.complete();
       });
     });
@@ -185,7 +209,7 @@ export class SpotFleetService extends Ec2Service{
 
   getInstanceTypes(): Observable<any> {
     return this.assetsService.get('instance-types.json').map(s => JSON.parse(s)
-      .sort((a, b) => parseFloat(a.SpotPrice)*parseInt(a.WeightedCapacity||1) - parseFloat(b.SpotPrice)*parseInt(b.WeightedCapacity||1)))
+      .sort((a, b) => parseFloat(a.SpotPrice) * parseInt(a.WeightedCapacity || 1) - parseFloat(b.SpotPrice) * parseInt(b.WeightedCapacity || 1)));
   }
 }
 

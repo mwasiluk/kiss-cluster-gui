@@ -1,5 +1,10 @@
 <h1 mat-dialog-title>Node {{ node.nodeid }}</h1>
 <div mat-dialog-content>
+
+  <div class="advanced-users-info">
+    <a [href]="getInstanceConsoleUrl(node)" target="_blank">Open in AWS Console</a>
+  </div>
+
   <div class="node-details-form">
     <mat-form-field>
       <input matInput placeholder="nodeid" [(ngModel)]="node.nodeid" [readonly]="mode==='view'">

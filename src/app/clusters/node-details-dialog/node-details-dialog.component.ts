@@ -1,6 +1,8 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {Node} from '../node';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {AppConfig} from "../../app-config";
+import {NodeService} from "../node.service";
 
 @Component({
   selector: 'app-node-details-dialog',
@@ -14,6 +16,7 @@ export class NodeDetailsDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<NodeDetailsDialogComponent>,
+    private nodeService: NodeService,
     @Inject(MAT_DIALOG_DATA) public data: any) {
 
     this.node = data.node;
@@ -25,5 +28,9 @@ export class NodeDetailsDialogComponent implements OnInit {
   }
 
   ngOnInit() { }
+
+  getInstanceConsoleUrl(node: Node): string {
+    return this.nodeService.getInstanceConsoleUrl(node);
+  }
 
 }

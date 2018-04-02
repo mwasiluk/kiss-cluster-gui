@@ -6,7 +6,7 @@
 
   <form #spotFleetForm="ngForm" [hidden]="workInProgress">
 
-    <div *ngIf="!cluster && mode!=='view'">
+    <div *ngIf="!cluster && mode==='create'">
       <mat-form-field>
         <mat-select placeholder="Select cluster" [(ngModel)]="cluster" name="cluster" (selectionChange)="setCluster(cluster)">
           <mat-option *ngFor="let c of clusters" [value]="c">
@@ -17,23 +17,24 @@
 
     </div>
 
-    <div *ngIf="cluster">
+    <div *ngIf="cluster || mode!=='create'">
 
-      <div class="cluster-info">
+      <div class="cluster-info" *ngIf="cluster">
         Cluster: {{ cluster.clustername }}
       </div>
 
       <div *ngIf="spotFleet" class="spot-fleet-config">
 
         <div class="advanced-users-info">
-          <a [href]="getSpotRequestConsoleUrl()" target="_blank">For advances users only - you can use AWS Spot Fleet GUI instead of KissCluster GUI</a>
+          <a [href]="getSpotRequestConsoleUrl()" target="_blank" *ngIf="mode!=='view'">For advances users only - you can use AWS Spot Fleet GUI instead of KissCluster GUI</a>
+          <a [href]="getSpotRequestConsoleUrl()" target="_blank" *ngIf="mode==='view'">Open in AWS Console</a>
         </div>
-        <div class="read-only-info-panel">
+        <div class="read-only-info-panel" *ngIf="mode!=='edit'">
 
 
           <div class="read-only-item">
             <div class="item-name">Spot Fleet Request Type</div>
-            <div class="item-value">{{spotFleet.data.SpotFleetRequestConfig.Type}}</div>
+            <div class="item-value">{{ spotFleet.data.SpotFleetRequestConfig.Type }}</div>
           </div>
           <div class="read-only-item">
             <div class="item-name">Interruption behavior</div>
@@ -55,13 +56,14 @@
         </mat-form-field>-->
 
         <mat-form-field>
-          <input name="TargetCapacity" matInput placeholder="Target Capacity (vCPUs)" [(ngModel)]="spotFleet.data.SpotFleetRequestConfig.TargetCapacity" [readonly]="mode==='view'" required>
+          <input type="number" min="0" step="1" name="TargetCapacity" matInput placeholder="Target Capacity (vCPUs)" [(ngModel)]="spotFleet.data.SpotFleetRequestConfig.TargetCapacity" [readonly]="mode==='view'" required>
         </mat-form-field>
 
+        <div class="spot-fleet-config create-info" *ngIf="mode!=='edit'">
         <mat-form-field>
           <mat-select placeholder="Instance types" [(ngModel)]="instanceTypes" name="instance_types" multiple required [disabled]="mode==='view'">
             <mat-option *ngFor="let i of availableInstanceTypes" [value]="i">
-              {{ i.InstanceType }} ({{i.WeightedCapacity ? i.WeightedCapacity : 1}} vCPU)
+              {{ i.InstanceType }} ({{ i.WeightedCapacity ? i.WeightedCapacity : 1 }} vCPU)
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -79,7 +81,7 @@
           <input matInput placeholder="AMI" aria-label="AMI" [matAutocomplete]="autoAMI" [(ngModel)]="amiId" name="ami_ids" required [readonly]="mode==='view'">
           <mat-autocomplete #autoAMI="matAutocomplete">
             <mat-option *ngFor="let ami of availableAMIs" [value]="ami.ImageId">
-              {{ ami.ImageId}}  ({{ ami.Description }})
+              {{ ami.ImageId }}  ({{ ami.Description }})
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
@@ -92,7 +94,7 @@
         <mat-form-field>
           <mat-select placeholder="Security group" [(ngModel)]="securityGroup" name="security_group" required [disabled]="mode==='view'">
             <mat-option *ngFor="let s of availableSecurityGroups" [value]="s">
-              {{ s.GroupName}}  ({{ s.Description }})
+              {{ s.GroupName }}  ({{ s.Description }})
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -100,7 +102,7 @@
         <mat-form-field>
           <mat-select placeholder="Key pair name" [(ngModel)]="keyPairName" name="keyPairName" required [disabled]="mode==='view'">
             <mat-option *ngFor="let s of availableKeyPairs" [value]="s.KeyName">
-              {{ s.KeyName}}
+              {{ s.KeyName }}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -112,7 +114,7 @@
                  [readonly]="mode==='view'" pattern="{{arnPattern}}" required>
           <mat-autocomplete #autoIamProfile="matAutocomplete">
             <mat-option *ngFor="let iam of availableIamInstanceProfiles" [value]="iam.Arn">
-              {{ iam.InstanceProfileId}}
+              {{ iam.InstanceProfileId }}
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
@@ -150,6 +152,7 @@
 
         </mat-expansion-panel>
         <br/>
+        </div>
       </div>
     </div>
 
@@ -162,5 +165,6 @@
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="close()" tabindex="-1">Close</button>
-  <button mat-button (click)="onSubmit()" tabindex="-1" color="primary" [disabled]="!spotFleetForm.form.valid || !cluster" *ngIf="mode!=='view'">Submit</button>
+  <button mat-button (click)="onSubmit()" tabindex="-1" color="primary" [disabled]="!spotFleetForm.form.valid || !spotFleetForm.form.dirty || mode === 'create' && !cluster" *ngIf="mode!=='view'">Submit</button>
+  <button mat-button (click)="edit()" tabindex="-1" color="primary"  *ngIf="mode==='view' && spotFleet && spotFleet.data.SpotFleetRequestState !== 'cancelled'">Edit</button>
 </div>

@@ -104,4 +104,8 @@ export class NodeListComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  getInstancesConsoleUrl(): string {
+    return this.nodeService.getInstancesConsoleUrl(this.cluster);
+  }
+
 }

@@ -10,6 +10,7 @@ import {NotificationsService} from 'angular2-notifications';
 import {CrudBaseService} from '../crud-base.service';
 import {UtilsService} from '../utils.service';
 import {Ec2Service} from "../ec2.service";
+import {Cluster} from "./cluster";
 
 @Injectable()
 export class NodeService  extends CrudBaseService<Node> {
@@ -115,5 +116,14 @@ export class NodeService  extends CrudBaseService<Node> {
 
     return nodes.reduce((prev, n) => prev + (Node.isActive(n) ? parseInt(n.nproc) : 0), 0);
   }
+
+  getInstanceConsoleUrl(node: Node): string {
+    return AppConfig.getInstanceConsoleUrl(this.regionService.region, node.instance_id);
+  }
+
+  getInstancesConsoleUrl(cluster: Cluster): string {
+    return AppConfig.getSearchInstanceConsoleUrl(this.regionService.region, AppConfig.getNodeName(cluster));
+  }
+
 }
 

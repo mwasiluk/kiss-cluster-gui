@@ -89,6 +89,21 @@ export class SpotFleetListComponent implements OnInit, OnDestroy, AfterViewInit 
     });
   }
 
+
+  viewSpotFleet(spotFleet){
+    const config = {
+      width: '800px',
+      data: {
+        cluster: this.cluster,
+        spotFleet: spotFleet,
+        mode: 'view'
+      },
+      disableClose: true
+    };
+
+    const dialogRef = this.dialog.open(SpotFleetDialogComponent, config);
+  }
+
   terminateBtnClick(spotFleet: SpotFleet) {
     if (!window.confirm('Are you sure?')) {
       return;

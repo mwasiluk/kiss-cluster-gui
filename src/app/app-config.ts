@@ -1,7 +1,8 @@
 
 
-import {ServiceConfigurationOptions} from "aws-sdk/lib/service";
+import {ServiceConfigurationOptions} from 'aws-sdk/lib/service';
 import * as AWS from 'aws-sdk';
+import {Cluster} from "./clusters/cluster";
 
 export class AppConfig {
 
@@ -36,7 +37,14 @@ export class AppConfig {
 
 
   public static polling_interval = 5000;
-  static SPOT_FLEET_TAG= 'kissc-cluster';
+
+  static PREFIX= 'kissc-';
+  static SPOT_FLEET_TAG= AppConfig.PREFIX + 'cluster';
+
+  public static getNodeName(cluster: Cluster) {
+    return `${AppConfig.PREFIX}${cluster.clustername}-node`;
+  }
+
 
   public static AWS_ARN_PATTERN = 'arn:aws:iam::([0-9]+):([a-z0-9\-A-Z]+)\/([a-z0-9\-A-Z]+)';
 
@@ -45,11 +53,20 @@ export class AppConfig {
   public static updateAwsServiceConfig(c?: ServiceConfigurationOptions): ServiceConfigurationOptions{
     c.credentials = AWS.config.credentials;
     c.region = AWS.config.region;
-    if( AppConfig.awsEndpoint){
+    if ( AppConfig.awsEndpoint){
       c.endpoint = AppConfig.awsEndpoint;
     }
 
     return c;
+  }
+
+
+  public static getSearchInstanceConsoleUrl(region: string, searchString: string) {
+    return `https://${region}.console.aws.amazon.com/ec2/v2/home?region=${region}#Instances:search=${searchString};sort=desc:launchTime`;
+  }
+
+  public static getInstanceConsoleUrl(region: string, instanceId: string) {
+    return AppConfig.getSearchInstanceConsoleUrl(region, instanceId);
   }
 
   public static getSpotRequestConsoleUrl(region: string) {
