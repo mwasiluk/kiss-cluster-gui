@@ -26,7 +26,7 @@ export class QueueListComponent extends BaseListComponent<Queue> implements OnIn
   @Input() queues: Queue[];
 
 
-  displayedColumns = ['name', 'id', 'S3_location', 'command', 'creator', 'date', 'jobid', 'maxjobid', 'minjobid', 'status'];
+  displayedColumns = ['queue_name', 'queueid', 'S3_location', 'command', 'creator', 'date', 'jobid', 'maxjobid', 'minjobid', 'qstatus'];
   loaded = false;
 
 

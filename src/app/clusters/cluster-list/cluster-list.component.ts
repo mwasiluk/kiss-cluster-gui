@@ -26,7 +26,7 @@ export class ClusterListComponent extends BaseListComponent<Cluster> implements 
 
   clusters: Cluster[];
 
-  displayedColumns = ['name', 'nodes', 'cpu', 'activeNodes', 'activeCPU', 'currentQueue'];
+  displayedColumns = ['clustername', 'nodes', 'cpu', 'activeNodes', 'activeCPU', 'currentQueue'];
 
 
 
