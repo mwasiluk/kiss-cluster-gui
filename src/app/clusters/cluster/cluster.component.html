@@ -42,10 +42,18 @@
             </mat-form-field>
           </div>
           <div *ngIf="mode=='create'">
-            <mat-form-field>
-              <input matInput name="$s3_bucket" placeholder="s3_bucket" [(ngModel)]="cluster.$s3_bucket" required>
-              <span matPrefix>s3:// </span>
-            </mat-form-field>
+            <div>
+              <mat-form-field>
+                <input matInput name="s3_bucket" placeholder="s3_bucket" [(ngModel)]="cluster.s3_bucket" required>
+                <span matPrefix>s3:// </span>
+              </mat-form-field>
+            </div>
+
+            <div>
+              <mat-form-field>
+                <input matInput name="spot_fleet_arn_instance_profile" placeholder="Spot Fleet instance profile arn" [(ngModel)]="cluster.spot_fleet_arn_instance_profile" size="100">
+              </mat-form-field>
+            </div>
           </div>
 
         </form>

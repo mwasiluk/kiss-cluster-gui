@@ -30,7 +30,7 @@ export class AuthService {
 
     this.regionService.update();
 
-    return this.clusterService.createTableIfNotExists().flatMap(r => {
+    return this.clusterService.initIfNotExists().flatMap(r => {
       if (r) {
         this.isLoggedIn = true;
         this.emit();

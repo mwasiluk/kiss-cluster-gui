@@ -19,7 +19,7 @@ export class ClusterDetailResolver implements Resolve<Cluster> {
     const id = route.paramMap.get('id');
 
     if (!id) {
-      return of(this.cs.getNewCluster(this.dataService.clusterData));
+      return this.cs.getNewCluster(this.dataService.clusterData);
     }
 
     return this.cs.getCluster(id).catch(e => {

@@ -97,7 +97,13 @@ export class SpotFleetService extends Ec2Service{
       };
     });
 
-    return this.doRequestSpotFleet(spotFleet);
+    const arnChanged = !cluster.spot_fleet_arn_instance_profile && cluster.spot_fleet_arn_instance_profile !== iamInstanceProfileArn;
+    if (arnChanged) {
+      cluster.spot_fleet_arn_instance_profile = iamInstanceProfileArn;
+    }
+    return Observable.forkJoin(
+      this.doRequestSpotFleet(spotFleet),
+      arnChanged ? this.clusterService.putItem(cluster) : of(true));
   }
 
 

@@ -17,7 +17,7 @@ import {S3Service} from '../s3.service';
 import {AssetsService} from '../assets.service';
 import 'rxjs/add/observable/throw';
 import {CrudBaseService} from '../crud-base.service';
-import * as _ from "lodash";
+import * as _ from 'lodash';
 
 @Injectable()
 export class ClusterService extends CrudBaseService<Cluster> {
@@ -70,10 +70,27 @@ export class ClusterService extends CrudBaseService<Cluster> {
     };
   }
 
-  getNewItem(data: any): Cluster {
+
+  initIfNotExists(): Observable<boolean> {
+
+    return this.checkIfTableExists().flatMap(r => {
+      if (r) {
+        console.log(this.getTableName() + ' DynamoDB table already exists.');
+        return of(true);
+      }
+      console.log(this.getTableName() + ' DynamoDB table not exists. Creating...');
+      return this.createTable().flatMap(res => {
+        return this.createClusterTemplate();
+      }).map(tr => {
+        return !!tr;
+      });
+    });
+
+  }
+
+  getNewItem(data?: any): Cluster {
     if (!data) {
       return {
-        $s3_bucket: this.regionService.outputS3,
         username: 'ubuntu'
       };
     }
@@ -85,9 +102,9 @@ export class ClusterService extends CrudBaseService<Cluster> {
     return `Cluster: ${item.clustername}`;
   }
 
-  getClusters(fetchNodes = false, fetchQueues = false): Observable<Cluster[]> {
+  getClusters(fetchNodes = false, fetchQueues = false, filterTemplate = true): Observable<Cluster[]> {
     let c_;
-    let res = this.getAll();
+    const res = this.getAll().map(clusters => filterTemplate ? clusters.filter(c => !c.template) : clusters);
     if (fetchNodes || fetchQueues) {
       return res.flatMap(clusters => {
         c_ = clusters;
@@ -149,6 +166,13 @@ export class ClusterService extends CrudBaseService<Cluster> {
     });
   }
 
+  createClusterTemplate(): Observable<Cluster> {
+    return this.putItem(this.getNewItem({
+      clustername: AppConfig.TEMPLATE_CLUSTER_NAME,
+      template: true
+    }));
+  }
+
   createCluster(cluster: Cluster): Observable<Cluster> {
 
     return this.getCluster(cluster.clustername).flatMap(c => {
@@ -168,6 +192,7 @@ export class ClusterService extends CrudBaseService<Cluster> {
       console.log(message);
 
       return Observable.forkJoin([
+        this.updateTemplate(cluster),
         this.nodeService.createTable(cluster.clustername),
         this.queueService.createTable(cluster.clustername),
         this.jobService.createTable(cluster.clustername)
@@ -194,13 +219,13 @@ export class ClusterService extends CrudBaseService<Cluster> {
       cluster.creator = this.utilsService.getCreator();
 
       return Observable.forkJoin([
-        this.s3Service.putObject(cluster.$s3_bucket,
+        this.s3Service.putObject(cluster.s3_bucket,
           `${Cluster.getS3KeyLocation(cluster)}/${AppConfig.get_CLOUD_INIT_FILE_NAME(cluster.clustername)}`,
           AppConfig.getCloudInitFileContent(this.regionService.region, cluster.S3_location, cluster.clustername, cluster.username, scripts['sh/cloud_init_template.sh'])),
 
-        this.s3Service.putObject(cluster.$s3_bucket, AppConfig.get_S3_RUN_NODE_SCRIPT(Cluster.getS3KeyLocation(cluster), cluster.clustername), scripts['sh/run_node.sh']),
-        this.s3Service.putObject(cluster.$s3_bucket, AppConfig.get_S3_JOB_ENVELOPE_SCRIPT(Cluster.getS3KeyLocation(cluster)), scripts['sh/job_envelope.sh']),
-        this.s3Service.putObject(cluster.$s3_bucket, AppConfig.get_S3_QUEUE_UPDATE_SCRIPT(Cluster.getS3KeyLocation(cluster)), scripts['sh/queue_update.sh'])
+        this.s3Service.putObject(cluster.s3_bucket, AppConfig.get_S3_RUN_NODE_SCRIPT(Cluster.getS3KeyLocation(cluster), cluster.clustername), scripts['sh/run_node.sh']),
+        this.s3Service.putObject(cluster.s3_bucket, AppConfig.get_S3_JOB_ENVELOPE_SCRIPT(Cluster.getS3KeyLocation(cluster)), scripts['sh/job_envelope.sh']),
+        this.s3Service.putObject(cluster.s3_bucket, AppConfig.get_S3_QUEUE_UPDATE_SCRIPT(Cluster.getS3KeyLocation(cluster)), scripts['sh/queue_update.sh'])
       ]);
     }).flatMap(result => {
       return this.putItem(cluster);
@@ -215,8 +240,25 @@ export class ClusterService extends CrudBaseService<Cluster> {
 
   }
 
-  getNewCluster(data: any): Cluster {
-    return this.getNewItem(data);
+  getNewCluster(data: any): Observable<Cluster> {
+    return this.getTemplateCluster().map(t => {
+      const item = this.getNewItem();
+      item.s3_bucket = t.s3_bucket;
+      item.spot_fleet_arn_instance_profile = t.spot_fleet_arn_instance_profile;
+      return item;
+    });
+  }
+
+  public getTemplateCluster(): Observable<Cluster> {
+    return this.getCluster(AppConfig.TEMPLATE_CLUSTER_NAME);
+  }
+
+  public updateTemplate(cluster): Observable<Cluster> {
+    return this.getTemplateCluster().flatMap(t => {
+      t.s3_bucket = cluster.s3_bucket;
+      t.spot_fleet_arn_instance_profile = cluster.spot_fleet_arn_instance_profile || t.spot_fleet_arn_instance_profile;
+      return this.putItem(t);
+    });
   }
 }
 

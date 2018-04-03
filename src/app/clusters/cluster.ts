@@ -16,12 +16,15 @@ export class Cluster {
   S3_run_node_script?: string;
   workers_in_a_node?: string;
   username? = 'ubuntu';
+  template? = false;
+  spot_fleet_arn_instance_profile?: string;
+  s3_bucket?: string;
 
   $cpu?: number;
   $activeNodes?: number;
   $activeCPU?: number;
   $currentQueue?: Queue;
-  $s3_bucket?: string;
+
 
   $nodes?: Node[];
   $queues?: Queue[];
@@ -34,7 +37,7 @@ export class Cluster {
     if (cluster.S3_location) {
       return cluster.S3_location;
     }
-    return `s3://${cluster.$s3_bucket}/${Cluster.getS3KeyLocation(cluster)}`;
+    return `s3://${cluster.s3_bucket}/${Cluster.getS3KeyLocation(cluster)}`;
   }
 
   public static getS3Bucket(S3_location: string): string {

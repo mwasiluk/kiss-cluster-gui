@@ -15,6 +15,7 @@ export class Node {
   privateip?: string;
   publicip?: string;
   security_groups?: string;
+  active?: boolean;
 
   $instance?: AWS.EC2.Instance;
 

@@ -79,7 +79,7 @@ export class QueueService extends CrudBaseService<Queue> {
   getNewQueueForCluster(cluster: Cluster): Queue {
     console.log('getNewQueueForCluster', Cluster.getS3Bucket(cluster.S3_location));
     return {
-      $S3_bucket: Cluster.getS3Bucket(cluster.S3_location),
+      $S3_bucket: cluster.s3_bucket,
       minjobid: AppConfig.MINJOBID,
       maxjobid: AppConfig.MAXJOBID
     };

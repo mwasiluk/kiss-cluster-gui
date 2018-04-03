@@ -212,6 +212,7 @@ export abstract class CrudBaseService<E> {
   }
 
   putItem(item: E, ...args): Observable<E> {
+    console.log('putting item', item);
     return new Observable(observer => {
       this.db.putItem({
         TableName: this.getTableName(...args),

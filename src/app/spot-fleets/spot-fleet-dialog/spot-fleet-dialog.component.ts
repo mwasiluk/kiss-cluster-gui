@@ -46,6 +46,7 @@ export class SpotFleetDialogComponent implements OnInit {
   filteredAmis: Observable<string[]>;
 
   arnPattern = AppConfig.AWS_ARN_PATTERN;
+  templateCluster: Cluster;
 
   constructor(private notificationsService: NotificationsService,
               private spotFleetService: SpotFleetService,
@@ -58,7 +59,7 @@ export class SpotFleetDialogComponent implements OnInit {
   ngOnInit() {
     this.workInProgress++;
 
-    const fork: any[] = [this.setAvailableData()];
+    const fork: any[] = [this.setAvailableData(this.data.cluster)];
 
     if (!this.data.cluster) {
       fork.push(this.getClusters());
@@ -77,9 +78,10 @@ export class SpotFleetDialogComponent implements OnInit {
   private getClusters(): Observable<Cluster[]> {
     this.workInProgress++;
     return new Observable(observer => {
-      this.clusterService.getClusters().finally(() => this.workInProgress--)
+      this.clusterService.getClusters(false, false, false).finally(() => this.workInProgress--)
         .subscribe(clusters => {
-          this.clusters = clusters;
+          this.clusters = clusters.filter(c => !c.template);
+          this.templateCluster = _.find(clusters, c => c.template);
           observer.next(clusters);
           observer.complete();
         }, e => {
@@ -107,7 +109,7 @@ export class SpotFleetDialogComponent implements OnInit {
       if (spotFleet.data.SpotFleetRequestConfig.LaunchSpecifications.length) {
         const first = spotFleet.data.SpotFleetRequestConfig.LaunchSpecifications[0];
         this.amiId = first.ImageId;
-        this.iamInstanceProfileArn = first.IamInstanceProfile.Arn;
+        this.iamInstanceProfileArn = this.iamInstanceProfileArn || first.IamInstanceProfile.Arn;
         if (first.SecurityGroups.length) {
           this.securityGroup = _.find(this.availableSecurityGroups, sg => sg.GroupId === first.SecurityGroups[0].GroupId);
         }
@@ -125,19 +127,23 @@ export class SpotFleetDialogComponent implements OnInit {
     }
   }
 
-  private setAvailableData(): Observable<boolean> {
+  private setAvailableData(fetchTemplateCluster = false): Observable<boolean> {
     return Observable.forkJoin(
       this.spotFleetService.getAvailableInstanceTypes(),
       this.spotFleetService.describeAMIs(),
       this.spotFleetService.describeSecurityGroups(),
       this.spotFleetService.describeKeyPairs(),
-      this.spotFleetService.listIamInstanceProfiles()
+      this.spotFleetService.listIamInstanceProfiles(),
+      fetchTemplateCluster ? this.clusterService.getTemplateCluster() : Observable.of(null)
     ).map(r => {
         this.availableInstanceTypes = r[0];
         this.availableAMIs = r[1];
         this.availableSecurityGroups = r[2];
         this.availableKeyPairs = r[3];
         this.availableIamInstanceProfiles = r[4];
+        if(fetchTemplateCluster) {
+          this.templateCluster = r[5];
+        }
         // this.spotFleet = r[5];
         console.log('result', r);
         return true;
@@ -176,6 +182,20 @@ export class SpotFleetDialogComponent implements OnInit {
 
   private setDefaults() {
     this.securityGroup = _.find(this.availableSecurityGroups, sg => sg.GroupName === 'default');
+    if (this.cluster) {
+      console.log('dasda', this.cluster, this.templateCluster);
+      this.iamInstanceProfileArn = this.iamInstanceProfileArn || this.cluster.spot_fleet_arn_instance_profile || (this.templateCluster ? this.templateCluster.spot_fleet_arn_instance_profile : '');
+      if (this.iamInstanceProfileArn && !this.availableIamInstanceProfiles.length) {
+        this.availableIamInstanceProfiles.push({
+          Arn: this.iamInstanceProfileArn,
+          Path: undefined,
+          InstanceProfileName: undefined,
+          InstanceProfileId: undefined,
+          CreateDate: undefined,
+          Roles: undefined
+        });
+      }
+    }
   }
 
   parseDate(s) {

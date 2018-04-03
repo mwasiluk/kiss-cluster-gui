@@ -46,7 +46,7 @@ export class AppComponent  implements OnInit {
       if (this.authService.isLoggedIn) {
         console.log('region switched, checking dynamoDB db tables..')
         this.workInProgress = true;
-        this.clusterService.createTableIfNotExists().map(res => {
+        this.clusterService.initIfNotExists().map(res => {
           if (res) {
             return Observable.of(true);
           }else {
