@@ -70,6 +70,7 @@ export class AppComponent  implements OnInit {
     this.authService.subscribe(loggedIn => {
       console.log(loggedIn);
       if (!loggedIn) {
+        this.router.navigate(['login']);
         return;
       }
       /*this.s3Service.listBuckets().catch(e => {
@@ -111,6 +112,10 @@ export class AppComponent  implements OnInit {
       width: '500px',
       data: { }
     });
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 
   openFile() {
