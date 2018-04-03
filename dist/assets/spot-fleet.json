@@ -1,0 +1,30 @@
+{
+  "IamFleetRole": "arn:aws:iam::${iamId}:role/aws-ec2-spot-fleet-tagging-role",
+  "AllocationStrategy": "lowestPrice",
+  "TargetCapacity": 10,
+  "TerminateInstancesWithExpiration": true,
+  "LaunchSpecifications": [
+    {
+      "InstanceType": "c4.large",
+      "KeyName": "ohio-cluster",
+      "WeightedCapacity": 2,
+      "SpotPrice": "0.05",
+      "IamInstanceProfile": {
+      },
+      "BlockDeviceMappings": [
+        {
+          "DeviceName": "/dev/sda1",
+          "Ebs": {
+            "DeleteOnTermination": true,
+            "VolumeType": "gp2",
+            "VolumeSize": 8,
+            "SnapshotId": "snap-055b7609cb0e52065"
+          }
+        }
+      ],
+      "SecurityGroups": [],
+      "UserData": "IyEvYmluL2Jhc2gKCmVjaG8gImhlcmUgc29tZSBjb2RlIg=="
+    }
+  ],
+  "Type": "maintain"
+}
