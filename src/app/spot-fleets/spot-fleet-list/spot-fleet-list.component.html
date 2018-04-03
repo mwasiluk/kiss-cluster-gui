@@ -3,6 +3,7 @@
     <mat-card-title>
       Spot fleets
       <button mat-button color="primary" (click)="addBtnClick();"><i class="material-icons">add</i> new spot fleet</button>
+      <button *ngIf="spotFleets" mat-button [disabled]="workInProgress>0" (click)="refresh()" class="refresh-list-button"><i class="fas fa-sync" [ngClass]="{'fa-spin': workInProgress>0}"></i></button>
     </mat-card-title>
 
 
@@ -77,7 +78,7 @@
       <mat-paginator #paginator
                      [pageSize]="5"
                      [pageSizeOptions]="[5, 10, 20]"
-                     *ngIf="dataSource.data && dataSource.data.length>5">
+                     [hidden]="!dataSource.data || dataSource.data.length<=5">
       </mat-paginator>
 
       <div class="no-data-available-msg" *ngIf="!dataSource.data || !dataSource.data.length">

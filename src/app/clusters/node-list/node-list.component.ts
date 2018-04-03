@@ -12,56 +12,39 @@ import {ReplaySubject} from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/takeUntil';
 import {AppConfig} from '../../app-config';
 import {NotificationsService} from 'angular2-notifications';
+import {BaseListComponent} from '../../base-list/base-list.component';
+import {RegionService} from '../../region.service';
 
 @Component({
   selector: 'app-node-list',
   templateUrl: './node-list.component.html',
   styleUrls: ['./node-list.component.scss']
 })
-export class NodeListComponent implements OnInit, OnDestroy, AfterViewInit {
+export class NodeListComponent extends BaseListComponent<Node> implements OnInit, OnDestroy, AfterViewInit {
 
   @Input() cluster: Cluster;
   @Input() nodes: Node[];
 
-  private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
-
   displayedColumns = ['nodeid', 'ami_id', 'currentqueueid', 'instance_type', 'nproc', 'instance_state'];
-  dataSource = new MatTableDataSource<Node>();
   loaded = false;
   cpus: number;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
-
   constructor(private router: Router, private dialog: MatDialog, private nodeService: NodeService,
-              private notificationsService: NotificationsService) {}
-
-  ngOnInit() {
-    this.getNodes();
+              private notificationsService: NotificationsService, protected regionService: RegionService) {
+    super(regionService);
   }
 
-  ngOnDestroy() {
-    this.destroyed$.next(true);
-    this.destroyed$.complete();
+  loadData(): Observable<Node[]> {
+    return this.nodeService.getNodes(this.cluster.clustername, true);
   }
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+  onLoaded(items: Node[]) {
+    this.setNodes(items);
   }
 
-  getNodes(): void {
-
-    Observable.interval(AppConfig.polling_interval)
-      .takeUntil(this.destroyed$)
-      .switchMap(() => this.nodeService.getNodes(this.cluster.clustername, true))
-      .catch(e => {
-        this.notificationsService.error('Error loading nodes', e.message);
-        return [];
-      })
-      .subscribe(nodes => {
-        this.setNodes(nodes);
-      });
+  onLoadingError(e: any) {
+    this.notificationsService.error('Error loading nodes', e.message);
+    this.setNodes([]);
   }
 
   private setNodes(nodes: Node[]) {

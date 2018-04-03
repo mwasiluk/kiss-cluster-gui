@@ -3,6 +3,7 @@
     <mat-card-title>
       Queues
       <button mat-button color="primary" (click)="createQueueBtnClick();"><i class="material-icons">add</i> new queue</button>
+      <button *ngIf="loaded" mat-button [disabled]="workInProgress>0" (click)="refresh()" class="refresh-list-button"><i class="fas fa-sync" [ngClass]="{'fa-spin': workInProgress>0}"></i></button>
     </mat-card-title>
     <mat-card-subtitle>
       In KissCluster Queue is a distributed loop

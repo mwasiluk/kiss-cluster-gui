@@ -3,6 +3,8 @@
     <mat-card-title>
       Clusters
       <button mat-button color="primary" (click)="createClusterBtnClick();"><i class="material-icons">add</i> new cluster</button>
+      <button *ngIf="clusters" mat-button [disabled]="workInProgress>0" (click)="refresh()" class="refresh-list-button"><i class="fas fa-sync" [ngClass]="{'fa-spin': workInProgress>0}"></i></button>
+
     </mat-card-title>
     <div class="spinner-container">
       <mat-spinner *ngIf="!clusters"></mat-spinner>

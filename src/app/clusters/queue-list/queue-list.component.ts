@@ -13,54 +13,43 @@ import 'rxjs/add/operator/takeUntil';
 import {AppConfig} from "../../app-config";
 import {S3Service} from "../../s3.service";
 import {NotificationsService} from "angular2-notifications";
+import {BaseListComponent} from "../../base-list/base-list.component";
+import {RegionService} from "../../region.service";
 @Component({
   selector: 'app-queue-list',
   templateUrl: './queue-list.component.html',
   styleUrls: ['./queue-list.component.scss']
 })
-export class QueueListComponent implements OnInit, OnDestroy, AfterViewInit {
+export class QueueListComponent extends BaseListComponent<Queue> implements OnInit, OnDestroy, AfterViewInit {
 
   @Input() cluster: Cluster;
   @Input() queues: Queue[];
 
-  private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   displayedColumns = ['name', 'id', 'S3_location', 'command', 'creator', 'date', 'jobid', 'maxjobid', 'minjobid', 'status'];
-  dataSource = new MatTableDataSource<Queue>();
   loaded = false;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
 
   constructor(private router: Router, private dialog: MatDialog, private queueService: QueueService, private s3Service: S3Service,
-              private notificationsService: NotificationsService) {}
-
-  ngOnInit() {
-    this.getQueues();
+              private notificationsService: NotificationsService, protected regionService: RegionService) {
+    super(regionService);
   }
 
-  ngOnDestroy() {
-    this.destroyed$.next(true);
-    this.destroyed$.complete();
+  loadData(): Observable<Queue[]> {
+    return this.queueService.getQueues(this.cluster.clustername);
   }
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+  onLoaded(items: Queue[]) {
+    this.setQueues(items);
+  }
+
+  onLoadingError(e: any) {
+    this.notificationsService.error('Error loading queues', e.message);
+    this.setQueues([]);
   }
 
   getQueues(): void {
-
-    Observable.interval(AppConfig.polling_interval)
-      .takeUntil(this.destroyed$)
-      .switchMap(() => this.queueService.getQueues(this.cluster.clustername))
-      .catch(e => {
-        this.notificationsService.error('Error loading queues', e.message);
-        return [];
-      })
-      .subscribe(queues => {
-        this.setQueues(queues);
-      });
+    return this.getItems(true);
   }
 
   private setQueues(queues) {

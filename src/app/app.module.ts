@@ -36,6 +36,7 @@ import {UtilsService} from './utils.service';
 import {S3Service} from './s3.service';
 import {SpotFleetsModule} from './spot-fleets/spot-fleets.module';
 import {Ec2Service} from './ec2.service';
+import {BaseListComponent} from "./base-list/base-list.component";
 
 
 @NgModule({
@@ -44,7 +45,8 @@ import {Ec2Service} from './ec2.service';
     DashboardComponent,
     LoginComponent,
     HelpDialogComponent,
-    AboutDialogComponent
+    AboutDialogComponent,
+    BaseListComponent
   ],
   entryComponents: [HelpDialogComponent, AboutDialogComponent],
   imports: [

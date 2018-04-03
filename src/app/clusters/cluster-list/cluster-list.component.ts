@@ -9,8 +9,12 @@ import 'rxjs/add/observable/interval';
 import 'rxjs/add/operator/switchMap';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/takeUntil';
+import 'rxjs/add/operator/startWith';
 import {AppConfig} from '../../app-config';
 import {NotificationsService} from 'angular2-notifications';
+import {Subscription} from 'rxjs/Subscription';
+import {BaseListComponent} from '../../base-list/base-list.component';
+
 
 
 @Component({
@@ -18,50 +22,41 @@ import {NotificationsService} from 'angular2-notifications';
   templateUrl: './cluster-list.component.html',
   styleUrls: ['./cluster-list.component.scss']
 })
-export class ClusterListComponent implements OnInit, OnDestroy, AfterViewInit {
-
-  private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
+export class ClusterListComponent extends BaseListComponent<Cluster> implements OnInit, OnDestroy, AfterViewInit {
 
   clusters: Cluster[];
 
   displayedColumns = ['name', 'nodes', 'cpu', 'activeNodes', 'activeCPU', 'currentQueue'];
-  dataSource = new MatTableDataSource<Cluster>();
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private router: Router, private clusterService: ClusterService, private regionService: RegionService,
-              private notificationsService: NotificationsService) {}
 
-  ngOnInit() {
-    this.regionService.subscribe(r => this.getClusters());
-    this.getClusters();
+  constructor(private router: Router, private clusterService: ClusterService, protected regionService: RegionService,
+              private notificationsService: NotificationsService) {
+    super(regionService);
   }
 
-  ngOnDestroy() {
-    this.destroyed$.next(true);
-    this.destroyed$.complete();
+  loadData(): Observable<Cluster[]>{
+    return this.clusterService.getClusters(true, true);
   }
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+  onLoaded(items: Cluster[]) {
+    this.clusters = items;
   }
 
-  getClusters(): void {
-    Observable.interval(AppConfig.polling_interval)
-      .takeUntil(this.destroyed$)
-      .switchMap(() => this.clusterService.getClusters(true, true))
-      .subscribe(clusters => {
-        this.clusters = clusters;
-        this.dataSource.data = clusters;
-      }, e => {
-        this.notificationsService.error('Error loading clusters', e.message);
-        this.clusters = [];
-      });
+  onLoadingError(e: any) {
+    this.notificationsService.error('Error loading clusters', e.message);
+    this.clusters = [];
   }
+
+  getClusters(startImmediatelly = false): void {
+    this.getItems(startImmediatelly);
+  }
+
 
   createClusterBtnClick() {
     this.router.navigate(['./cluster/create']);
   }
+
+
+
 }
