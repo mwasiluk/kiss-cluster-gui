@@ -1,0 +1,88 @@
+
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  KisscRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        -
+          PolicyName: "KissCluster"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action: "dynamodb:*"
+                Resource: "*"
+              - Effect: "Allow"
+                Action: "s3:*"
+                Resource:
+                 - !Join ["", ["arn:aws:s3:::", !Ref data]]
+                 - !Join ["", ["arn:aws:s3:::", !Ref data, "/*"]]
+
+  KisscInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: "/"
+      Roles:
+        -
+          Ref: "KisscRole"
+
+  KisscLambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        -
+          PolicyName: "KissClusterLambda"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "arn:aws:logs:*:*:*"
+              - Effect: "Allow"
+                Action: "s3:ListAllMyBuckets"
+                Resource: "*"
+              - Effect: "Allow"
+                Action: "iam:ListInstanceProfiles"
+                Resource: "*"
+  data:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      CorsConfiguration:
+        CorsRules:
+          -
+            AllowedHeaders:
+              - "*"
+            AllowedMethods:
+              - "GET"
+              - "PUT"
+              - "HEAD"
+              - "POST"
+              - "DELETE"
+            AllowedOrigins:
+              - "*"
