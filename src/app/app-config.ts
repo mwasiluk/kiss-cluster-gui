@@ -41,6 +41,8 @@ export class AppConfig {
   static PREFIX= 'kissc-';
   static SPOT_FLEET_TAG= AppConfig.PREFIX + 'cluster';
   static TEMPLATE_CLUSTER_NAME = 'kiss_cluster_template_-_do_not_remove';
+  static LAMBDA_FUNCTION_DESC = 'kiss_cluster_lambda_function_-_do_not_change' ;
+  static CHANGE_SET_NAME = 'CreateLambdaChangeSet';
 
   public static getNodeName(cluster: Cluster) {
     return `${AppConfig.PREFIX}${cluster.clustername}-node`;

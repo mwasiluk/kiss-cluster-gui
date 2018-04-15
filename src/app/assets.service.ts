@@ -12,12 +12,12 @@ export class AssetsService {
 
   constructor(private http: HttpClient) { }
 
-  public get(assetName: string): Observable<string> {
+  public get(assetName: string, responseType = 'text'): Observable<string> {
     if (this.cache[assetName]) {
       return of(this.cache[assetName]);
     }
 
-    return this.http.get(`assets/${assetName}`, {responseType: 'text'}).flatMap(data => {
+    return this.http.get(`assets/${assetName}`, {responseType: responseType as 'text'}).flatMap(data => {
       this.cache[assetName] = data;
       return of(data);
     });

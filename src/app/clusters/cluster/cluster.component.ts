@@ -14,6 +14,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/finally';
 import {S3Service} from '../../s3.service';
 import {Queue} from '../queue';
+import {DataService} from '../../data.service';
 
 @Component({
   selector: 'app-cluster',
@@ -40,7 +41,8 @@ export class ClusterComponent implements OnInit {
     private dialog: MatDialog,
     private clusterService: ClusterService,
     private breadcrumbs: BreadcrumbsService,
-    protected s3Service: S3Service
+    protected s3Service: S3Service,
+    protected dataService: DataService
   ) { }
 
   ngOnInit() {
@@ -107,7 +109,7 @@ export class ClusterComponent implements OnInit {
       this.router.navigate(['/']);
 
     }, (e) => {
-      let msg = cleanUp ? 'Cluster cleanup failed' : 'Cluster deletion failure!';
+      const msg = cleanUp ? 'Cluster cleanup failed' : 'Cluster deletion failure!';
       this.notificationsService.error(msg);
       this.notificationsService.error(e);
 

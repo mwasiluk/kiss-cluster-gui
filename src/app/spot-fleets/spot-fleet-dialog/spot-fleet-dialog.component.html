@@ -113,8 +113,8 @@
           <input  matInput placeholder="IAM instance profile arn" aria-label="IAM instance profile" [matAutocomplete]="autoIamProfile" [(ngModel)]="iamInstanceProfileArn" name="iamInstanceProfile"
                  [readonly]="mode==='view'" pattern="{{arnPattern}}" required>
           <mat-autocomplete #autoIamProfile="matAutocomplete">
-            <mat-option *ngFor="let iam of availableIamInstanceProfiles" [value]="iam.Arn">
-              {{ iam.InstanceProfileId }}
+            <mat-option *ngFor="let ip of availableIamInstanceProfiles" [value]="ip.Arn">
+              {{ ip.InstanceProfileName }}
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>

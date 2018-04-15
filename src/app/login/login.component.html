@@ -5,7 +5,7 @@
     <mat-card-subtitle> {{ message }}</mat-card-subtitle>
     <mat-card-content >
 
-      <div class="spinner-container" *ngIf="inProgress">
+      <div class="spinner-container" *ngIf="inProgress>0">
         <mat-spinner *ngIf="!queues"></mat-spinner>
       </div>
       <div *ngIf="!authService.isLoggedIn && !inProgress">
@@ -13,7 +13,7 @@
         <div class="region-select">
           <mat-form-field class="region-form-field">
             <mat-select placeholder="Region"  [(value)]="regionService.region">
-              <mat-option *ngFor="let r of availableRegions" [value]="r">{{r}}</mat-option>
+              <mat-option *ngFor="let r of availableRegions" [value]="r">{{ r }}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -22,6 +22,7 @@
     </mat-card-content>
     <mat-card-actions *ngIf="!inProgress">
       <button mat-button (click)="login()"  *ngIf="!authService.isLoggedIn" [disabled]="!credentials">Login</button>
+      <button mat-button (click)="initCloud()"  *ngIf="!authService.isLoggedIn" [disabled]="!credentials">Run cloud formation</button>
       <button mat-button (click)="logout()" *ngIf="authService.isLoggedIn">Logout</button>
     </mat-card-actions>
   </mat-card>

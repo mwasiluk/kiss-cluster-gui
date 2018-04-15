@@ -37,6 +37,7 @@ import {S3Service} from './s3.service';
 import {SpotFleetsModule} from './spot-fleets/spot-fleets.module';
 import {Ec2Service} from './ec2.service';
 import {BaseListComponent} from "./base-list/base-list.component";
+import {CloudFormationService} from "./cloud-formation.service";
 
 
 @NgModule({
@@ -63,7 +64,7 @@ import {BaseListComponent} from "./base-list/base-list.component";
     LoginRoutingModule,
     AppRoutingModule
   ],
-  providers: [RegionService, CredentialsCsvService, AssetsService, DataService, UtilsService, S3Service, Ec2Service],
+  providers: [RegionService, CredentialsCsvService, AssetsService, DataService, UtilsService, S3Service, Ec2Service, CloudFormationService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

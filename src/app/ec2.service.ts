@@ -10,6 +10,7 @@ import * as IAM from 'aws-sdk/clients/iam';
 
 import {AppConfig} from './app-config';
 import {AssetsService} from "./assets.service";
+import {DataService} from "./data.service";
 
 
 @Injectable()
@@ -19,7 +20,7 @@ export class Ec2Service {
   iam: IAM;
 
   constructor(protected notificationsService: NotificationsService, protected regionService: RegionService,
-              protected assetsService: AssetsService) {
+              protected assetsService: AssetsService, protected dataService: DataService) {
     this.regionService.subscribe(r => this.initAWS());
     this.initAWS();
   }
@@ -92,7 +93,7 @@ export class Ec2Service {
   }
 
   listIamInstanceProfiles(): Observable<IAM.InstanceProfile[]> {
-    return of([]); // TODO network error
+    return of(this.dataService.instanceProfiles);
     // return new Observable(observer => {
     //   this.iam.listInstanceProfiles((err, data) => {
     //     console.log(err, data);

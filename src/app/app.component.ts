@@ -14,6 +14,7 @@ import {Observable} from 'rxjs/Observable';
 import {NotificationsService} from 'angular2-notifications';
 import {ClusterService} from './clusters/cluster.service';
 import {BreadcrumbsService} from 'ng2-breadcrumbs'
+import {CloudFormationService} from "./cloud-formation.service";
 
 @Component({
   selector: 'app-root',
@@ -36,7 +37,7 @@ export class AppComponent  implements OnInit {
 
   constructor(private router: Router, public dialog: MatDialog, public authService: AuthService, public regionService: RegionService,
               private dataService: DataService, private s3Service: S3Service, private notificationsService: NotificationsService,
-              private clusterService: ClusterService, private breadcrumbs: BreadcrumbsService) {}
+              private clusterService: ClusterService, private breadcrumbs: BreadcrumbsService, private cloudFormationService: CloudFormationService) {}
 
   ngOnInit(): void {
 

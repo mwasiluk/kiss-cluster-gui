@@ -5,7 +5,9 @@
   }
 
   .cluster-details-form{
-
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
     mat-form-field{
 
     }

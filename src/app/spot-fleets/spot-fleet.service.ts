@@ -13,6 +13,7 @@ import {AssetsService} from '../assets.service';
 import {AppConfig} from '../app-config';
 import {ClusterService} from '../clusters/cluster.service';
 import {Ec2Service} from '../ec2.service';
+import {DataService} from "../data.service";
 
 @Injectable()
 export class SpotFleetService extends Ec2Service{
@@ -21,8 +22,9 @@ export class SpotFleetService extends Ec2Service{
   iam: IAM;
 
   constructor(protected notificationsService: NotificationsService, protected regionService: RegionService,
-              protected utilsService: UtilsService, protected assetsService: AssetsService, private clusterService: ClusterService) {
-    super(notificationsService, regionService, assetsService);
+              protected utilsService: UtilsService, protected assetsService: AssetsService, private clusterService: ClusterService,
+              protected dataService: DataService) {
+    super(notificationsService, regionService, assetsService, dataService);
   }
 
   protected initAWS() {
