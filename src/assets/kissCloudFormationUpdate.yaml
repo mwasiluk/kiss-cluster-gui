@@ -95,7 +95,7 @@ Resources:
       CodeUri: s3://kissc-public/kisscLambda.zip
       Description: 'kiss_cluster_lambda_function_-_do_not_change'
       MemorySize: 128
-      Timeout: 3
+      Timeout: 10
       Role: !Join ["", ["arn:aws:iam::", !Ref "AWS::AccountId", ":role/", !Ref KisscLambdaRole]]
       Tags:
         kissc: kissc-lambda
