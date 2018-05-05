@@ -9,7 +9,7 @@ import {ClusterService} from './cluster.service';
 import {
   MatButtonModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatInputModule, MatPaginatorModule,
   MatTableModule, MatToolbarModule, MatSortModule, MatDialogModule, MatProgressSpinnerModule, MatExpansionModule,
-  MatSnackBarModule, MatAutocompleteModule, MatSelectModule
+  MatSnackBarModule, MatAutocompleteModule, MatSelectModule, MatTooltipModule
 } from '@angular/material';
 
 import { QueueListComponent } from './queue-list/queue-list.component';
@@ -27,7 +27,7 @@ import {SpotFleetsModule} from '../spot-fleets/spot-fleets.module';
   imports: [
     CommonModule,
     FormsModule,
-    MatButtonModule, MatCheckboxModule, MatCardModule, MatFormFieldModule, MatInputModule, MatTableModule,
+    MatButtonModule, MatCheckboxModule, MatCardModule, MatFormFieldModule, MatInputModule, MatTableModule, MatTooltipModule,
     MatPaginatorModule, MatToolbarModule, MatSortModule, MatDialogModule, MatProgressSpinnerModule, MatExpansionModule,
     MatSnackBarModule, MatSelectModule, MatAutocompleteModule,
     BreadcrumbsModule,

@@ -19,6 +19,8 @@
       <span matPrefix>s3:// </span>
     </mat-form-field>
 
+
+    <label class="queue-folder-label" matTooltip="The contents of the folder will be copied to each cluster node.">Folder that contains all files needed to execute the command*</label>
       <input  *ngIf="mode!=='view'"
         required
         #folderInput

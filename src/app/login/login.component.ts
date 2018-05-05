@@ -76,7 +76,8 @@ export class LoginComponent implements OnInit {
 
     const dialogRef = this.dialog.open(CloudFormationDialogComponent, {
       width: '800px',
-      data: {}
+      data: {},
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(result => {
