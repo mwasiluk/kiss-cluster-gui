@@ -1,0 +1,103 @@
+<div mat-dialog-title>Cloud Formation <button class="close-button" mat-icon-button (click)="close()" tabindex="-1" [disabled]="workInProgress>0" title="Close"><i class="material-icons">close</i></button></div>
+<div mat-dialog-content>
+  <div class="spinner-container">
+    <mat-spinner *ngIf="workInProgress"></mat-spinner>
+  </div>
+  <div class="main-content">
+    <div [ngSwitch]="status">
+      <div *ngSwitchCase="Status.CHECKING_IF_STACK_ALREADY_EXISTS">
+
+        Checking whether the stack {{ stackName }} already exists ...
+      </div>
+      <div *ngSwitchCase="Status.STACK_ALREADY_EXISTS">
+        <p>
+         The stack {{ stackName }} already exists on your AWS account. You must delete it first before continuing.
+        </p>
+
+        <button color="warn" mat-raised-button mat-button (click)="deleteStack()">Delete stack {{ stackName }}</button>
+      </div>
+      <div *ngSwitchCase="Status.STACK_NOT_EXISTS">
+
+        <p>
+          Initial system configuration. <br/> Press the button below to automatically configure required resources for KissCluster
+        </p>
+
+
+        <mat-expansion-panel class="advanced-info-expansion-panel">
+          <mat-expansion-panel-header>
+            Advanced information
+          </mat-expansion-panel-header>
+
+          <div class="advanced-info">
+
+            Cloud formation scripts will create following resources on your AWS account:
+            <ul>
+              <li>2 IAM Roles</li>
+              <li>IAM Instance Profile</li>
+              <li>S3 bucket</li>
+              <li>Lambda function (for listing your s3 buckets and IAM instance profiles)</li>
+            </ul>
+
+
+            Cloud formation template scripts may be found here:
+              <ul>
+                <li>
+                  <a href="assets/kissCloudFormation.yaml" target="_blank">Initial stack creation script</a>
+                </li>
+                <li>
+                  <a href="assets/kissCloudFormationUpdate.yaml" target="_blank">Stack update - lambda function creation</a>
+                </li>
+              </ul>
+
+            <p>
+              <a href="https://s3.us-east-2.amazonaws.com/kissc-public/kisscLambda.zip" target="_blank">Lambda function source code</a>
+            </p>
+
+
+          </div>
+
+        </mat-expansion-panel>
+
+        <button color="primary" mat-raised-button (click)="initCloud()">Run stack cloud formation script</button>
+      </div>
+      <div *ngSwitchCase="Status.CREATION_IN_PROGRESS">
+        <p>
+          Stack creation in progress... It may take a few minutes.
+        </p>
+
+
+        <button mat-raised-button (click)="pollStackEvents()" *ngIf="!showEvents">Show stack events</button>
+
+        <div class="event-log" *ngIf="showEvents">
+            <app-stack-events-list></app-stack-events-list>
+        </div>
+
+
+      </div>
+      <div *ngSwitchCase="Status.SUCCESS">
+        <p>Success! You can now log in.</p>
+        <p><button mat-raised-button (click)="closeAfterSuccess()">Close and login</button></p>
+      </div>
+      <div *ngSwitchCase="Status.DELETE_IN_PROGRESS">
+        <p>
+          Stack deletion in progress...
+        </p>
+        <button mat-raised-button (click)="pollStackEvents()" *ngIf="!showEvents">Show stack events</button>
+
+        <div class="event-log" *ngIf="showEvents">
+          <app-stack-events-list></app-stack-events-list>
+        </div>
+      </div>
+      <div *ngSwitchCase="Status.ERROR" class="error-container">
+        Error!
+        <p>
+          {{error.message}}
+        </p>
+      </div>
+      <div *ngSwitchDefault>Unknown status.</div>
+    </div>
+  </div>
+</div>
+<div mat-dialog-actions>
+
+</div>

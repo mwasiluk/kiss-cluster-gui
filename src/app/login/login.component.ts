@@ -9,6 +9,8 @@ import {NotificationsService} from 'angular2-notifications';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {CloudFormationService} from '../cloud-formation.service';
+import {MatDialog} from '@angular/material';
+import {CloudFormationDialogComponent} from '../cloud-formation-dialog/cloud-formation-dialog.component';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +25,7 @@ export class LoginComponent implements OnInit {
   availableRegions = [];
   inProgress = 0;
 
-  constructor(public authService: AuthService, public router: Router, public regionService: RegionService,
+  constructor(public authService: AuthService, public router: Router, public regionService: RegionService, public dialog: MatDialog,
               private csvService: CredentialsCsvService, protected notificationsService: NotificationsService, private cloudFormationService: CloudFormationService) {
 
   }
@@ -68,23 +70,24 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  initCloud() {
-    if (!window.confirm('Are you sure?')) {
-      return;
-    }
+  initCloud(queue) {
 
-    this.inProgress++;
-    this.message = 'Cloud formation creation in progress... It may take a few minutes.';
+    this.authService.setCredentials(this.credentials);
 
-    this.authService.initCloud(this.credentials).finally(() => this.inProgress--).subscribe((r) => {
-      this.message = 'Cloud formation success ... Logging in...';
-      this.notificationsService.success('Cloud formation success ... Logging in...');
-      this.login();
-    }, e => {
-      this.message = 'Cloud formation failed!';
-      this.notificationsService.error(e.message);
+    const dialogRef = this.dialog.open(CloudFormationDialogComponent, {
+      width: '800px',
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+
+      if (result) {
+        this.login();
+      }
     });
   }
+
 
   private getUrlParams(redirect: string) {
     const url = new URL(redirect, 'http://dummy.pl');

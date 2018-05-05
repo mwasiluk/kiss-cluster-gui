@@ -29,11 +29,7 @@ export class AuthService {
   redirectUrl: string;
 
   login(credentials: Credentials): Observable<boolean> {
-    // AWS.config.region
-    AWS.config.credentials = credentials;
-    AWS.config.region = this.regionService.region;
-
-    this.regionService.update();
+    this.setCredentials(credentials);
 
     // this.cloudFormationService.updateStack().subscribe(r => console.log(r), e => console.log(e));
 
@@ -65,12 +61,18 @@ export class AuthService {
     });
 
   }
-  initCloud(credentials: Credentials): Observable<boolean> {
-    // AWS.config.region
+
+  setCredentials(credentials: Credentials, updateRegionService = true) {
     AWS.config.credentials = credentials;
     AWS.config.region = this.regionService.region;
 
-    this.regionService.update();
+    if (updateRegionService) {
+      this.regionService.update();
+    }
+  }
+
+  initCloud(credentials: Credentials): Observable<boolean> {
+    this.setCredentials(credentials);
 
     return this.cloudFormationService.createStack().flatMap(r => {
       console.log(r);

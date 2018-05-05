@@ -5,7 +5,7 @@ import {Form, FormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {
   MatButtonModule, MatCheckboxModule, MatCardModule, MatPaginatorModule, MatToolbarModule, MatSortModule,
-  MatSelectModule, MatMenuModule, MatDialogModule, MatProgressSpinnerModule
+  MatSelectModule, MatMenuModule, MatDialogModule, MatProgressSpinnerModule, MatExpansionModule, MatTooltipModule
 } from '@angular/material';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
@@ -38,6 +38,8 @@ import {SpotFleetsModule} from './spot-fleets/spot-fleets.module';
 import {Ec2Service} from './ec2.service';
 import {BaseListComponent} from "./base-list/base-list.component";
 import {CloudFormationService} from "./cloud-formation.service";
+import { CloudFormationDialogComponent } from './cloud-formation-dialog/cloud-formation-dialog.component';
+import { StackEventsListComponent } from './stack-events-list/stack-events-list.component';
 
 
 @NgModule({
@@ -47,16 +49,19 @@ import {CloudFormationService} from "./cloud-formation.service";
     LoginComponent,
     HelpDialogComponent,
     AboutDialogComponent,
-    BaseListComponent
+    BaseListComponent,
+    CloudFormationDialogComponent,
+    StackEventsListComponent
   ],
-  entryComponents: [HelpDialogComponent, AboutDialogComponent],
+  entryComponents: [HelpDialogComponent, AboutDialogComponent, CloudFormationDialogComponent],
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    MatButtonModule, MatCheckboxModule, MatCardModule, MatFormFieldModule, MatInputModule, MatTableModule,
+    MatButtonModule, MatCheckboxModule, MatCardModule, MatFormFieldModule, MatInputModule, MatTableModule,  MatExpansionModule,
     MatPaginatorModule, MatToolbarModule, MatSortModule, MatSelectModule, MatMenuModule, MatDialogModule, MatProgressSpinnerModule,
+    MatTooltipModule,
     SimpleNotificationsModule.forRoot(),
     BreadcrumbsModule,
     ClustersModule,

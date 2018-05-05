@@ -1,0 +1,29 @@
+.stack-event-list{
+
+  margin-bottom: 25px;
+
+
+
+  .stack-event-table-container{
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+    clear: both;
+    margin-top: 15px;
+  }
+
+  .mat-table {
+    overflow: auto;
+    //max-height: 300px;
+  }
+
+  .mat-row{
+    &.empty{
+      background-color: #f2f2f2;
+    }
+
+    &.active{
+      background-color: #d8f4d2;
+    }
+  }
+}

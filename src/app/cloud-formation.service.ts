@@ -11,6 +11,7 @@ import * as IAM from 'aws-sdk/clients/iam';
 import {AppConfig} from './app-config';
 import {AssetsService} from './assets.service';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
+import * as _ from 'lodash';
 
 
 @Injectable()
@@ -18,7 +19,8 @@ export class CloudFormationService {
 
   cf: AWS.CloudFormation;
   lambda: AWS.Lambda;
-  stackName = 'kissc';
+
+
 
   constructor(protected notificationsService: NotificationsService, protected regionService: RegionService,
               protected assetsService: AssetsService) {
@@ -50,7 +52,7 @@ export class CloudFormationService {
     const createOb = this.assetsService.get('kissCloudFormation.yaml').flatMap(templateBody => {
       return new Observable(observer => {
         this.cf.createStack({
-          StackName: this.stackName,
+          StackName: AppConfig.STACK_NAME,
           TemplateBody: templateBody,
           // TemplateURL: 'https://s3.us-east-2.amazonaws.com/szufel-public/kissRoleS3.yaml',
           Capabilities: ['CAPABILITY_IAM']
@@ -104,7 +106,7 @@ export class CloudFormationService {
       return new Observable(observer => {
         this.cf.createChangeSet({
           ChangeSetName: changeSetName,
-          StackName: this.stackName,
+          StackName: AppConfig.STACK_NAME,
           TemplateBody: templateBody,
           // TemplateURL: 'https://s3.us-east-2.amazonaws.com/szufel-public/kissRoleS3.yaml',
           Capabilities: ['CAPABILITY_IAM']
@@ -145,7 +147,7 @@ export class CloudFormationService {
       return new Observable(observer => {
         this.cf.executeChangeSet({
           ChangeSetName: changeSetName,
-          StackName: this.stackName,
+          StackName: AppConfig.STACK_NAME,
         }, (err, data) => {
           if (err) {
             err.message = 'CloudFormation.executeChangeSet - ' + err.message;
@@ -180,11 +182,21 @@ export class CloudFormationService {
     });
   }
 
-  describeStacks(): Observable<AWS.CloudFormation.Stacks> {
+  checkIfStackExists(): Observable<boolean> {
+    return this.describeStacks(true).map(stacks => {
+      return !!_.find(stacks, s => s.StackName === AppConfig.STACK_NAME);
+    });
+  }
+
+  describeStacks(all = false): Observable<AWS.CloudFormation.Stacks> {
     return new Observable(observer => {
-      this.cf.describeStacks({
-        StackName: this.stackName
-      }, (err, data) => {
+      const params = {};
+
+      if (!all) {
+        params['StackName'] = AppConfig.STACK_NAME;
+      }
+
+      this.cf.describeStacks(params, (err, data) => {
         if (err) {
           err.message = 'CloudFormation.describeStacks - ' + err.message;
           console.log(err, data);
@@ -198,10 +210,58 @@ export class CloudFormationService {
     });
   }
 
+  deleteStack(): Observable<boolean> {
+    return new Observable(observer => {
+      this.cf.deleteStack({
+        StackName: AppConfig.STACK_NAME
+      }, (err, data) => {
+        if (err) {
+          err.message = 'CloudFormation.deleteStack - ' + err.message;
+          console.log(err, data);
+          observer.error(err);
+          return;
+        }
+        const finished = new ReplaySubject(1);
+        Observable.interval(2000).takeUntil(finished)
+          .switchMap(() => {
+            return this.checkIfStackExists();
+          }).subscribe(res => {
+          if (!res) {
+            finished.next(true);
+            finished.complete();
+            observer.next(true);
+            observer.complete();
+          }
+        }, e => {
+          observer.error(e);
+        });
+
+      });
+    });
+  }
+
+  describeStackEvents(): Observable<AWS.CloudFormation.StackEvents> {
+    return new Observable(observer => {
+      this.cf.describeStackEvents({
+        StackName: AppConfig.STACK_NAME
+      }, (err, data) => {
+        if (err) {
+          err.message = 'CloudFormation.describeStackEvents - ' + err.message;
+          console.log(err, data);
+          observer.error(err);
+          return;
+        }
+        observer.next(data.StackEvents);
+        observer.complete();
+
+      });
+    });
+  }
+
   describeChangeSet(changeSetName = 'CreateLambdaCS'): Observable<AWS.CloudFormation.DescribeChangeSetOutput> {
     return new Observable(observer => {
       this.cf.describeChangeSet({
-        StackName: this.stackName,
+        StackName: AppConfig.STACK_NAME,
         ChangeSetName: changeSetName
       }, (err, data) => {
         if (err) {
