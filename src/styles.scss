@@ -55,9 +55,16 @@ simple-notifications .simple-notification .sn-title{
 .no-data-available-msg{
   padding: 15px 10px
 }
-
+a{
+  color:  #1a0dab
+}
 .clickable{
   cursor: pointer;
+  color:  #1a0dab!important;
+
+  &:hover{
+    text-decoration: underline;
+  }
 }
 
 .refresh-list-button{
