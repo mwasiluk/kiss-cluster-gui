@@ -22,9 +22,13 @@ export class CloudFormationDialogComponent implements OnInit, OnDestroy, AfterVi
   workInProgress = 0;
   Status = Status;
   status = Status.INITIAL;
+  prevStatus = null;
   stackName = AppConfig.STACK_NAME;
   error = null;
   showEvents = false;
+
+  timerFinished = null;
+  timeToLogin = 30;
 
   constructor(
     public dialogRef: MatDialogRef<CloudFormationDialogComponent>, private cloudFormationService: CloudFormationService,
@@ -55,6 +59,7 @@ export class CloudFormationDialogComponent implements OnInit, OnDestroy, AfterVi
 
     }, e => {
       this.notificationsService.error(e.message);
+      this.prevStatus = this.status;
       this.status = Status.ERROR;
       this.error = e;
     });
@@ -93,8 +98,10 @@ export class CloudFormationDialogComponent implements OnInit, OnDestroy, AfterVi
     }).subscribe((r) => {
       this.notificationsService.success('Cloud formation success...');
       this.status = Status.SUCCESS;
+      this.launchLoginTimer(this.timeToLogin);
     }, e => {
       this.error = e;
+      this.prevStatus = this.status;
       this.status = Status.ERROR;
       this.notificationsService.error(e.message);
     });
@@ -127,13 +134,35 @@ export class CloudFormationDialogComponent implements OnInit, OnDestroy, AfterVi
       this.status = Status.STACK_NOT_EXISTS;
     }, e => {
       this.error = e;
+      this.prevStatus = this.status;
       this.status = Status.ERROR;
       this.notificationsService.error(e.message);
     });
   }
 
+  getCloudFormationConsoleUrl(): string {
+    return this.cloudFormationService.getCloudFormationConsoleUrl();
+  }
+
+  launchLoginTimer(time = 11) {
+    this.timerFinished = new ReplaySubject(1);
+
+    Observable.interval(1000).takeUntil(this.timerFinished)
+      .take(time)
+      .map((v) => (time - 1) - v)
+      .finally(() => this.closeAfterSuccess())
+      .subscribe(v => this.timeToLogin = v);
+  }
+
+
   ngAfterViewInit(): void {
   }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    if (this.timerFinished){
+      this.timerFinished.next(true);
+      this.timerFinished.complete();
+    }
+
+  }
 }

@@ -78,6 +78,10 @@ export class AppConfig {
     return `https://${region}.console.aws.amazon.com/ec2sp/v1/spot/home`;
   }
 
+  public static getCloudFormationConsoleUrl(region: string) {
+    return `https://${region}.console.aws.amazon.com/cloudformation`;
+  }
+
   public static get_CLOUD_INIT_FILE_NAME(CLUSTERNAME) {
     return `cloud_init_node_${CLUSTERNAME}.sh`;
   }

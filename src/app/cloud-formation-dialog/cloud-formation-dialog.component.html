@@ -11,7 +11,7 @@
       </div>
       <div *ngSwitchCase="Status.STACK_ALREADY_EXISTS">
         <p>
-         The stack {{ stackName }} already exists on your AWS account. You must delete it first before continuing.
+          The stack <strong>{{ stackName }}</strong> already exists on your AWS account. You must delete it first before continuing.
         </p>
 
         <button color="warn" mat-raised-button mat-button (click)="deleteStack()">Delete stack {{ stackName }}</button>
@@ -75,7 +75,7 @@
 
       </div>
       <div *ngSwitchCase="Status.SUCCESS">
-        <p>Success! You can now log in.</p>
+        <p>Success! You can now log in. (Auto login in {{ timeToLogin }}s)</p>
         <p><button mat-raised-button (click)="closeAfterSuccess()">Close and login</button></p>
       </div>
       <div *ngSwitchCase="Status.DELETE_IN_PROGRESS">
@@ -91,7 +91,10 @@
       <div *ngSwitchCase="Status.ERROR" class="error-container">
         Error!
         <p>
-          {{error.message}}
+          {{ error.message }}
+        </p>
+        <p *ngIf="prevStatus === Status.DELETE_IN_PROGRESS">
+          Stack deletion failed. You can try again using <a [href]="getCloudFormationConsoleUrl()" target="_blank">AWS console</a>
         </p>
       </div>
       <div *ngSwitchDefault>Unknown status.</div>

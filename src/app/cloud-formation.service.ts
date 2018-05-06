@@ -224,13 +224,21 @@ export class CloudFormationService {
         const finished = new ReplaySubject(1);
         Observable.interval(2000).takeUntil(finished)
           .switchMap(() => {
-            return this.checkIfStackExists();
-          }).subscribe(res => {
-          if (!res) {
+          return this.describeStacks();
+        }).map(stacks => {
+          return stacks;
+        }).subscribe(stacks => {
+          const stack = stacks[0];
+          if (!stack.StackStatus.includes('_IN_PROGRESS')) {
             finished.next(true);
             finished.complete();
-            observer.next(true);
-            observer.complete();
+            if (stack.StackStatus === 'DELETE_COMPLETE') {
+              observer.next(true);
+              observer.complete();
+            } else {
+              const message = 'Delete stack error: ' + stack.StackStatus;
+              observer.error(message);
+            }
           }
         }, e => {
           observer.error(e);
@@ -345,6 +353,10 @@ export class CloudFormationService {
 
       });
     });
+  }
+
+  getCloudFormationConsoleUrl() {
+    return AppConfig.getCloudFormationConsoleUrl(this.regionService.region);
   }
 
 }
