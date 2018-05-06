@@ -123,7 +123,7 @@ export abstract class CrudBaseService<E> {
         console.log(this.getTableName(...args) + ' DynamoDB table already exists.');
         return of(true);
       }
-      console.log(this.getTableName(...args) + ' DynamoDB table not exists. Creating...');
+      console.log(this.getTableName(...args) + ' DynamoDB table does not exist. Creating...');
       return this.createTable();
     });
 

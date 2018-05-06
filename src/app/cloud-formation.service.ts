@@ -241,7 +241,13 @@ export class CloudFormationService {
             }
           }
         }, e => {
-          observer.error(e);
+          if (e.message.includes('does not exist') && e.code === 'ValidationError') {
+            observer.next(true);
+            observer.complete();
+          }else {
+            console.log(e.message, e.code);
+            observer.error(e);
+          }
         });
 
       });
