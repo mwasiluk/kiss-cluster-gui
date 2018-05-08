@@ -33,6 +33,8 @@ export class ClusterComponent implements OnInit {
   operationLog = '';
   isNewCluster = false;
 
+  instanceProfiles = [];
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -48,6 +50,7 @@ export class ClusterComponent implements OnInit {
   ngOnInit() {
     this.getCluster();
     this.operationLog = '';
+    this.setAvailableInstanceProfiles();
   }
 
   private getCluster() {
@@ -123,6 +126,17 @@ export class ClusterComponent implements OnInit {
 
   openS3(location, file = false) {
     window.open(this.s3Service.getConsoleUrl(location, file), '_blank');
+  }
+
+  s3BucketChanged(value) {
+
+    this.cluster.s3_bucket = value;
+    this.setAvailableInstanceProfiles();
+  }
+
+  setAvailableInstanceProfiles() {
+    console.log(this.cluster.s3_bucket)
+    this.instanceProfiles = this.dataService.getInstanceProfilesForBucket(this.cluster.s3_bucket);
   }
 
 }

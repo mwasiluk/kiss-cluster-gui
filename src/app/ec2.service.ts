@@ -92,8 +92,8 @@ export class Ec2Service {
     });
   }
 
-  listIamInstanceProfiles(): Observable<IAM.InstanceProfile[]> {
-    return of(this.dataService.instanceProfiles);
+  listIamInstanceProfiles(s3Bucket = null): Observable<IAM.InstanceProfile[]> {
+    return of(this.dataService.getInstanceProfilesForBucket(s3Bucket));
     // return new Observable(observer => {
     //   this.iam.listInstanceProfiles((err, data) => {
     //     console.log(err, data);

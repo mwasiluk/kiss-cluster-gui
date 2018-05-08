@@ -133,7 +133,7 @@ export class SpotFleetDialogComponent implements OnInit {
       this.spotFleetService.describeAMIs(),
       this.spotFleetService.describeSecurityGroups(),
       this.spotFleetService.describeKeyPairs(),
-      this.spotFleetService.listIamInstanceProfiles(),
+      this.spotFleetService.listIamInstanceProfiles(this.cluster ? this.cluster.s3_bucket : null),
       fetchTemplateCluster ? this.clusterService.getTemplateCluster() : Observable.of(null)
     ).map(r => {
         this.availableInstanceTypes = r[0];
@@ -158,11 +158,13 @@ export class SpotFleetDialogComponent implements OnInit {
     this.cluster = cluster;
 
     Observable.forkJoin(
-      spotFleet ? Observable.of(spotFleet) : this.spotFleetService.getNewSpotFleetConfig(cluster)
+      spotFleet ? Observable.of(spotFleet) : this.spotFleetService.getNewSpotFleetConfig(cluster),
+      this.spotFleetService.listIamInstanceProfiles(this.cluster ? this.cluster.s3_bucket : null)
     ).finally(() => this.workInProgress--)
       .subscribe(r => {
         this.setDefaults();
         this.setSpotFleet(r[0]);
+        this.availableIamInstanceProfiles = r[1];
         // this.spotFleet = r[5];
 
         console.log('result', r);

@@ -3,11 +3,9 @@
   <mat-card-content>
     <br/>
     <p>The Servless master of cluster {{ cluster.clustername }} has been successfully build!</p>
-    <p>Now you can simply run <a [href]="s3Service.getConsoleUrl(cluster.S3_node_init_script, true)" target="_blank">{{
-      cluster.S3_node_init_script }}</a> on any Linux machine having AWS CLI configured to start processing on your
+    <p>Now you can simply run <a [href]="s3Service.getConsoleUrl(cluster.S3_node_init_script, true)" target="_blank">{{ cluster.S3_node_init_script }}</a> on any Linux machine having AWS CLI configured to start processing on your
       cluster</p>
-    <p><a [href]="s3Service.getConsoleUrl(cluster.S3_node_init_script, true)" target="_blank">{{
-      cluster.S3_node_init_script }}</a> can also be used as a cloud-init configuration for AWS EC2 instances.</p>
+    <p><a [href]="s3Service.getConsoleUrl(cluster.S3_node_init_script, true)" target="_blank">{{ cluster.S3_node_init_script }}</a> can also be used as a cloud-init configuration for AWS EC2 instances.</p>
   </mat-card-content>
 </mat-card>
 
@@ -45,7 +43,7 @@
 
 
           <mat-form-field *ngIf="mode=='create'">
-            <input matInput name="s3_bucket" placeholder="s3 bucket" [matAutocomplete]="autoBuckets"
+            <input matInput name="s3_bucket" placeholder="s3 bucket" [matAutocomplete]="autoBuckets" (ngModelChange)="s3BucketChanged($event)"
                    [(ngModel)]="cluster.s3_bucket" required>
             <mat-autocomplete #autoBuckets="matAutocomplete">
               <mat-option *ngFor="let b of s3Service.bucketList" [value]="b">
@@ -60,7 +58,7 @@
             <input matInput name="spot_fleet_arn_instance_profile" placeholder="Spot Fleet instance profile arn"
                    [matAutocomplete]="autoIAM" [(ngModel)]="cluster.spot_fleet_arn_instance_profile" size="100">
             <mat-autocomplete #autoIAM="matAutocomplete">
-              <mat-option *ngFor="let ip of dataService.instanceProfiles" [value]="ip.Arn">
+              <mat-option *ngFor="let ip of instanceProfiles" [value]="ip.Arn">
                 {{ ip.InstanceProfileName }}
               </mat-option>
             </mat-autocomplete>
