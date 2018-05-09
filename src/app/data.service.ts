@@ -12,6 +12,13 @@ export class DataService {
 
   constructor() { }
 
+  clear() {
+    this.clusterData = null;
+    this.instanceProfiles = [];
+    this.s3Buckets = [];
+    this.lamdaFunctionName = null;
+  }
+
   getInstanceProfilesForBucket(s3_bucket) {
     if (!this.instanceProfiles) {
       return [];
