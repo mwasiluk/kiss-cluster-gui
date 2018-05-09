@@ -42,14 +42,15 @@ export class AuthService {
         return false;
       }),
       this.cloudFormationService.fetchLambdaInfo().catch(e => {
-        this.notificationsService.warn('Error loading S3 bucket list and IAM InstanceProfiles list!', e.message);
-        console.log(e);
+        // this.notificationsService.warn('Error loading S3 bucket list and IAM InstanceProfiles list!', e.message);
+        console.log('Error loading S3 bucket list and IAM InstanceProfiles list!', e.message);
         return Observable.of(false);
       }).map(data => {
         if (data) {
           this.dataService.s3Buckets = data['Buckets'].map(b => b.Name);
           this.s3Service.bucketList = this.dataService.s3Buckets;
           this.dataService.instanceProfiles = data['InstanceProfiles'];
+          this.dataService.lamdaFunctionName = data['FunctionName'];
           console.log(data);
           return true;
         }

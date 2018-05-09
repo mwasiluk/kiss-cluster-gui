@@ -46,6 +46,7 @@
             <input matInput name="s3_bucket" placeholder="s3 bucket" [matAutocomplete]="autoBuckets" (ngModelChange)="s3BucketChanged($event)"
                    [(ngModel)]="cluster.s3_bucket" required>
             <mat-autocomplete #autoBuckets="matAutocomplete">
+              <mat-option *ngIf="!dataService.lamdaFunctionName" class="missing-lambda-function-option">[you need to create stack to see the list of S3 buckets]</mat-option>
               <mat-option *ngFor="let b of s3Service.bucketList" [value]="b">
                 {{ b }}
               </mat-option>
@@ -58,6 +59,7 @@
             <input matInput name="spot_fleet_arn_instance_profile" placeholder="Spot Fleet instance profile arn"
                    [matAutocomplete]="autoIAM" [(ngModel)]="cluster.spot_fleet_arn_instance_profile" size="100">
             <mat-autocomplete #autoIAM="matAutocomplete">
+              <mat-option *ngIf="!dataService.lamdaFunctionName" class="missing-lambda-function-option">[you need to create stack to see the instance profile list]</mat-option>
               <mat-option *ngFor="let ip of instanceProfiles" [value]="ip.Arn">
                 {{ ip.InstanceProfileName }}
               </mat-option>

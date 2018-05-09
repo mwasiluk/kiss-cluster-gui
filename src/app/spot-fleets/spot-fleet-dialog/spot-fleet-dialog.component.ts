@@ -11,6 +11,7 @@ import {ClusterService} from '../../clusters/cluster.service';
 import * as AWS from 'aws-sdk';
 import {FormControl} from '@angular/forms';
 import * as _ from 'lodash';
+import {DataService} from "../../data.service";
 
 @Component({
   selector: 'app-spot-fleet-dialog',
@@ -51,6 +52,7 @@ export class SpotFleetDialogComponent implements OnInit {
   constructor(private notificationsService: NotificationsService,
               private spotFleetService: SpotFleetService,
               private clusterService: ClusterService,
+              protected dataService: DataService,
               public dialogRef: MatDialogRef<SpotFleetDialogComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any) {
     this.mode = data.mode;

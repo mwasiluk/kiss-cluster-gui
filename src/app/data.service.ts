@@ -8,10 +8,14 @@ export class DataService {
   clusterData: any;
   instanceProfiles: AWS.IAM.InstanceProfile[];
   s3Buckets: string[];
+  lamdaFunctionName: string = null;
 
   constructor() { }
 
   getInstanceProfilesForBucket(s3_bucket) {
+    if (!this.instanceProfiles) {
+      return [];
+    }
 
     if (!s3_bucket) {
       return this.instanceProfiles;

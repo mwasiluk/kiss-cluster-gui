@@ -352,6 +352,7 @@ export class CloudFormationService {
           }
           const d = JSON.parse(<string>data.Payload);
           d['InstanceProfiles'] = d['InstanceProfiles'] as AWS.IAM.InstanceProfile[];
+          d['FunctionName'] = fn.FunctionName;
           observer.next(d);
           observer.complete();
 
