@@ -6,7 +6,7 @@ import {NotificationsService} from 'angular2-notifications';
 import {RegionService} from './region.service';
 import {UtilsService} from './utils.service';
 import * as AWS from 'aws-sdk';
-import * as IAM from 'aws-sdk/clients/iam';
+import * as ResourceGroupsTaggingAPI from 'aws-sdk/clients/resourcegroupstaggingapi';
 
 import {AppConfig} from './app-config';
 import {AssetsService} from './assets.service';
@@ -19,7 +19,7 @@ export class CloudFormationService {
 
   cf: AWS.CloudFormation;
   lambda: AWS.Lambda;
-
+  resourceGroupsTagging: ResourceGroupsTaggingAPI;
 
 
   constructor(protected notificationsService: NotificationsService, protected regionService: RegionService,
@@ -39,6 +39,12 @@ export class CloudFormationService {
       region: AWS.config.region
       // endpoint: AWS.config.apigateway.endpoint
     });
+    this.resourceGroupsTagging = new ResourceGroupsTaggingAPI({
+      credentials: AWS.config.credentials,
+      region: AWS.config.region
+      // endpoint: AWS.config.apigateway.endpoint
+    });
+
   }
 
   /* createAndUpdateStack(): Observable<any> {
@@ -323,26 +329,35 @@ export class CloudFormationService {
 
   fetchLambdaInfo(): Observable<any> {
 
+
+
     return new Observable(observer => {
 
-      this.lambda.listFunctions({}, (err, data) => {
+      this.resourceGroupsTagging.getResources({
+        ResourceTypeFilters: ['lambda:function'],
+        TagFilters: [{
+          Key: 'kissc',
+          Values: ['kissc-lambda']
+        }]
+      }, (err, data) => {
         if (err) {
-          err.message = 'Lambda.listFunctions - ' + err.message;
+          err.message = 'ResourceGroupsTagging.getResources - ' + err.message;
           console.log(err, data);
           observer.error(err);
           return;
         }
 
-        const fn = data.Functions.find(f => f.Description === AppConfig.LAMBDA_FUNCTION_DESC);
-        if ( !fn ) {
+        if (data.ResourceTagMappingList.length < 1) {
           observer.error('Lambda function not found!');
           return;
         }
+        const arn = data.ResourceTagMappingList[0].ResourceARN;
+        const fn = arn.split(':function:')[1];
 
-        console.log('Lambda function name: ' + fn.FunctionName);
+        console.log('Lambda function name: ' + fn);
 
         this.lambda.invoke({
-          FunctionName: fn.FunctionName
+          FunctionName: fn
         }, (err, data) => {
           console.log(err, data);
           if (err) {
@@ -352,13 +367,13 @@ export class CloudFormationService {
           }
           const d = JSON.parse(<string>data.Payload);
           d['InstanceProfiles'] = d['InstanceProfiles'] as AWS.IAM.InstanceProfile[];
-          d['FunctionName'] = fn.FunctionName;
+          d['FunctionName'] = fn;
           observer.next(d);
           observer.complete();
 
         });
-
       });
+
     });
   }
 
