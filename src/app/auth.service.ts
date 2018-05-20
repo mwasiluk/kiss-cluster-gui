@@ -34,13 +34,10 @@ export class AuthService {
     // this.cloudFormationService.updateStack().subscribe(r => console.log(r), e => console.log(e));
 
     return Observable.forkJoin(
-      this.clusterService.initIfNotExists().map(r => {
-        if (r) {
-          this.isLoggedIn = true;
-          return true;
-        }
-        return false;
-      }),
+      this.clusterService.initIfNotExists().catch(e => {
+        this.isLoggedIn = false;
+        return Observable.throw(e);
+      }).map(r => !!r),
       this.cloudFormationService.fetchLambdaInfo().catch(e => {
         // this.notificationsService.warn('Error loading S3 bucket list and IAM InstanceProfiles list!', e.message);
         console.log('Error loading S3 bucket list and IAM InstanceProfiles list!', e.message);
@@ -57,6 +54,7 @@ export class AuthService {
         return false;
       })
     ).map(r => {
+      this.isLoggedIn = r[0];
       this.emit();
       return r[0];
     });
