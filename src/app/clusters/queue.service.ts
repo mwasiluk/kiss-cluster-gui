@@ -1,7 +1,10 @@
+
+import {forkJoin as observableForkJoin, of as observableOf, throwError as observableThrowError, Observable} from 'rxjs';
+
+import {mergeMap, catchError} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/catch';
+
+
 
 import {Queue} from './queue';
 import * as AWS from 'aws-sdk';
@@ -121,8 +124,8 @@ export class QueueService extends CrudBaseService<Queue> {
 
       }, (err, data) => {
 
-        if (err || !data){
-          return Observable.throw(err);
+        if (err || !data) {
+          return observableThrowError(err);
         }
         console.log('getNewQueueId', err, data, data.Attributes.queueid.N);
 
@@ -139,7 +142,7 @@ export class QueueService extends CrudBaseService<Queue> {
 
   createQueue(queue: Queue, cluster: Cluster, appFiles): Observable<Queue> {
 
-    return this.getNewQueueId(cluster).flatMap(queueId => {
+    return this.getNewQueueId(cluster).pipe(mergeMap(queueId => {
       queue.queueid = queueId;
       const queueIdF = this.printQueueID(queue);
 
@@ -154,20 +157,20 @@ export class QueueService extends CrudBaseService<Queue> {
 
       this.notificationsService.info('Deleting S3 folder ' + appFolder);
 
-      return this.s3Service.emptyBucket(queue.$S3_bucket, appFolder).catch(e => {
+      return this.s3Service.emptyBucket(queue.$S3_bucket, appFolder).pipe(catchError(e => {
           console.log('Deleting S3 folder failed!', e, e.code);
         this.notificationsService.warn('Deleting S3 folder failed!');
-        return Observable.of(false);
-      }).flatMap(r => {
+        return observableOf(false);
+      }), mergeMap(r => {
 
         console.log('Uploading app files!');
-        return Observable.forkJoin([
+        return observableForkJoin([
           this.s3Service.putObject(queue.$S3_bucket, `${appFolder}/job.sh`, `#!/bin/bash\n\n${queue.command} \$1`),
           this.s3Service.uploadFiles(queue.$S3_bucket, appFolder, appFiles)
         ]);
-      });
+      }), );
 
-    }).flatMap(result => {
+    }), mergeMap(result => {
 
 
       queue.qstatus = 'created';
@@ -177,7 +180,7 @@ export class QueueService extends CrudBaseService<Queue> {
 
       return this.putItem(queue, cluster.clustername);
 
-    });
+    }), );
 
   }
 

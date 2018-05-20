@@ -1,3 +1,5 @@
+
+import {throwError as observableThrowError, Observable, of} from 'rxjs';
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from './auth.service';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
@@ -9,12 +11,11 @@ import {HttpClient} from '@angular/common/http';
 import {FileLoader} from './file-loader';
 import {DataService} from './data.service';
 import {S3Service} from './s3.service';
-import 'rxjs/add/operator/catch';
-import {Observable} from 'rxjs/Observable';
 import {NotificationsService} from 'angular2-notifications';
 import {ClusterService} from './clusters/cluster.service';
-import {BreadcrumbsService} from 'ng2-breadcrumbs'
-import {CloudFormationService} from "./cloud-formation.service";
+import {BreadcrumbsService} from 'ng2-breadcrumbs';
+import {CloudFormationService} from './cloud-formation.service';
+import {map, finalize} from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -41,24 +42,24 @@ export class AppComponent  implements OnInit {
 
   ngOnInit(): void {
 
-    this.breadcrumbs.storePrefixed({label: 'Home' , url: '/', params: []})
+    this.breadcrumbs.storePrefixed({label: 'Home' , url: '/', params: []});
     this.setAvailableRegions();
     this.regionService.subscribe(r => {
       if (this.authService.isLoggedIn) {
-        console.log('region switched, checking dynamoDB db tables..')
+        console.log('region switched, checking dynamoDB db tables..');
         this.workInProgress = true;
-        this.clusterService.initIfNotExists().map(res => {
+        this.clusterService.initIfNotExists().pipe(map(res => {
           if (res) {
-            return Observable.of(true);
+            return of(true);
           }else {
-            return Observable.throw('Region switching error (Problem while creating the cluster DynamoDB table)');
+            return observableThrowError('Region switching error (Problem while creating the cluster DynamoDB table)');
           }
-        }).finally(() => {
+        })).pipe(finalize(() => {
           setTimeout(() => {
             this.workInProgress = false;
             this.router.navigate(['/']);
           }, 200);
-        }).subscribe(res => {
+        })).subscribe(res => {
           console.log('res', res);
         }, e => {
           this.notificationsService.error(e);

@@ -2,7 +2,7 @@ import {AfterViewInit, Component, Input, OnDestroy, OnInit} from '@angular/core'
 import {MatDialog} from '@angular/material';
 import {SpotFleet} from '../spot-fleet';
 import {SpotFleetService} from '../spot-fleet.service';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {NotificationsService} from 'angular2-notifications';
 import {Cluster} from '../../clusters/cluster';
 import {SpotFleetDialogComponent} from '../spot-fleet-dialog/spot-fleet-dialog.component';
@@ -31,8 +31,8 @@ export class SpotFleetListComponent extends BaseListComponent<SpotFleet>  implem
     this.getItems(true);
   }
 
-  loadData(): Observable<SpotFleet[]>{
-    return this.spotFleetService.getSpotFleets(this.cluster ? this.cluster.clustername : null)
+  loadData(): Observable<SpotFleet[]> {
+    return this.spotFleetService.getSpotFleets(this.cluster ? this.cluster.clustername : null);
   }
 
   onLoaded(items: SpotFleet[]) {

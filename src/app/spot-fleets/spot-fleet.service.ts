@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { Observable ,  of, forkJoin } from 'rxjs';
+import {map} from 'rxjs/operators';
 import {SpotFleet} from './spot-fleet';
 import {SPOT_FLEETS} from '../mock-spot-fleets';
 import {NotificationsService} from 'angular2-notifications';
@@ -13,10 +13,11 @@ import {AssetsService} from '../assets.service';
 import {AppConfig} from '../app-config';
 import {ClusterService} from '../clusters/cluster.service';
 import {Ec2Service} from '../ec2.service';
-import {DataService} from "../data.service";
+import {DataService} from '../data.service';
+
 
 @Injectable()
-export class SpotFleetService extends Ec2Service{
+export class SpotFleetService extends Ec2Service {
 
   ec2: AWS.EC2;
   iam: IAM;
@@ -48,7 +49,7 @@ export class SpotFleetService extends Ec2Service{
           return;
         }
 
-        let list = data.SpotFleetRequestConfigs.map(this.map);
+        let list = data.SpotFleetRequestConfigs.map(this.mapItem);
         if (clustername) {
           list = list.filter(s => s.getClusterName() && s.getClusterName().indexOf(clustername) > -1);
         }
@@ -58,18 +59,19 @@ export class SpotFleetService extends Ec2Service{
     });
   }
 
-  map(data: AWS.EC2.SpotFleetRequestConfig): SpotFleet {
+  mapItem(data: AWS.EC2.SpotFleetRequestConfig): SpotFleet {
     return new SpotFleet(data);
   }
 
-  requestSpotFleet(spotFleet: SpotFleet, cluster: Cluster, instanceTypes: any[],  iamId: string, amiId: string, iamInstanceProfileArn: string, securityGroupId: string , keyPairName: string): Observable<any> {
+  requestSpotFleet(spotFleet: SpotFleet, cluster: Cluster, instanceTypes: any[],  iamId: string, amiId: string, iamInstanceProfileArn: string,
+                   securityGroupId: string , keyPairName: string): Observable<any> {
 
     const userDataB64 = btoa(spotFleet.userData);
     const blockDeviceMappings = spotFleet.data.SpotFleetRequestConfig.LaunchSpecifications[0].BlockDeviceMappings;
 
     spotFleet.data.SpotFleetRequestConfig.IamFleetRole = spotFleet.data.SpotFleetRequestConfig.IamFleetRole.replace('${iamId}', iamId);
 
-    if (!iamInstanceProfileArn.startsWith('arn:aws:iam')){
+    if (!iamInstanceProfileArn.startsWith('arn:aws:iam')) {
       iamInstanceProfileArn = `arn:aws:iam::${iamId}:instance-profile/${iamInstanceProfileArn}`;
     }
     spotFleet.data.SpotFleetRequestConfig.LaunchSpecifications = instanceTypes.map(t => {
@@ -103,7 +105,7 @@ export class SpotFleetService extends Ec2Service{
     if (arnChanged) {
       cluster.spot_fleet_arn_instance_profile = iamInstanceProfileArn;
     }
-    return Observable.forkJoin(
+    return forkJoin(
       this.doRequestSpotFleet(spotFleet),
       arnChanged ? this.clusterService.putItem(cluster) : of(true));
   }
@@ -149,18 +151,18 @@ export class SpotFleetService extends Ec2Service{
 
   getNewSpotFleetConfig(cluster: Cluster): Observable<SpotFleet> {
 
-    return Observable.forkJoin([
-      this.assetsService.get('spot-fleet.json').map(confStr => JSON.parse(confStr)),
+    return forkJoin([
+      this.assetsService.get('spot-fleet.json').pipe(map(confStr => JSON.parse(confStr))),
       this.clusterService.getCloudInitFileContent(cluster)
-    ]).map(r => {
+    ]).pipe(map(r => {
       console.log(r);
-      const spotFleet = this.map(this.test(r[0]));
+      const spotFleet = this.mapItem(this.test(r[0]));
       spotFleet.userData = r[1];
       const date = new Date();
       date.setHours(date.getHours() + AppConfig.SPOT_FLEET_VALID_UNTIL_HOURS_DEFAULT);
       spotFleet.data.SpotFleetRequestConfig.ValidUntil = date;
       return spotFleet;
-    });
+    }));
 
 
   }
@@ -216,8 +218,8 @@ export class SpotFleetService extends Ec2Service{
   }
 
   getInstanceTypes(): Observable<any> {
-    return this.assetsService.get('instance-types.json').map(s => JSON.parse(s)
-      .sort((a, b) => parseFloat(a.SpotPrice) * parseInt(a.WeightedCapacity || 1) - parseFloat(b.SpotPrice) * parseInt(b.WeightedCapacity || 1)));
+    return this.assetsService.get('instance-types.json').pipe(map(s => JSON.parse(s)
+      .sort((a, b) => parseFloat(a.SpotPrice) * parseInt(a.WeightedCapacity || 1) - parseFloat(b.SpotPrice) * parseInt(b.WeightedCapacity || 1))));
   }
 }
 

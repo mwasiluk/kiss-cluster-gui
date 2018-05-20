@@ -1,11 +1,11 @@
 import {Component, OnInit, Inject, OnDestroy, AfterViewInit} from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatTableDataSource} from '@angular/material';
-import {Observable} from 'rxjs/Observable';
+import {Observable, ReplaySubject, interval} from 'rxjs';
 import {CloudFormationService} from '../cloud-formation.service';
 import {NotificationsService} from 'angular2-notifications';
 import {AppConfig} from '../app-config';
 import * as AWS from 'aws-sdk';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
+import {finalize, map, take, takeUntil} from 'rxjs/operators';
 
 enum Status {
   INITIAL, CHECKING_IF_STACK_ALREADY_EXISTS, STACK_ALREADY_EXISTS, STACK_NOT_EXISTS, CREATION_IN_PROGRESS, DELETE_IN_PROGRESS, SUCCESS, ERROR
@@ -47,7 +47,7 @@ export class CloudFormationDialogComponent implements OnInit, OnDestroy, AfterVi
     this.workInProgress++;
     this.status = Status.CHECKING_IF_STACK_ALREADY_EXISTS;
 
-    this.cloudFormationService.checkIfStackExists().finally(() => this.workInProgress--).subscribe(res => {
+    this.cloudFormationService.checkIfStackExists().pipe(finalize(() => this.workInProgress--)).subscribe(res => {
       if (res) {
         this.status = Status.STACK_ALREADY_EXISTS;
         // this.status = Status.CREATION_IN_PROGRESS;
@@ -89,13 +89,13 @@ export class CloudFormationDialogComponent implements OnInit, OnDestroy, AfterVi
     this.workInProgress++;
     this.status = Status.CREATION_IN_PROGRESS;
 
-    this.cloudFormationService.createStack().map(r => {
+    this.cloudFormationService.createStack().pipe(map(r => {
       console.log(r);
       return !!r;
-    }).finally(() => {
+    })).pipe(finalize(() => {
       this.workInProgress--;
       this.showEvents = false;
-    }).subscribe((r) => {
+    })).subscribe((r) => {
       this.notificationsService.success('Cloud formation success...');
       this.status = Status.SUCCESS;
       this.launchLoginTimer(this.timeToLogin);
@@ -126,10 +126,10 @@ export class CloudFormationDialogComponent implements OnInit, OnDestroy, AfterVi
     this.workInProgress++;
     this.status = Status.DELETE_IN_PROGRESS;
 
-    this.cloudFormationService.deleteStack().finally(() => {
+    this.cloudFormationService.deleteStack().pipe(finalize(() => {
       this.workInProgress--;
       this.showEvents = false;
-    }).subscribe((r) => {
+    })).subscribe((r) => {
       this.notificationsService.success('Stack deletion success...');
       this.status = Status.STACK_NOT_EXISTS;
     }, e => {
@@ -147,10 +147,10 @@ export class CloudFormationDialogComponent implements OnInit, OnDestroy, AfterVi
   launchLoginTimer(time = 11) {
     this.timerFinished = new ReplaySubject(1);
 
-    Observable.interval(1000).takeUntil(this.timerFinished)
-      .take(time)
-      .map((v) => (time - 1) - v)
-      .finally(() => this.closeAfterSuccess())
+    interval(1000).pipe(takeUntil(this.timerFinished))
+      .pipe(take(time))
+      .pipe(map((v) => (time - 1) - v))
+      .pipe(finalize(() => this.closeAfterSuccess()))
       .subscribe(v => this.timeToLogin = v);
   }
 
@@ -159,7 +159,7 @@ export class CloudFormationDialogComponent implements OnInit, OnDestroy, AfterVi
   }
 
   ngOnDestroy(): void {
-    if (this.timerFinished){
+    if (this.timerFinished) {
       this.timerFinished.next(true);
       this.timerFinished.complete();
     }

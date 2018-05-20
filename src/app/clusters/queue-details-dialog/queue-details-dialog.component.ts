@@ -5,9 +5,10 @@ import {Queue} from '../queue';
 import {QueueService} from '../queue.service';
 import {Cluster} from '../cluster';
 import {NotificationsService} from 'angular2-notifications';
-import {Observable} from "rxjs/Observable";
-import 'rxjs/add/operator/catch';
-import {S3Service} from "../../s3.service";
+import {Observable} from 'rxjs';
+
+import {S3Service} from '../../s3.service';
+import {finalize} from 'rxjs/operators';
 
 @Component({
   selector: 'app-queue-details-dialog',
@@ -47,9 +48,9 @@ export class QueueDetailsDialogComponent implements OnInit {
   onSubmit() {
     this.submitted = true;
     this.workInProgress =  true;
-    this.queueService.createQueue(this.queue, this.cluster, this.appFiles).finally(() => {
+    this.queueService.createQueue(this.queue, this.cluster, this.appFiles).pipe(finalize(() => {
       this.workInProgress = false;
-    }).subscribe(q => {
+    })).subscribe(q => {
       this.notificationsService.success('The queue ' + this.queueService.printQueueID(q) + ' has been successfully created');
       this.dialogRef.close(q);
     }, (e) => {

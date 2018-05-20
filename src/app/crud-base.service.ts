@@ -1,13 +1,14 @@
 
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
-import 'rxjs/add/observable/forkJoin';
+import {mergeMap} from 'rxjs/operators';
+
+import { Observable ,  of } from 'rxjs';
+
 import * as AWS from 'aws-sdk';
 import {NotificationsService} from 'angular2-notifications';
 import {RegionService} from './region.service';
 import {UtilsService} from './utils.service';
-import 'rxjs/add/observable/throw';
-import {AppConfig} from "./app-config";
+
+import {AppConfig} from './app-config';
 
 
 
@@ -118,14 +119,14 @@ export abstract class CrudBaseService<E> {
 
   createTableIfNotExists(...args: any[]): Observable<boolean> {
 
-    return this.checkIfTableExists().flatMap(r => {
+    return this.checkIfTableExists().pipe(mergeMap(r => {
       if (r) {
         console.log(this.getTableName(...args) + ' DynamoDB table already exists.');
         return of(true);
       }
       console.log(this.getTableName(...args) + ' DynamoDB table does not exist. Creating...');
       return this.createTable();
-    });
+    }));
 
   }
 

@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {RegionService} from '../region.service';
 import {BaseListComponent} from '../base-list/base-list.component';
 import {NotificationsService} from 'angular2-notifications';

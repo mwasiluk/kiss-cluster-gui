@@ -1,15 +1,16 @@
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/take';
+
+import {map, catchError} from 'rxjs/operators';
+
+
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable , of} from 'rxjs';
 import { Router, Resolve, RouterStateSnapshot,
   ActivatedRouteSnapshot } from '@angular/router';
 
 import { Cluster } from './cluster';
 import { ClusterService } from './cluster.service';
-import {of} from 'rxjs/observable/of';
 import {DataService} from '../data.service';
-import {NotificationsService} from "angular2-notifications";
+import {NotificationsService} from 'angular2-notifications';
 
 @Injectable()
 export class ClusterDetailResolver implements Resolve<Cluster> {
@@ -22,10 +23,10 @@ export class ClusterDetailResolver implements Resolve<Cluster> {
       return this.cs.getNewCluster(this.dataService.clusterData);
     }
 
-    return this.cs.getCluster(id).catch(e => {
+    return this.cs.getCluster(id).pipe(catchError(e => {
       this.notificationsService.error(e);
       return null;
-    }).map(cluster => {
+    }), map(cluster => {
       console.log('cluster', cluster);
 
       if (cluster) {
@@ -35,7 +36,7 @@ export class ClusterDetailResolver implements Resolve<Cluster> {
         this.router.navigate(['/']);
         return null;
       }
-    });
+    }), );
 
   }
 }

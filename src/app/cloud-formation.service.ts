@@ -1,6 +1,8 @@
+
+import {interval as observableInterval, Observable, of, ReplaySubject, forkJoin} from 'rxjs';
+
+import {switchMap, map, takeUntil, flatMap} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import {of} from 'rxjs/observable/of';
 
 import {NotificationsService} from 'angular2-notifications';
 import {RegionService} from './region.service';
@@ -10,7 +12,6 @@ import * as ResourceGroupsTaggingAPI from 'aws-sdk/clients/resourcegroupstagging
 
 import {AppConfig} from './app-config';
 import {AssetsService} from './assets.service';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
 import * as _ from 'lodash';
 
 
@@ -55,7 +56,7 @@ export class CloudFormationService {
    }
    */
   createStack(withUpdate = true): Observable<any> {
-    const createOb = this.assetsService.get('kissCloudFormation.yaml').flatMap(templateBody => {
+    const createOb = this.assetsService.get('kissCloudFormation.yaml').pipe(flatMap(templateBody => {
       return new Observable<any>(observer => {
         this.cf.createStack({
           StackName: AppConfig.STACK_NAME,
@@ -72,12 +73,12 @@ export class CloudFormationService {
           }
 
           const finished = new ReplaySubject(1);
-          Observable.interval(5000).takeUntil(finished)
-            .switchMap(() => {
+          observableInterval(5000).pipe(takeUntil(finished),
+            switchMap(() => {
               return this.describeStacks();
-            }).map(stacks => {
+            }), map(stacks => {
             return stacks;
-          }).subscribe(stacks => {
+          })).subscribe(stacks => {
             const stack = stacks[0];
             if (stack.StackStatus !== 'CREATE_IN_PROGRESS') {
               finished.next(true);
@@ -96,19 +97,19 @@ export class CloudFormationService {
           });
         });
       });
-    });
+    }));
 
     if (!withUpdate) {
       return createOb;
     }
 
-    return createOb.flatMap(r => this.updateStack());
+    return createOb.pipe(flatMap(r => this.updateStack()));
   }
 
   updateStack(): Observable<any> {
     const changeSetName = AppConfig.CHANGE_SET_NAME;
 
-    return this.assetsService.get('kissCloudFormationUpdate.yaml').flatMap(templateBody => {
+    return this.assetsService.get('kissCloudFormationUpdate.yaml').pipe(flatMap(templateBody => {
       return new Observable<any>(observer => {
         this.cf.createChangeSet({
           ChangeSetName: changeSetName,
@@ -127,10 +128,10 @@ export class CloudFormationService {
           }
 
           const finished = new ReplaySubject(1);
-          Observable.interval(5000).takeUntil(finished)
-            .switchMap(() => {
+          observableInterval(5000).pipe(takeUntil(finished),
+            switchMap(() => {
               return this.describeChangeSet(changeSetName);
-            }).subscribe(cs => {
+            })).subscribe(cs => {
             if (cs.ExecutionStatus === 'AVAILABLE') {
               finished.next(true);
               finished.complete();
@@ -149,7 +150,7 @@ export class CloudFormationService {
 
         });
       });
-    }).flatMap(r => {
+    })).pipe(flatMap(r => {
       return new Observable(observer => {
         this.cf.executeChangeSet({
           ChangeSetName: changeSetName,
@@ -163,12 +164,12 @@ export class CloudFormationService {
           }
 
           const finished = new ReplaySubject(1);
-          Observable.interval(5000).takeUntil(finished)
-            .switchMap(() => {
+          observableInterval(5000).pipe(takeUntil(finished),
+            switchMap(() => {
               return this.describeStacks();
-            }).map(stacks => {
+            }), map(stacks => {
             return stacks;
-          }).subscribe(stacks => {
+          })).subscribe(stacks => {
             const stack = stacks[0];
             if (stack.StackStatus === 'UPDATE_COMPLETE') {
               finished.next(true);
@@ -185,13 +186,13 @@ export class CloudFormationService {
 
         });
       });
-    });
+    }));
   }
 
   checkIfStackExists(): Observable<boolean> {
-    return this.describeStacks(true).map(stacks => {
+    return this.describeStacks(true).pipe(map(stacks => {
       return !!_.find(stacks, s => s.StackName === AppConfig.STACK_NAME);
-    });
+    }));
   }
 
   describeStacks(all = false): Observable<AWS.CloudFormation.Stacks> {
@@ -228,12 +229,12 @@ export class CloudFormationService {
           return;
         }
         const finished = new ReplaySubject(1);
-        Observable.interval(2000).takeUntil(finished)
-          .switchMap(() => {
+        observableInterval(2000).pipe(takeUntil(finished),
+          switchMap(() => {
           return this.describeStacks();
-        }).map(stacks => {
+        }), map(stacks => {
           return stacks;
-        }).subscribe(stacks => {
+        })).subscribe(stacks => {
           const stack = stacks[0];
           if (!stack.StackStatus.includes('_IN_PROGRESS')) {
             finished.next(true);
@@ -298,7 +299,7 @@ export class CloudFormationService {
   }
 
   createLambda(): Observable<any> {
-    return this.assetsService.get('kisscLambda.zip', 'arraybuffer').flatMap(zipFile => {
+    return this.assetsService.get('kisscLambda.zip', 'arraybuffer').pipe(flatMap(zipFile => {
       return new Observable(observer => {
         this.lambda.createFunction({
           FunctionName: 'kisscLambda',
@@ -323,7 +324,7 @@ export class CloudFormationService {
 
         });
       });
-    });
+    }));
   }
 
 

@@ -1,9 +1,11 @@
+
+import {of as observableOf, throwError as observableThrowError,  Observable, forkJoin } from 'rxjs';
+
+import {catchError, flatMap, map} from 'rxjs/operators';
 import {EventEmitter, Injectable} from '@angular/core';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/delay';
+
+
 import {Credentials, S3} from 'aws-sdk';
 import * as AWS from 'aws-sdk';
 import {RegionService} from './region.service';
@@ -33,16 +35,16 @@ export class AuthService {
 
     // this.cloudFormationService.updateStack().subscribe(r => console.log(r), e => console.log(e));
 
-    return Observable.forkJoin(
-      this.clusterService.initIfNotExists().catch(e => {
+    return forkJoin(
+      this.clusterService.initIfNotExists().pipe(catchError(e => {
         this.isLoggedIn = false;
-        return Observable.throw(e);
-      }).map(r => !!r),
-      this.cloudFormationService.fetchLambdaInfo().catch(e => {
+        return observableThrowError(e);
+      }), map(r => !!r)),
+      this.cloudFormationService.fetchLambdaInfo().pipe(catchError(e => {
         // this.notificationsService.warn('Error loading S3 bucket list and IAM InstanceProfiles list!', e.message);
         console.log('Error loading S3 bucket list and IAM InstanceProfiles list!', e.message);
-        return Observable.of(false);
-      }).map(data => {
+        return observableOf(false);
+      }), map(data => {
         if (data) {
           this.dataService.s3Buckets = data['Buckets'].map(b => b.Name);
           this.s3Service.bucketList = this.dataService.s3Buckets;
@@ -52,12 +54,12 @@ export class AuthService {
           return true;
         }
         return false;
-      })
-    ).map(r => {
+      }))
+    ).pipe(map(r => {
       this.isLoggedIn = r[0];
       this.emit();
       return r[0];
-    });
+    }));
 
   }
 
@@ -73,13 +75,13 @@ export class AuthService {
   initCloud(credentials: Credentials): Observable<boolean> {
     this.setCredentials(credentials);
 
-    return this.cloudFormationService.createStack().flatMap(r => {
+    return this.cloudFormationService.createStack().pipe(flatMap(r => {
       console.log(r);
       if (r) {
-        return Observable.of(true);
+        return observableOf(true);
       }
-      return Observable.of(false);
-    });
+      return observableOf(false);
+    }));
 
   }
 

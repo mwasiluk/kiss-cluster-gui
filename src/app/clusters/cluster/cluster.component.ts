@@ -1,3 +1,5 @@
+
+import {finalize} from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
@@ -9,9 +11,9 @@ import {BreadcrumbsService} from 'ng2-breadcrumbs';
 import {MatDialog} from '@angular/material';
 import {NotificationsService} from 'angular2-notifications';
 import * as FileSaver from 'file-saver';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/finally';
+import {Observable} from 'rxjs';
+
+
 import {S3Service} from '../../s3.service';
 import {Queue} from '../queue';
 import {DataService} from '../../data.service';
@@ -77,9 +79,9 @@ export class ClusterComponent implements OnInit {
   onSubmit() {
     this.submitted = true;
     this.workInProgress = true;
-    this.clusterService.createCluster(this.cluster).finally(() => {
+    this.clusterService.createCluster(this.cluster).pipe(finalize(() => {
       this.workInProgress = false;
-    }).subscribe(c => {
+    })).subscribe(c => {
         this.notificationsService.success('The cluster ' + c.clustername + ' has been successfully created');
         this.router.navigate(['/cluster', this.cluster.clustername], { queryParams: { is_new: true } });
     }, (e) => {
@@ -100,12 +102,12 @@ export class ClusterComponent implements OnInit {
 
   private deleteCluster(cleanUp = false) {
     this.workInProgress = true;
-    this.clusterService.deleteCluster(this.cluster).finally(() => {
+    this.clusterService.deleteCluster(this.cluster).pipe(finalize(() => {
       this.workInProgress = false;
-    }).subscribe(c => {
+    })).subscribe(c => {
       if (cleanUp) {
 
-      }else{
+      }else {
         this.notificationsService.success('The cluster ' + this.cluster.clustername + ' has been successfully deleted');
       }
 
@@ -135,7 +137,7 @@ export class ClusterComponent implements OnInit {
   }
 
   setAvailableInstanceProfiles() {
-    console.log(this.cluster.s3_bucket)
+    console.log(this.cluster.s3_bucket);
     this.instanceProfiles = this.dataService.getInstanceProfilesForBucket(this.cluster.s3_bucket);
   }
 

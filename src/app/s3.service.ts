@@ -1,7 +1,7 @@
+
+import {forkJoin as observableForkJoin, Observable, of} from 'rxjs';
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import {of} from 'rxjs/observable/of';
-import 'rxjs/add/operator/mergeMap';
+
 
 import * as AWS from 'aws-sdk';
 import {NotificationsService} from 'angular2-notifications';
@@ -136,7 +136,7 @@ export class S3Service {
   }
 
   uploadFiles(bucketName, fileKeyPrefix, files): Observable<Array<boolean>> {
-    return Observable.forkJoin(Array.from(files)
+    return observableForkJoin(Array.from(files)
       .map(file => this.upload(bucketName, `${fileKeyPrefix}/${(file['webkitRelativePath'] || '/').split('/').slice(1)}`, file)));
   }
 

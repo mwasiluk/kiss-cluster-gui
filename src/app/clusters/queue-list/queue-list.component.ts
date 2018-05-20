@@ -5,16 +5,13 @@ import {Router} from '@angular/router';
 import {QueueService} from '../queue.service';
 import {Cluster} from '../cluster';
 import {QueueDetailsDialogComponent} from '../queue-details-dialog/queue-details-dialog.component';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/observable/interval';
-import 'rxjs/add/operator/switchMap';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
-import 'rxjs/add/operator/takeUntil';
-import {AppConfig} from "../../app-config";
-import {S3Service} from "../../s3.service";
-import {NotificationsService} from "angular2-notifications";
-import {BaseListComponent} from "../../base-list/base-list.component";
-import {RegionService} from "../../region.service";
+import {Observable, ReplaySubject} from 'rxjs';
+
+import {AppConfig} from '../../app-config';
+import {S3Service} from '../../s3.service';
+import {NotificationsService} from 'angular2-notifications';
+import {BaseListComponent} from '../../base-list/base-list.component';
+import {RegionService} from '../../region.service';
 @Component({
   selector: 'app-queue-list',
   templateUrl: './queue-list.component.html',

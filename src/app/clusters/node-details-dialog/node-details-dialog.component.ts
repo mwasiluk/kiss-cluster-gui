@@ -1,8 +1,8 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {Node} from '../node';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {AppConfig} from "../../app-config";
-import {NodeService} from "../node.service";
+import {AppConfig} from '../../app-config';
+import {NodeService} from '../node.service';
 
 @Component({
   selector: 'app-node-details-dialog',

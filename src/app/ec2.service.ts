@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { Observable ,  of } from 'rxjs';
 
 import {NotificationsService} from 'angular2-notifications';
 import {RegionService} from './region.service';
@@ -9,8 +8,8 @@ import * as AWS from 'aws-sdk';
 import * as IAM from 'aws-sdk/clients/iam';
 
 import {AppConfig} from './app-config';
-import {AssetsService} from "./assets.service";
-import {DataService} from "./data.service";
+import {AssetsService} from './assets.service';
+import {DataService} from './data.service';
 
 
 @Injectable()

@@ -1,13 +1,10 @@
+
+import {interval as observableInterval, Observable, ReplaySubject, Subscription} from 'rxjs';
+
+import {switchMap, takeUntil, startWith} from 'rxjs/operators';
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatPaginator, MatTableDataSource, MatSort} from '@angular/material';
 import {RegionService} from '../region.service';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/observable/interval';
-import 'rxjs/add/operator/switchMap';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
-import 'rxjs/add/operator/takeUntil';
-import 'rxjs/add/operator/startWith';
-import {Subscription} from 'rxjs/Subscription';
 import {AppConfig} from '../app-config';
 
 @Component({
@@ -37,7 +34,7 @@ export class BaseListComponent<T> implements OnInit, OnDestroy, AfterViewInit {
     throw new Error('onLoaded method not implemented!');
   }
 
-  onLoadingError(e){
+  onLoadingError(e) {
     throw new Error('onLoadingError method not implemented!');
   }
 
@@ -58,12 +55,12 @@ export class BaseListComponent<T> implements OnInit, OnDestroy, AfterViewInit {
 
   getItems(startImmediatelly = false): void {
 
-    this.subscription = Observable.interval(AppConfig.polling_interval).startWith(startImmediatelly ? 0 : AppConfig.polling_interval)
-      .takeUntil(this.destroyed$)
-      .switchMap(() => {
+    this.subscription = observableInterval(AppConfig.polling_interval).pipe(startWith(startImmediatelly ? 0 : AppConfig.polling_interval),
+      takeUntil(this.destroyed$),
+      switchMap(() => {
         this.workInProgress++;
         return this.loadData();
-      })
+      }))
       .subscribe(items => {
         setTimeout(() => this.workInProgress--, 500);
         this.dataSource.data = items;

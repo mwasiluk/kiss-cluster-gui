@@ -1,5 +1,8 @@
+
+import {forkJoin as observableForkJoin,  Observable } from 'rxjs';
+
+import {map} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 
 import {Node} from './node';
 
@@ -9,8 +12,8 @@ import {RegionService} from '../region.service';
 import {NotificationsService} from 'angular2-notifications';
 import {CrudBaseService} from '../crud-base.service';
 import {UtilsService} from '../utils.service';
-import {Ec2Service} from "../ec2.service";
-import {Cluster} from "./cluster";
+import {Ec2Service} from '../ec2.service';
+import {Cluster} from './cluster';
 
 @Injectable()
 export class NodeService  extends CrudBaseService<Node> {
@@ -35,8 +38,8 @@ export class NodeService  extends CrudBaseService<Node> {
     if (!fetchInstanceInfo) {
       return all;
     }
-    return Observable.forkJoin([all, this.ec2Service.describeInstances()]).map(r => {
-      let instances = <AWS.EC2.Reservation[]>r[1];
+    return observableForkJoin([all, this.ec2Service.describeInstances()]).pipe(map(r => {
+      const instances = <AWS.EC2.Reservation[]>r[1];
 
       const nodes = <Node[]>r[0];
       const nodesByInstanceId = {};
@@ -53,7 +56,7 @@ export class NodeService  extends CrudBaseService<Node> {
       });
 
       return nodes;
-    });
+    }));
   }
 
   getCreateTableInput(clustername): AWS.DynamoDB.CreateTableInput {

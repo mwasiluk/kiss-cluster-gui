@@ -6,11 +6,11 @@ import {CredentialsCsvService} from '../csv.service';
 import {Credentials} from 'aws-sdk';
 import {forEach} from '@angular/router/src/utils/collection';
 import {NotificationsService} from 'angular2-notifications';
-import {Observable} from 'rxjs/Observable';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
+import {Observable, ReplaySubject} from 'rxjs';
 import {CloudFormationService} from '../cloud-formation.service';
 import {MatDialog} from '@angular/material';
 import {CloudFormationDialogComponent} from '../cloud-formation-dialog/cloud-formation-dialog.component';
+import {finalize} from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -44,7 +44,7 @@ export class LoginComponent implements OnInit {
     this.inProgress++;
     this.message = 'Trying to log in ...';
 
-    this.authService.login(this.credentials).finally(() => this.inProgress--).subscribe((r) => {
+    this.authService.login(this.credentials).pipe(finalize(() => this.inProgress--)).subscribe((r) => {
       this.setMessage();
       if (this.authService.isLoggedIn) {
         // Get the redirect URL from our auth service

@@ -1,8 +1,9 @@
+
+import {forkJoin as observableForkJoin, Observable, of} from 'rxjs';
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs/Observable';
-import {of} from 'rxjs/observable/of';
 import {AppConfig} from './app-config';
+import {flatMap} from 'rxjs/operators';
 
 @Injectable()
 export class AssetsService {
@@ -17,14 +18,14 @@ export class AssetsService {
       return of(this.cache[assetName]);
     }
 
-    return this.http.get(`assets/${assetName}`, {responseType: responseType as 'text'}).flatMap(data => {
+    return this.http.get(`assets/${assetName}`, {responseType: responseType as 'text'}).pipe(flatMap(data => {
       this.cache[assetName] = data;
       return of(data);
-    });
+    }));
   }
 
   public getAllScripts(): Observable<any> {
-    return Observable.forkJoin(AppConfig.SCRIPT_NAMES.map(s => this.get(`sh/${s}`))).flatMap(r => of(this.cache));
+    return observableForkJoin(AppConfig.SCRIPT_NAMES.map(s => this.get(`sh/${s}`))).pipe(flatMap(r => of(this.cache)));
   }
 
 }

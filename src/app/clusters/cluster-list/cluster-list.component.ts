@@ -4,15 +4,11 @@ import {MatPaginator, MatTableDataSource, MatSort} from '@angular/material';
 import {Cluster} from '../cluster';
 import {ClusterService} from '../cluster.service';
 import {RegionService} from '../../region.service';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/observable/interval';
-import 'rxjs/add/operator/switchMap';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
-import 'rxjs/add/operator/takeUntil';
-import 'rxjs/add/operator/startWith';
+import {Observable, ReplaySubject, Subscription} from 'rxjs';
+
+
 import {AppConfig} from '../../app-config';
 import {NotificationsService} from 'angular2-notifications';
-import {Subscription} from 'rxjs/Subscription';
 import {BaseListComponent} from '../../base-list/base-list.component';
 
 

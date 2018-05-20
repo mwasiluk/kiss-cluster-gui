@@ -3,15 +3,17 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {SpotFleet} from '../spot-fleet';
 import {SpotFleetService} from '../spot-fleet.service';
 import {NotificationsService} from 'angular2-notifications';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/catch';
+import {Observable, forkJoin, of} from 'rxjs';
+import {DataService} from '../../data.service';
+import {finalize, map} from 'rxjs/operators';
+
 import {Cluster} from '../../clusters/cluster';
 import {AppConfig} from '../../app-config';
 import {ClusterService} from '../../clusters/cluster.service';
 import * as AWS from 'aws-sdk';
 import {FormControl} from '@angular/forms';
 import * as _ from 'lodash';
-import {DataService} from "../../data.service";
+
 
 @Component({
   selector: 'app-spot-fleet-dialog',
@@ -67,8 +69,8 @@ export class SpotFleetDialogComponent implements OnInit {
       fork.push(this.getClusters());
     }
 
-    Observable.forkJoin(fork
-    ).finally(() => this.workInProgress--)
+    forkJoin(fork
+    ).pipe(finalize(() => this.workInProgress--))
       .subscribe(r => {
         this.setData(this.data.cluster, this.data.spotFleet);
       }, e => {
@@ -80,7 +82,7 @@ export class SpotFleetDialogComponent implements OnInit {
   private getClusters(): Observable<Cluster[]> {
     this.workInProgress++;
     return new Observable(observer => {
-      this.clusterService.getClusters(false, false, false).finally(() => this.workInProgress--)
+      this.clusterService.getClusters(false, false, false).pipe(finalize(() => this.workInProgress--))
         .subscribe(clusters => {
           this.clusters = clusters.filter(c => !c.template);
           this.templateCluster = _.find(clusters, c => c.template);
@@ -99,7 +101,7 @@ export class SpotFleetDialogComponent implements OnInit {
 
     this.spotFleet = spotFleet;
 
-    if (!this.spotFleet || !this.spotFleet.data){
+    if (!this.spotFleet || !this.spotFleet.data) {
       return;
     }
 
@@ -130,26 +132,26 @@ export class SpotFleetDialogComponent implements OnInit {
   }
 
   private setAvailableData(fetchTemplateCluster = false): Observable<boolean> {
-    return Observable.forkJoin(
+    return forkJoin(
       this.spotFleetService.getAvailableInstanceTypes(),
       this.spotFleetService.describeAMIs(),
       this.spotFleetService.describeSecurityGroups(),
       this.spotFleetService.describeKeyPairs(),
       this.spotFleetService.listIamInstanceProfiles(this.cluster ? this.cluster.s3_bucket : null),
-      fetchTemplateCluster ? this.clusterService.getTemplateCluster() : Observable.of(null)
-    ).map(r => {
+      fetchTemplateCluster ? this.clusterService.getTemplateCluster() : of(null)
+    ).pipe(map(r => {
         this.availableInstanceTypes = r[0];
         this.availableAMIs = r[1];
         this.availableSecurityGroups = r[2];
         this.availableKeyPairs = r[3];
         this.availableIamInstanceProfiles = r[4];
-        if(fetchTemplateCluster) {
+        if (fetchTemplateCluster) {
           this.templateCluster = r[5];
         }
         // this.spotFleet = r[5];
         console.log('result', r);
         return true;
-      });
+      }));
   }
 
   protected setData(cluster: Cluster, spotFleet: SpotFleet) {
@@ -159,10 +161,10 @@ export class SpotFleetDialogComponent implements OnInit {
     this.workInProgress++;
     this.cluster = cluster;
 
-    Observable.forkJoin(
-      spotFleet ? Observable.of(spotFleet) : this.spotFleetService.getNewSpotFleetConfig(cluster),
+    forkJoin(
+      spotFleet ? of(spotFleet) : this.spotFleetService.getNewSpotFleetConfig(cluster),
       this.spotFleetService.listIamInstanceProfiles(this.cluster ? this.cluster.s3_bucket : null)
-    ).finally(() => this.workInProgress--)
+    ).pipe(finalize(() => this.workInProgress--))
       .subscribe(r => {
         this.setDefaults();
         this.setSpotFleet(r[0]);
@@ -222,9 +224,9 @@ export class SpotFleetDialogComponent implements OnInit {
 
   modifySpotFleetRequest() {
     this.workInProgress++;
-    this.spotFleetService.modifySpotFleetRequest(this.spotFleet).finally(() => {
+    this.spotFleetService.modifySpotFleetRequest(this.spotFleet).pipe(finalize(() => {
       this.workInProgress--;
-    }).subscribe(r => {
+    })).subscribe(r => {
       this.notificationsService.success('Spot fleet modification success!');
       console.log(r);
       this.mode = 'view';
@@ -247,9 +249,10 @@ export class SpotFleetDialogComponent implements OnInit {
 
     console.log('Extracted IAM:', this.iamId);
 
-    this.spotFleetService.requestSpotFleet(this.spotFleet, this.cluster, this.instanceTypes, this.iamId, this.amiId, this.iamInstanceProfileArn, this.securityGroup.GroupId, this.keyPairName).finally(() => {
+    this.spotFleetService.requestSpotFleet(this.spotFleet, this.cluster, this.instanceTypes, this.iamId, this.amiId,
+      this.iamInstanceProfileArn, this.securityGroup.GroupId, this.keyPairName).pipe(finalize(() => {
       this.workInProgress--;
-    }).subscribe(r => {
+    })).subscribe(r => {
       this.notificationsService.success('Spot fleet request success!');
       console.log(r);
       this.dialogRef.close(r);

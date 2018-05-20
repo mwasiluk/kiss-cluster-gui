@@ -5,11 +5,8 @@ import {Router} from '@angular/router';
 import {NodeService} from '../node.service';
 import {Cluster} from '../cluster';
 import {NodeDetailsDialogComponent} from '../node-details-dialog/node-details-dialog.component';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/observable/interval';
-import 'rxjs/add/operator/switchMap';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
-import 'rxjs/add/operator/takeUntil';
+import {Observable, ReplaySubject} from 'rxjs';
+
 import {AppConfig} from '../../app-config';
 import {NotificationsService} from 'angular2-notifications';
 import {BaseListComponent} from '../../base-list/base-list.component';
