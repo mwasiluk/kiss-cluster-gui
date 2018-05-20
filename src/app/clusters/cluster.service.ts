@@ -201,7 +201,7 @@ export class ClusterService extends CrudBaseService<Cluster> {
 
     }).flatMap(result => {
       console.log('dynamodb tables created', result);
-      if (!result || !result.every(r => r)) {
+      if (!result || !result.every(r => !!r)) {
         return Observable.throw('Error creating DynamoDB tables');
       }
 

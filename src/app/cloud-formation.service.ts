@@ -56,7 +56,7 @@ export class CloudFormationService {
    */
   createStack(withUpdate = true): Observable<any> {
     const createOb = this.assetsService.get('kissCloudFormation.yaml').flatMap(templateBody => {
-      return new Observable(observer => {
+      return new Observable<any>(observer => {
         this.cf.createStack({
           StackName: AppConfig.STACK_NAME,
           TemplateBody: templateBody,
@@ -109,7 +109,7 @@ export class CloudFormationService {
     const changeSetName = AppConfig.CHANGE_SET_NAME;
 
     return this.assetsService.get('kissCloudFormationUpdate.yaml').flatMap(templateBody => {
-      return new Observable(observer => {
+      return new Observable<any>(observer => {
         this.cf.createChangeSet({
           ChangeSetName: changeSetName,
           StackName: AppConfig.STACK_NAME,
