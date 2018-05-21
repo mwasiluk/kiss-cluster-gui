@@ -36,10 +36,11 @@ import {UtilsService} from './utils.service';
 import {S3Service} from './s3.service';
 import {SpotFleetsModule} from './spot-fleets/spot-fleets.module';
 import {Ec2Service} from './ec2.service';
-import {BaseListComponent} from "./base-list/base-list.component";
-import {CloudFormationService} from "./cloud-formation.service";
+import {BaseListComponent} from './base-list/base-list.component';
+import {CloudFormationService} from './cloud-formation.service';
 import { CloudFormationDialogComponent } from './cloud-formation-dialog/cloud-formation-dialog.component';
 import { StackEventsListComponent } from './stack-events-list/stack-events-list.component';
+import {AppConfigService} from './app-config.service';
 
 
 @NgModule({
@@ -69,7 +70,7 @@ import { StackEventsListComponent } from './stack-events-list/stack-events-list.
     LoginRoutingModule,
     AppRoutingModule
   ],
-  providers: [RegionService, CredentialsCsvService, AssetsService, DataService, UtilsService, S3Service, Ec2Service, CloudFormationService],
+  providers: [RegionService, CredentialsCsvService, AssetsService, DataService, UtilsService, S3Service, Ec2Service, CloudFormationService, AppConfigService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

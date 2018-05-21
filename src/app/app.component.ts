@@ -16,6 +16,7 @@ import {ClusterService} from './clusters/cluster.service';
 import {BreadcrumbsService} from 'ng2-breadcrumbs';
 import {CloudFormationService} from './cloud-formation.service';
 import {map, finalize} from 'rxjs/operators';
+import {AppConfigService} from "./app-config.service";
 
 @Component({
   selector: 'app-root',
@@ -36,13 +37,18 @@ export class AppComponent  implements OnInit {
     theClass: 'notification'
   };
 
-  constructor(private router: Router, public dialog: MatDialog, public authService: AuthService, public regionService: RegionService,
+  constructor(private router: Router, public dialog: MatDialog, public authService: AuthService, public regionService: RegionService, private appConfigService: AppConfigService,
               private dataService: DataService, private s3Service: S3Service, private notificationsService: NotificationsService,
               private clusterService: ClusterService, private breadcrumbs: BreadcrumbsService, private cloudFormationService: CloudFormationService) {}
 
   ngOnInit(): void {
 
     this.breadcrumbs.storePrefixed({label: 'Home' , url: '/', params: []});
+    this.workInProgress = true;
+    this.appConfigService.getConfig().subscribe(conf => {
+      this.workInProgress = false;
+    })
+
     this.setAvailableRegions();
     this.regionService.subscribe(r => {
       if (this.authService.isLoggedIn) {
@@ -75,21 +81,6 @@ export class AppComponent  implements OnInit {
         this.router.navigate(['login']);
         return;
       }
-      /*this.s3Service.listBuckets().catch(e => {
-        console.log('catch', e);
-        this.notificationsService.error(e);
-        return Observable.throw(e);
-      }).subscribe(
-        function (x) {
-          console.log('Next: ', x);
-        },
-        function (err) {
-          console.log('Error: ' + err);
-        },
-        function () {
-          console.log('Completed');
-        });
-      */
     },  (err) => {
       console.log('Error: ' + err);
     }, () => {
