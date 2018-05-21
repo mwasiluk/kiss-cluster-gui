@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SpotFleetListComponent } from './spot-fleet-list.component';
 
-describe('SpotFleetListComponent', () => {
+xdescribe('SpotFleetListComponent', () => {
   let component: SpotFleetListComponent;
   let fixture: ComponentFixture<SpotFleetListComponent>;
 

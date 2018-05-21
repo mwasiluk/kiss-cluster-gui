@@ -2,7 +2,7 @@ import { TestBed, inject } from '@angular/core/testing';
 
 import { SpotFleetService } from './spot-fleet.service';
 
-describe('SpotFleetService', () => {
+xdescribe('SpotFleetService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [SpotFleetService]
