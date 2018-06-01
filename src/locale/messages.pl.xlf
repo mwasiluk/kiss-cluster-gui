@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="global.button.close" datatype="html">
+        <source>Close</source>
+        <target>Zamknij</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/spot-fleets/spot-fleet-dialog/spot-fleet-dialog.component.ts</context>
+          <context context-type="linenumber">168</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/help-dialog/help-dialog.component.ts</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/about-dialog/about-dialog.component.ts</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/clusters/queue-details-dialog/queue-details-dialog.component.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/clusters/node-details-dialog/node-details-dialog.component.ts</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="85b79c9064aed1ead31ace985f31aa1363f6bdaf" datatype="html">
+        <source>Help</source>
+        <target>Pomoc</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/help-dialog/help-dialog.component.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <note priority="1" from="description">help.title</note>
+      </trans-unit>
+      <trans-unit id="ab3930196e7d7fa5cb1b54f0d8e8a8cf587aa4e4" datatype="html">
+        <source>
+  <x id="START_PARAGRAPH" ctype="x-p" equiv-text="&lt;p&gt;"/>Help help help<x id="CLOSE_PARAGRAPH" ctype="x-p" equiv-text="&lt;/p&gt;"/>
+
+</source><target>
+  <x id="START_PARAGRAPH" ctype="x-p" equiv-text="&lt;p&gt;"/>Pomoc ...<x id="CLOSE_PARAGRAPH" ctype="x-p" equiv-text="&lt;/p&gt;"/>
+
+</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/help-dialog/help-dialog.component.ts</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <note priority="1" from="description">help.content</note>
+      </trans-unit>
+      <trans-unit id="004b222ff9ef9dd4771b777950ca1d0e4cd4348a" datatype="html">
+        <source>About</source>
+        <target>Informacje</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/about-dialog/about-dialog.component.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <note priority="1" from="description">about.title</note>
+      </trans-unit>
+      <trans-unit id="272e1c8c3d07ee2ac103e0af1fcd358fbe18d8e7" datatype="html">
+        <source> Open </source>
+        <target> Otwórz </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/app.component.ts</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <note priority="1" from="description">menu.open</note>
+      </trans-unit>
+      <trans-unit id="977ad63c0dfa68a6f681a3cc2a1f6088196e3713" datatype="html">
+        <source> Save </source>
+        <target> Zapisz </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/app.component.ts</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <note priority="1" from="description">menu.save</note>
+      </trans-unit>
+      <trans-unit id="d21746b8b80de91d00dddfb32769dc6e51174342" datatype="html">
+        <source>
+         File
+      </source><target>
+         Plik
+      </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/app.component.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <note priority="1" from="description">menu.file</note>
+      </trans-unit>
+      <trans-unit id="04660baec8752bda5783a25c1b698a70a9913339" datatype="html">
+        <source>Region:</source>
+        <target>Region:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/app.component.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <note priority="1" from="description">menu.region</note>
+      </trans-unit>
+      <trans-unit id="2688971c6a1099532e40f4adce61203f71826bec" datatype="html">
+        <source>
+         Help
+      </source><target>
+         Pomoc
+      </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/app.component.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <note priority="1" from="description">menu.help</note>
+      </trans-unit>
+      <trans-unit id="ea113ee1f5f28c3102efbfd4280fbdaf2d5bfe27" datatype="html">
+        <source>
+         About
+      </source><target>
+         Informacje
+      </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/app.component.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <note priority="1" from="description">menu.about</note>
+      </trans-unit>
+      <trans-unit id="0ccc29c1c1c5da006492b78f7576fc1418826ecf" datatype="html">
+        <source>
+         Logout
+      </source><target>
+         Wyloguj
+      </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/app.component.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <note priority="1" from="description">menu.logout</note>
+      </trans-unit>
+      <trans-unit id="6765b4c916060f6bc42d9bb69e80377dbcb5e4e9" datatype="html">
+        <source>Login</source>
+        <target>Login</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/login/login.component.ts</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <note priority="1" from="description">login.login</note>
+      </trans-unit>
+      <trans-unit id="8ffb091c5182da556c95443a5e35ca598458c6c9" datatype="html">
+        <source>Run cloud formation</source>
+        <target>Uruchom CloudFormation</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/login/login.component.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <note priority="1" from="description">login.runCloudFormation</note>
+      </trans-unit>
+      <trans-unit id="bb694b49d408265c91c62799c2b3a7e3151c824d" datatype="html">
+        <source>Logout</source>
+        <target>Logout</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/login/login.component.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <note priority="1" from="description">login.logout</note>
+      </trans-unit>
+      <trans-unit id="global.button.save" datatype="html">
+        <source>Save</source>
+        <target>Zapisz</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/clusters/node-details-dialog/node-details-dialog.component.ts</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

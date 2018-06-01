@@ -43,6 +43,6 @@
 
 </div>
 <div mat-dialog-actions>
-  <button mat-button (click)="close()" tabindex="-1">Close</button>
+  <button mat-button (click)="close()" tabindex="-1" i18n="@@global.button.close">Close</button>
   <button mat-button (click)="onSubmit()" tabindex="-1" color="primary" [disabled]="!queueForm.form.valid || !appFiles.length" *ngIf="mode!=='view'">Submit</button>
 </div>

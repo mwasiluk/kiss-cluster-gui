@@ -56,6 +56,6 @@
 
 </div>
 <div mat-dialog-actions>
-  <button mat-button (click)="close()" tabindex="-1">Close</button>
-  <button mat-button (click)="close()" tabindex="-1" color="primary" *ngIf="mode!=='view'">Save</button>
+  <button mat-button (click)="close()" tabindex="-1" i18n="@@global.button.close">Close</button>
+  <button mat-button (click)="close()" tabindex="-1" color="primary" *ngIf="mode!=='view'" i18n="@@global.button.save">Save</button>
 </div>

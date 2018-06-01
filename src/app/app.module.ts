@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule } from '@angular/core';
 import {Form, FormsModule} from '@angular/forms';
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -70,7 +70,7 @@ import {AppConfigService} from './app-config.service';
     LoginRoutingModule,
     AppRoutingModule
   ],
-  providers: [RegionService, CredentialsCsvService, AssetsService, DataService, UtilsService, S3Service, Ec2Service, CloudFormationService, AppConfigService],
+  providers: [{ provide: LOCALE_ID, useValue: 'en' }, RegionService, CredentialsCsvService, AssetsService, DataService, UtilsService, S3Service, Ec2Service, CloudFormationService, AppConfigService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

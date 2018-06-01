@@ -165,7 +165,7 @@
 
 </div>
 <div mat-dialog-actions>
-  <button mat-button (click)="close()" tabindex="-1">Close</button>
+  <button mat-button (click)="close()" tabindex="-1" i18n="@@global.button.close">Close</button>
   <button mat-button (click)="onSubmit()" tabindex="-1" color="primary" [disabled]="!spotFleetForm.form.valid || !spotFleetForm.form.dirty || mode === 'create' && !cluster" *ngIf="mode!=='view'">Submit</button>
   <button mat-button (click)="edit()" tabindex="-1" color="primary"  *ngIf="mode==='view' && spotFleet && spotFleet.data.SpotFleetRequestState !== 'cancelled'">Edit</button>
 </div>

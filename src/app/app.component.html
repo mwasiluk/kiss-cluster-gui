@@ -3,13 +3,13 @@
   <mat-toolbar class="toolbar" *ngIf="authService.isLoggedIn">
 
       <mat-menu #appMenu="matMenu">
-        <button mat-menu-item (click)="openFile()"> Open </button>
-        <button mat-menu-item > Save </button>
+        <button mat-menu-item (click)="openFile()" i18n="menu.open"> Open </button>
+        <button mat-menu-item i18n="menu.save"> Save </button>
       </mat-menu>
 
 
     <div class="toolbar-group">
-      <span class="file-menu-button" [matMenuTriggerFor]="appMenu">
+      <span class="file-menu-button" [matMenuTriggerFor]="appMenu" i18n="menu.file">
          File
       </span>
     </div>
@@ -17,7 +17,7 @@
 
 
     <div class="toolbar-group region-select">
-      <label>Region:</label>
+      <label i18n="menu.region">Region:</label>
       <mat-form-field class="region-form-field">
         <mat-select [(ngModel)]="regionService.region" (ngModelChange)="regionService.update()">
           <mat-option *ngFor="let r of availableRegions" [value]="r">{{ r }}</mat-option>
@@ -34,19 +34,19 @@
     <span class="fill-remaining-space"></span>
 
     <div class="toolbar-group">
-      <span class="help-menu-button" (click)="openHelpDialog()">
+      <span class="help-menu-button" (click)="openHelpDialog()" i18n="menu.help">
          Help
       </span>
     </div>
     <div class="separator"></div>
     <div class="toolbar-group">
-      <span class="about-menu-button" (click)="openAboutDialog()">
+      <span class="about-menu-button" (click)="openAboutDialog()" i18n="menu.about">
          About
       </span>
     </div>
     <div class="separator"></div>
     <div class="toolbar-group">
-      <span class="about-menu-button" (click)="logout()">
+      <span class="about-menu-button" (click)="logout()" i18n="menu.logout">
          Logout
       </span>
     </div>

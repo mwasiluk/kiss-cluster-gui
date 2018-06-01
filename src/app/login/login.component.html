@@ -21,9 +21,9 @@
 
     </mat-card-content>
     <mat-card-actions *ngIf="!inProgress">
-      <button mat-button (click)="login()"  *ngIf="!authService.isLoggedIn" [disabled]="!credentials">Login</button>
-      <button mat-button (click)="initCloud()"  *ngIf="!authService.isLoggedIn" [disabled]="!credentials">Run cloud formation</button>
-      <button mat-button (click)="logout()" *ngIf="authService.isLoggedIn">Logout</button>
+      <button mat-button (click)="login()"  *ngIf="!authService.isLoggedIn" [disabled]="!credentials" i18n="login.login">Login</button>
+      <button mat-button (click)="initCloud()"  *ngIf="!authService.isLoggedIn" [disabled]="!credentials" i18n="login.runCloudFormation">Run cloud formation</button>
+      <button mat-button (click)="logout()" *ngIf="authService.isLoggedIn" i18n="login.logout">Logout</button>
     </mat-card-actions>
   </mat-card>
 
